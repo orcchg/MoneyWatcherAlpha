@@ -1,0 +1,1 @@
+SUBDIRS=libmoneywatcher include exampleProgram
