@@ -18,16 +18,40 @@
 
 namespace mw {
 
-/// @struct Record
+/// @class Record
 /// @brief Represents a single record in Daily Table.
-struct Record {
-  ID_t id;
-  std::string name;
-  MoneyValue_t money;
-  DateTime datetime;
-  std::string description;
-  Status status;
-  void* data;
+class Record {
+ public:
+  // --------------------------------------------
+  /// @defgroup GET Getters for class members.
+  /// @{
+
+  /// @brief Gets an ID of the current record.
+  ID_t getID() const;
+  /// @brief Gets a name of the current record.
+  const std::string& getName() const;
+  /// @brief Gets an actual money balance of the current record.
+  const MoneyValue_t& getBalance() const;
+  /// @brief Gets the descriptive comment supplied with the
+  /// current record.
+  const std::string& getDescription() const;
+  /// @brief Gets the date and the clock time, when the current record
+  /// has been created.
+  const DateTime& getDateTime() const;
+  /// @brief Gets the status of the current record.
+  const Status& getStatus() const;
+  /// @brief Gets other data.
+  void* getData() const;
+  /// @}
+
+ private:
+  ID_t m_id;
+  std::string m_name;
+  MoneyValue_t m_balance;
+  std::string m_description;
+  DateTime m_datetime;
+  Status m_status;
+  void* m_data;
 };
 
 } /* namespace mw */
