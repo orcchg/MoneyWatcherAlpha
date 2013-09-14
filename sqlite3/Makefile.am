@@ -7,15 +7,15 @@ lib_LTLIBRARIES = libsqlite3formw.la
 #######################################
 # Build information for each library
 
-# Sources for libmoneywatcher
-libsqlite3formw_la_SOURCES = sqlite3.c
+# Sources for libsqlite3formw
+libsqlite3formw_la_SOURCES = sqlite3.c sqlite_driver.cc
 
-# Linker options libTestProgram
+# Linker options libsqlite3formw
 libsqlite3formw_la_LDFLAGS = 
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
-include_HEADERS = sqlite3.h
+include_HEADERS = sqlite3.h sqlite_driver.h
 
 libsqlite3formw_la_CPPFLAGS = -I$(top_srcdir)/sqlite3
 
