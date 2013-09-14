@@ -10,6 +10,7 @@
 #ifndef DAILY_TABLE_H_
 #define DAILY_TABLE_H_
 
+#include <string>
 #include <unordered_map>
 #include "hash.h"
 #include "record.h"
@@ -21,8 +22,13 @@ namespace mw {
 /// @brief Represents a table of daily changes.
 class DailyTable {
  public:
+  DailyTable(const std::string& table_name = "Daily Table");
+  virtual ~DailyTable();
+
+  void addRecord();
 
  private:
+  std::string m_table_name;
   std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 };
 

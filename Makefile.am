@@ -1,1 +1,1 @@
-SUBDIRS=libmoneywatcher include exampleProgram
+SUBDIRS=sqlite3 src include main
