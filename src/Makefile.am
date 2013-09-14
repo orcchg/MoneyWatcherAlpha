@@ -15,5 +15,5 @@ libmoneywatcher_la_LDFLAGS =
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
-libmoneywatcher_la_CPPFLAGS = -I$(top_srcdir)/include -std=c++11
+libmoneywatcher_la_CPPFLAGS = -I$(top_srcdir)/include
 
