@@ -21,7 +21,7 @@ namespace mw {
 /// @class Entry
 /// @brief Represents an element of Cycle Table.
 class Entry {
- public:
+public:
   // --------------------------------------------
   /// @defgroup GET Getters for class members.
   /// @{
@@ -71,7 +71,7 @@ class Entry {
   void clear();
   /// @}
 
- private:
+private:
   ID_t m_id;
   std::string m_name;
   MoneyValue_t m_current_balance;

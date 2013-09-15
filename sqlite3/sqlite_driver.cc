@@ -8,3 +8,8 @@
  */
 
 #include "sqlite_driver.h"
+
+
+namespace db {
+
+}  /* namespace db */

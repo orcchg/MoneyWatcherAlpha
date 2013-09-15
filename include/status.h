@@ -16,7 +16,6 @@ namespace mw {
 /// @class Status
 /// @brief Represents various statuses of data.
 class Status {
- public:
 };
 
 }  /* namespace mw */

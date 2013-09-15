@@ -21,7 +21,7 @@ namespace mw {
 /// @class Record
 /// @brief Represents a single record in Daily Table.
 class Record {
- public:
+public:
   // --------------------------------------------
   /// @defgroup GET Getters for class members.
   /// @{
@@ -44,7 +44,7 @@ class Record {
   void* getData() const;
   /// @}
 
- private:
+private:
   ID_t m_id;
   std::string m_name;
   MoneyValue_t m_balance;

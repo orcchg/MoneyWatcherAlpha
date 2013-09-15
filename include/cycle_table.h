@@ -21,11 +21,11 @@ namespace mw {
 /// @class CycleTable
 /// @brief Represents a table of entries, updating once per certain cycle.
 class CycleTable {
- public:
+public:
   void addEntry(const std::string& name);
   Entry& getEntry(ID_t entry_id) const;
 
- private:
+private:
   std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
 };
 

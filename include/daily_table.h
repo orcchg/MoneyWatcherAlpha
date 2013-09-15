@@ -21,13 +21,13 @@ namespace mw {
 /// @class DailyTable
 /// @brief Represents a table of daily changes.
 class DailyTable {
- public:
+public:
   DailyTable(const std::string& table_name = "Daily Table");
   virtual ~DailyTable();
 
   void addRecord();
 
- private:
+private:
   std::string m_table_name;
   std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 };
