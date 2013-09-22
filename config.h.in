@@ -106,8 +106,8 @@
 /* Define for large files, on AIX-style hosts. */
 #undef _LARGE_FILES
 
-/* "Disabled caching from database" */
+/* Disabled caching from database */
 #undef __MW_ENABLE_CACHING__
 
-/* "Disabled logging in source code" */
+/* Disabled logging in source code */
 #undef __MW_ENABLE_LOGGING__

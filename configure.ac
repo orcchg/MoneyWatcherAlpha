@@ -50,19 +50,21 @@ dnl MoneyWatcher-specific options
 #
 AC_ARG_ENABLE(caching, [AS_HELP_STRING(
   [--enable-caching],
-  [use RAM caching of recent data from the database (yes, no) [default=yes]])],
+  [use RAM caching of recent data from the database (yes, no) [default=no]])],
   [case "${enableval}" in
     yes) caching=true ;;
     no) caching=false ;;
     *) AC_MSG_ERROR([bad value ${enableval} for --enable-caching]) ;;
-   esac], [enable_caching=yes])
+   esac], [enable_caching=no])
 if  test x"$enable_caching" != xno ; then
   # Enable data caching into RAM from database for more rapid access
-  AC_DEFINE([__MW_ENABLE_CACHING__], [true], ["Enabled caching from database"])
+  AC_DEFINE([__MW_ENABLE_CACHING__], [true], [Enabled caching from database])
   CFLAGS="$CFLAGS -DENABLE_CACHING"
   CXXFLAGS="$CXXFLAGS -DENABLE_CACHING"
+  AC_MSG_NOTICE([Enabled caching from database])
 else
-  AC_DEFINE([__MW_ENABLE_CACHING__], [false], ["Disabled caching from database"])
+  AC_DEFINE([__MW_ENABLE_CACHING__], [false], [Disabled caching from database])
+  AC_MSG_NOTICE([Disabled caching from database])
 fi
 AM_CONDITIONAL([ENABLE_CACHING], [test x$enable_caching != xno])
 
@@ -71,20 +73,22 @@ AM_CONDITIONAL([ENABLE_CACHING], [test x$enable_caching != xno])
 #
 AC_ARG_ENABLE(logging, [AS_HELP_STRING(
   [--enable-logging],
-  [record log messages of core sources for debug (yes, no) [default=yes]])],
+  [record log messages of core sources for debug (yes, no) [default=no]])],
   [case "${enableval}" in
     yes) logging=true ;;
     no) logging=false ;;
     *) AC_MSG_ERROR([bad value ${enableval} for --enable-logging]) ;;
-   esac], [enable_logging=yes])
+   esac], [enable_logging=no])
 AS_IF([test "x$enable_logging" != "xno"],
   [dnl Enable logging system for core sources debug
   CFLAGS="$CFLAGS -DENABLE_LOGGING"
   CXXFLAGS="$CXXFLAGS -DENABLE_LOGGING"
-  AC_DEFINE([__MW_ENABLE_LOGGING__], [true], ["Enabled logging in source code"])
+  AC_DEFINE([__MW_ENABLE_LOGGING__], [true], [Enabled logging in source code])
+  AC_MSG_NOTICE([Enabled logging in source code])
 ])
 AS_IF([test "x$enable_logging" == "xno"],
-  [AC_DEFINE([__MW_ENABLE_LOGGING__], [false], ["Disabled logging in source code"])
+  [AC_DEFINE([__MW_ENABLE_LOGGING__], [false], [Disabled logging in source code])
+  AC_MSG_NOTICE([Disabled logging in source code])
 ])
 AM_CONDITIONAL([ENABLE_LOGGING], [test x$enable_logging != xno])
 
