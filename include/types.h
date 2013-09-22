@@ -11,7 +11,7 @@
 #define TYPES_H_
 
 #include <stdint.h>
-#include "sqlite3.h"
+#include "../sqlite3/sqlite3.h"
 
 
 typedef int64_t ID_t;

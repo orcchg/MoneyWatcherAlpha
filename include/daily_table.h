@@ -31,7 +31,7 @@ public:
 private:
   std::string m_table_name;
   DB_Handler m_db_handler;
-  std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
+  __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 
   void __open_database__();
   void __close_database__();

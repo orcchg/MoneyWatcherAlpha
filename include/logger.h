@@ -10,9 +10,9 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-#define ENABLE_LOGGING 1
+#include "common.h"
 
-#if ENABLE_LOGGING
+#if ENABLED_LOGGING
 #include <stdio.h>
 #include <stdarg.h>
 

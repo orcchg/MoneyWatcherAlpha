@@ -1,4 +1,4 @@
-dnl Process this file with autoconf to produce a configure script.
+dnl Process this file with autoconf to produce a configure script
 
 AC_PREREQ(2.61)
 AC_INIT(MoneyWatcherAlpha, 1.0)
@@ -14,13 +14,14 @@ AC_PROG_LIBTOOL
 AC_PROG_MKDIR_P
 
 AC_CANONICAL_SYSTEM
+AC_CONFIG_HEADERS([config.h])
 
 dnl Initialize and use automake
 AM_INIT_AUTOMAKE([foreign])
 
 AC_SYS_LARGEFILE
 
-dnl Check for library functions that SQLite can optionally use.
+dnl Check for library functions that SQLite can optionally use
 AC_CHECK_FUNCS([fdatasync usleep fullfsync localtime_r gmtime_r])
 AC_FUNC_STRERROR_R
 
@@ -34,6 +35,7 @@ dnl Check if Libtool is present
 dnl Libtool is used for building share libraries 
 AC_PROG_LIBTOOL
 
+dnl Link with Makefile.am in source directories
 AC_CONFIG_FILES(Makefile
                 sqlite3/Makefile
                 src/Makefile
@@ -41,6 +43,50 @@ AC_CONFIG_FILES(Makefile
                 include/Makefile)
                 
 AC_SUBST(BUILD_CFLAGS)
+
+dnl MoneyWatcher-specific options
+#-----------------------------------------------------------------------
+#   --enable-caching
+#
+AC_ARG_ENABLE(caching, [AS_HELP_STRING(
+  [--enable-caching],
+  [use RAM caching of recent data from the database (yes, no) [default=yes]])],
+  [case "${enableval}" in
+    yes) caching=true ;;
+    no) caching=false ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-caching]) ;;
+   esac], [enable_caching=yes])
+if  test x"$enable_caching" != xno ; then
+  # Enable data caching into RAM from database for more rapid access
+  AC_DEFINE([__MW_ENABLE_CACHING__], [true], ["Enabled caching from database"])
+  CFLAGS="$CFLAGS -DENABLE_CACHING"
+  CXXFLAGS="$CXXFLAGS -DENABLE_CACHING"
+else
+  AC_DEFINE([__MW_ENABLE_CACHING__], [false], ["Disabled caching from database"])
+fi
+AM_CONDITIONAL([ENABLE_CACHING], [test x$enable_caching != xno])
+
+#-----------------------------------------------------------------------
+#   --enable-logging
+#
+AC_ARG_ENABLE(logging, [AS_HELP_STRING(
+  [--enable-logging],
+  [record log messages of core sources for debug (yes, no) [default=yes]])],
+  [case "${enableval}" in
+    yes) logging=true ;;
+    no) logging=false ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-logging]) ;;
+   esac], [enable_logging=yes])
+AS_IF([test "x$enable_logging" != "xno"],
+  [dnl Enable logging system for core sources debug
+  CFLAGS="$CFLAGS -DENABLE_LOGGING"
+  CXXFLAGS="$CXXFLAGS -DENABLE_LOGGING"
+  AC_DEFINE([__MW_ENABLE_LOGGING__], [true], ["Enabled logging in source code"])
+])
+AS_IF([test "x$enable_logging" == "xno"],
+  [AC_DEFINE([__MW_ENABLE_LOGGING__], [false], ["Disabled logging in source code"])
+])
+AM_CONDITIONAL([ENABLE_LOGGING], [test x$enable_logging != xno])
 
 dnl SQLite-specific options
 #-----------------------------------------------------------------------

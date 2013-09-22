@@ -17,15 +17,15 @@ namespace mw {
 
 DailyTable::DailyTable(const std::string& table_name)
   : m_table_name(table_name)
-  , m_db_handler(NULL) {
+  , m_db_handler(nullptr) {
   DBG("enter DailyTable constructor.");
-  //
+  this->__open_database__();
   DBG("exit DailyTable constructor.");
 }
 
 DailyTable::~DailyTable() {
   DBG("enter DailyTable destructor.");
-  //
+  this->__close_database__();
   DBG("exit DailyTable destructor.");
 }
 
