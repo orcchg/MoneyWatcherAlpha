@@ -29,7 +29,7 @@ public:
   /// @brief Gets an ID of the current entry.
   ID_t getID() const;
   /// @brief Gets a name of the current entry.
-  const std::string& getName() const;
+  const std::wstring& getName() const;
   /// @brief Gets an actual money balance of the current entry.
   const MoneyValue_t& getBalance() const;
   /// @brief Gets a money value of the last transaction
@@ -73,7 +73,7 @@ public:
 
 private:
   ID_t m_id;
-  std::string m_name;
+  std::wstring m_name;
   MoneyValue_t m_current_balance;
   MoneyValue_t m_last_transaction;
   DateTime m_datetime;

@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include "hash.h"
 #include "record.h"
+#include "types.h"
 
 
 namespace mw {
@@ -29,7 +30,11 @@ public:
 
 private:
   std::string m_table_name;
+  DB_Handler m_db_handler;
   std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
+
+  void __open_database__();
+  void __close_database__();
 };
 
 }  /* namespace mw */

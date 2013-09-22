@@ -18,7 +18,7 @@ ID_t Entry::getID() const {
   return (this->m_id);
 }
 
-const std::string& Entry::getName() const {
+const std::wstring& Entry::getName() const {
   return (this->m_name);
 }
 

@@ -11,9 +11,12 @@
 #define TYPES_H_
 
 #include <stdint.h>
+#include "sqlite3.h"
 
 
 typedef int64_t ID_t;
 typedef int64_t MoneyValue_t;
+
+typedef sqlite3* DB_Handler;
 
 #endif /* TYPES_H_ */
