@@ -14,8 +14,8 @@
 #include "../sqlite3/sqlite3.h"
 
 
-typedef int64_t ID_t;
-typedef int64_t MoneyValue_t;
+typedef sqlite3_int64 ID_t;
+typedef sqlite3_int64 MoneyValue_t;
 
 typedef sqlite3* DB_Handler;
 

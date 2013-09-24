@@ -26,7 +26,11 @@ public:
   DailyTable(const std::string& table_name = "Daily Table");
   virtual ~DailyTable();
 
-  void addRecord();
+  void addRecord(
+      const std::wstring& name,
+      const MoneyValue_t& balance,
+      const std::wstring& description,
+      const Status& status);
 
 private:
   std::string m_table_name;
@@ -35,6 +39,7 @@ private:
 
   void __open_database__();
   void __close_database__();
+  void __create_table__();
 };
 
 }  /* namespace mw */
