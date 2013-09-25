@@ -33,13 +33,15 @@ public:
       const Status& status);
 
 private:
-  std::string m_table_name;
+  std::string m_db_name;
   DB_Handler m_db_handler;
+  DB_Statement m_db_statement;
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 
   void __open_database__();
   void __close_database__();
   void __create_table__();
+  void __terminate__(const char* message);
 };
 
 }  /* namespace mw */

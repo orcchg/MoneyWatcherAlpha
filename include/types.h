@@ -18,5 +18,6 @@ typedef sqlite3_int64 ID_t;
 typedef sqlite3_int64 MoneyValue_t;
 
 typedef sqlite3* DB_Handler;
+typedef sqlite3_stmt* DB_Statement;
 
 #endif /* TYPES_H_ */
