@@ -22,6 +22,12 @@ DailyTable::DailyTable(const std::string& db_name)
   , m_db_statement(nullptr) {
   DBG("enter DailyTable constructor.");
   this->__open_database__();
+  try {
+    this->__create_table__();
+  } catch(std::runtime_error& e) {
+    ERR(e.what());
+    this->__terminate__("Error during create table.");
+  }
   DBG("exit DailyTable constructor.");
 }
 
@@ -48,9 +54,7 @@ void DailyTable::__open_database__() {
   int result = sqlite3_open(this->m_db_name.c_str(), &(this->m_db_handler));
   if (result != SQLITE_OK) {
     ERR("Unable to open database \"%s\"!", this->m_db_name.c_str());
-    sqlite3_close(this->m_db_handler);
-    this->m_db_handler = nullptr;
-    TRC("Database \"%s\" has been shut down.", this->m_db_name.c_str());
+    this->__terminate__("Error during open database.");
     throw std::runtime_error("Unable to open database \"%s\"!",
                              this->m_db_name.c_str());
   }
@@ -62,11 +66,13 @@ void DailyTable::__open_database__() {
 void DailyTable::__close_database__() {
   DBG("enter DailyTable::__close_database__().");
   if (this->m_db_handler) {
-    DBG("Found valid database handler.");
+    DBG("Found valid database handler at %p.", this->m_db_handler);
     sqlite3_close(this->m_db_handler);
     this->m_db_handler = nullptr;
     DBG("Database \"%s\" has been successfully closed.",
         this->m_db_name.c_str());
+  } else {
+    DBG("Database \"%s\" has been already shut down.", this->m_db_name);
   }
   DBG("exit DailyTable::__close_database__().");
 }
@@ -92,17 +98,24 @@ void DailyTable::__create_table__() {
   if (result != SQLITE_OK) {
     ERR("Unable to prepare statement \"%s\"!", statement);
     sqlite3_finalize(this->m_db_statement);
+    this->m_db_statement = nullptr;
     TRC("Statement \"%s\" has been finalized.", statement);
     throw std::runtime_error("Unable to prepare statement \"%s\"!", statement);
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   //
+  DBG("Table \"%s\" has been successfully created.", "Daily_Table");
   DBG("exit DailyTable::__create_table__().");
 }
 
 void DailyTable::__terminate__(const char* message) {
   DBG("enter DailyTable::__terminate__().");
+  WRN(message);
+  sqlite3_close(this->m_db_handler);
+  this->m_db_handler = nullptr;
+  TRC("Database \"%s\" has been shut down.", this->m_db_name.c_str());
+  DBG("exit DailyTable::__terminate__().");
 }
 
 }  /* namespace mw */
