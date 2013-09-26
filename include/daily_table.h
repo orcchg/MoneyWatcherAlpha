@@ -10,6 +10,7 @@
 #ifndef DAILY_TABLE_H_
 #define DAILY_TABLE_H_
 
+#include <exception>
 #include <string>
 #include <unordered_map>
 #include "hash.h"
@@ -44,6 +45,17 @@ private:
   void __close_database__();
   void __create_table__();
   void __terminate__(const char* message);
+};
+
+class DailyTableException : public std::exception {
+public:
+  DailyTableException(const char* message);
+  virtual ~DailyTableException();
+
+  const char* what() const throw();
+
+private:
+  const char* m_message;
 };
 
 }  /* namespace mw */
