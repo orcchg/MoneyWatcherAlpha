@@ -220,8 +220,9 @@ void DailyTable::__create_table__() {
 
 bool DailyTable::__does_table_exist__() {
   DBG("enter DailyTable::__does_table_exist__().");
-  const char* check_statement = "SELECT * FROM ";
+  const char* check_statement = "SELECT name FROM sqlite_master WHERE type='table' AND name=\"";
   strcat(const_cast<char*>(check_statement), DailyTable::table_name.c_str());
+  strcat(const_cast<char*>(check_statement), "\";");
   int nByte = static_cast<int>(strlen(check_statement));
   DBG("Provided string SQL statement: \"%s\" of length %i.", check_statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
