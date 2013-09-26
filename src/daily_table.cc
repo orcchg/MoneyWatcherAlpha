@@ -16,7 +16,8 @@
 
 namespace mw {
 
-DailyTable::next_id = 0;
+ID_t DailyTable::next_id = 0;
+const std::string DailyTable::table_name = "Daily_Table";
 
 DailyTable::DailyTable(const std::string& i_db_name)
   : m_db_name(i_db_name)
@@ -25,7 +26,9 @@ DailyTable::DailyTable(const std::string& i_db_name)
   DBG("enter DailyTable constructor.");
   this->__open_database__();
   try {
-    this->__create_table__();
+    if (!this->__does_table_exist__()) {
+      this->__create_table__();
+    }
   } catch(DailyTableException& e) {
     ERR(e.what());
     this->__terminate__("Error during create table.");
@@ -46,8 +49,9 @@ Record DailyTable::addRecord(
     const std::wstring& i_description,
     const Status& i_status) {
   DBG("enter DailyTable::addRecord().");
-  const char* insert_statement = "INSERT INTO Daily_Table"
-      " VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
+  const char* insert_statement = "INSERT INTO ";
+  strcat(const_cast<char*>(insert_statement), DailyTable::table_name.c_str());
+  strcat(const_cast<char*>(insert_statement), " VALUES(?1, ?2, ?3, ?4, ?5, ?6);");
   int nByte = static_cast<int>(strlen(insert_statement));
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
@@ -127,8 +131,16 @@ Record DailyTable::addRecord(
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
   TRC("Statement \"%s\" has been finalized.", insert_statement);
-  return (Record(i_balance, i_description, i_status));
+  Record record(i_balance, i_description, i_status);
+  DBG("Constructed output record.");
   DBG("exit DailyTable::addRecord().");
+  return (record);
+}
+
+bool DailyTable::load() {
+  DBG("enter DailyTable::load().");
+  //
+  DBG("exit DailyTable::load().");
 }
 
 /* Private members */
@@ -172,12 +184,14 @@ void DailyTable::__close_database__() {
 
 void DailyTable::__create_table__() {
   DBG("enter DailyTable::__create_table__().");
-  const char* statement = "CREATE TABLE Daily_Table("
-      "'ID' INTEGER PRIMARY KEY,"
+  const char* statement = "CREATE TABLE ";
+  strcat(const_cast<char*>(statement), DailyTable::table_name.c_str());
+  const char* tail = "('ID' INTEGER PRIMARY KEY,"
       "'Date' TEXT,"
       "'Time' TEXT,"
       "'Balance' INTEGER,"
       "'Description' TEXT);";
+  strcat(const_cast<char*>(statement), tail);
   int nByte = static_cast<int>(strlen(statement));
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
@@ -197,11 +211,42 @@ void DailyTable::__create_table__() {
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
-  DBG("Table \"%s\" has been successfully created.", "Daily_Table");
+  DBG("Table \"%s\" has been successfully created.", DailyTable::table_name.c_str());
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
   TRC("Statement \"%s\" has been finalized.", statement);
   DBG("exit DailyTable::__create_table__().");
+}
+
+bool DailyTable::__does_table_exist__() {
+  DBG("enter DailyTable::__does_table_exist__().");
+  const char* check_statement = "SELECT * FROM ";
+  strcat(const_cast<char*>(check_statement), DailyTable::table_name.c_str());
+  int nByte = static_cast<int>(strlen(check_statement));
+  DBG("Provided string SQL statement: \"%s\" of length %i.", check_statement, nByte);
+  assert("Invalid database handler! Database probably was not open." &&
+         this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      check_statement,
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  sqlite3_finalize(this->m_db_statement);
+  this->m_db_statement = nullptr;
+  TRC("Statement \"%s\" has been finalized.", statement);
+  bool table_exists = false;
+  switch (result) {
+    case SQLITE_OK:
+      DBG("SQLite table \"%s\" already exists.", DailyTable::table_name.c_str());
+      table_exists = true;
+      break;
+    default:
+      DBG("SQLite table \"%s\" does not exist.", DailyTable::table_name.c_str());
+      break;
+  }
+  DBG("exit DailyTable::__does_table_exist__().");
+  return (table_exists);
 }
 
 void DailyTable::__terminate__(const char* i_message) {

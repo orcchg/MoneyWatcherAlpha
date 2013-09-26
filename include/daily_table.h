@@ -24,16 +24,27 @@ namespace mw {
 /// @brief Represents a table of daily changes.
 class DailyTable {
 public:
-  DailyTable(const std::string& table_name = "Daily Table");
+  DailyTable(const std::string& db_name = "MW_DailyTable.db");
   virtual ~DailyTable();
 
+  /// @brief Adds new record to DailyTable.
+  /// @param balance - Value of money balance for record.
+  /// @param description - Text description of record.
+  /// @param status - Status of record.
+  /// @return Newly created record.
+  /// @details Record will also be stored into SQLite database.
   Record addRecord(
       const MoneyValue_t& balance,
       const std::wstring& description,
       const Status& status);
 
+  /// @brief Loads existing DailyTable from SQLite database.
+  /// @return True, if loading has succeeded, False otherwise.
+  bool load();
+
 private:
   static ID_t next_id;
+  static const std::string table_name;
 
   std::string m_db_name;
   DB_Handler m_db_handler;
@@ -43,9 +54,12 @@ private:
   void __open_database__();
   void __close_database__();
   void __create_table__();
+  bool __does_table_exist__();
   void __terminate__(const char* message);
 };
 
+/// @class DailyTableException
+/// @brief Represents a common exception raised by DailyTable class methods.
 class DailyTableException : public std::exception {
 public:
   DailyTableException(const char* message);
