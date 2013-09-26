@@ -24,6 +24,11 @@ public:
   /// @note Date and Time cannot be changed after construction.
   DateTime();
 
+  /// @brief Creates new class' instance with date and time
+  /// being set in advance.
+  /// @note Date and Time cannot be changed after construction.
+  DateTime(const std::string& date, const std::string& time);
+
   std::string getDate() const;
   std::string getTime() const;
 
