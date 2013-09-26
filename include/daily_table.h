@@ -27,8 +27,7 @@ public:
   DailyTable(const std::string& table_name = "Daily Table");
   virtual ~DailyTable();
 
-  void addRecord(
-      const std::wstring& name,
+  Record addRecord(
       const MoneyValue_t& balance,
       const std::wstring& description,
       const Status& status);

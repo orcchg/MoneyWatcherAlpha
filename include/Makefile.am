@@ -2,6 +2,7 @@
 # For example, /usr/include
 include_HEADERS = common.h \
 				  logger.h \
+				  serializable.h \
 				  cycle_table.h \
 				  daily_table.h \
 				  datetime.h \

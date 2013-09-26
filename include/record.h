@@ -26,8 +26,7 @@ public:
   Record(
       const MoneyValue_t& balance,
       const std::wstring& description,
-      const Status& status,
-      void* data = nullptr);
+      const Status& status);
   virtual ~Record();
 
   // --------------------------------------------
@@ -46,8 +45,6 @@ public:
   const DateTime& getDateTime() const;
   /// @brief Gets the status of the current record.
   const Status& getStatus() const;
-  /// @brief Gets other data.
-  void* getData() const;
   /// @}
 
 private:
@@ -56,7 +53,6 @@ private:
   std::wstring m_description;
   DateTime m_datetime;
   Status m_status;
-  void* m_data;
 };
 
 } /* namespace mw */

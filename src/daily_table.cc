@@ -41,8 +41,7 @@ DailyTable::~DailyTable() {
   DBG("exit DailyTable destructor.");
 }
 
-void DailyTable::addRecord(
-    const std::wstring& i_name,
+Record DailyTable::addRecord(
     const MoneyValue_t& i_balance,
     const std::wstring& i_description,
     const Status& i_status) {
@@ -113,7 +112,6 @@ void DailyTable::addRecord(
   DBG("Status [\"%s\"] has been stored in SQLite database \"%s\".",
       <string representation of status>, this->m_db_name.c_str());*/
   // TODO: store Status as integer
-  // TODO: store the name of Record
   if (!accumulate) {
     ERR("Error during saving data into database \"%s\" by statement \"%s\"!",
         this->m_db_name.c_str(), insert_statement);
@@ -129,6 +127,7 @@ void DailyTable::addRecord(
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
   TRC("Statement \"%s\" has been finalized.", insert_statement);
+  return (Record(i_balance, i_description, i_status));
   DBG("exit DailyTable::addRecord().");
 }
 
