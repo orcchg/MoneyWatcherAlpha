@@ -33,6 +33,8 @@ public:
       const Status& status);
 
 private:
+  static ID_t next_id;
+
   std::string m_db_name;
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;

@@ -24,8 +24,8 @@ public:
   /// @note Date and Time cannot be changed after construction.
   DateTime();
 
-  std::string get_date() const;
-  std::string get_time() const;
+  std::string getDate() const;
+  std::string getTime() const;
 
   /// @defgroup COMP Compare two date-time instances.
   /// @{

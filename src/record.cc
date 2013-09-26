@@ -14,13 +14,11 @@
 namespace mw {
 
 Record::Record(
-    const std::wstring& name,
     const MoneyValue_t& balance,
     const std::wstring& description,
     const Status& status,
     void* data)
   : m_id(0)
-  , m_name(name)
   , m_balance(balance)
   , m_description(description)
   , m_datetime(DateTime())
@@ -33,10 +31,6 @@ Record::~Record() {
 
 ID_t Record::getID() const {
   return (this->m_id);
-}
-
-const std::wstring& Record::getName() const {
-  return (this->m_name);
 }
 
 const MoneyValue_t& Record::getBalance() const {

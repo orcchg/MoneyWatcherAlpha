@@ -40,24 +40,24 @@ DateTime::DateTime()
   oss.clear();
 }
 
-std::string DateTime::get_date() const {
-  return _dayMonthYearWeekday;
+std::string DateTime::getDate() const {
+  return (_dayMonthYearWeekday);
 }
 
-std::string DateTime::get_time() const {
-  return _hoursMinutesSeconds;
+std::string DateTime::getTime() const {
+  return (_hoursMinutesSeconds);
 }
 
 bool DateTime::operator < (const DateTime& rhs) const {
-  return _datetime < rhs._datetime;
+  return (_datetime < rhs._datetime);
 }
 
 bool DateTime::operator == (const DateTime& rhs) const {
-  return _datetime == rhs._datetime;
+  return (_datetime == rhs._datetime);
 }
 
 bool DateTime::operator != (const DateTime& rhs) const {
-  return !(*this == rhs);
+  return (!(*this == rhs));
 }
 
 }  /* namespace mw */
