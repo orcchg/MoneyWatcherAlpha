@@ -33,7 +33,7 @@ DailyTable::DailyTable(const std::string& i_db_name)
     ERR(e.what());
     this->__terminate__("Error during create table.");
     // Do not allow invalid object of DailyTable to be instantiated.
-    throw DailyTableException("Creating database has failed!");
+    throw e;
   }
   DBG("exit DailyTable constructor.");
 }
@@ -235,7 +235,7 @@ bool DailyTable::__does_table_exist__() {
       nullptr);
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
-  TRC("Statement \"%s\" has been finalized.", statement);
+  TRC("Statement \"%s\" has been finalized.", check_statement);
   bool table_exists = false;
   switch (result) {
     case SQLITE_OK:
