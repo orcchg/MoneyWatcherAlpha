@@ -139,8 +139,9 @@ Record DailyTable::addRecord(
 
 bool DailyTable::load() {
   DBG("enter DailyTable::load().");
-  //
+  // TODO: for caching
   DBG("exit DailyTable::load().");
+  return (false);
 }
 
 /* Private members */
