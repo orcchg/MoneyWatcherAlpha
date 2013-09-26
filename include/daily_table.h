@@ -38,6 +38,11 @@ public:
       const std::wstring& description,
       const Status& status);
 
+  /// @brief Reads record from SQLite database.
+  /// @param record_id - Primary key of record of interest in SQLite database.
+  /// @return Newly read record.
+  Record readRecord(const ID_t& record_id);
+
   /// @brief Loads existing DailyTable from SQLite database.
   /// @return True, if loading has succeeded, False otherwise.
   bool load();
@@ -56,6 +61,8 @@ private:
   void __create_table__();
   bool __does_table_exist__();
   void __terminate__(const char* message);
+  void __finalize__(const char* statement);
+  void __finalize_and_throw__(const char* statement);
 };
 
 /// @class DailyTableException

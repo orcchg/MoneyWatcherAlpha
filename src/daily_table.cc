@@ -49,9 +49,9 @@ Record DailyTable::addRecord(
     const std::wstring& i_description,
     const Status& i_status) {
   DBG("enter DailyTable::addRecord().");
-  const char* insert_statement = "INSERT INTO ";
+  const char* insert_statement = "INSERT INTO \"";
   strcat(const_cast<char*>(insert_statement), DailyTable::table_name.c_str());
-  strcat(const_cast<char*>(insert_statement), " VALUES(?1, ?2, ?3, ?4, ?5, ?6);");
+  strcat(const_cast<char*>(insert_statement), "\" VALUES(?1, ?2, ?3, ?4, ?5, ?6);");
   int nByte = static_cast<int>(strlen(insert_statement));
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
@@ -63,11 +63,7 @@ Record DailyTable::addRecord(
         &(this->m_db_statement),
         nullptr);
   if (result != SQLITE_OK) {
-    ERR("Unable to prepare statement \"%s\"!", insert_statement);
-    sqlite3_finalize(this->m_db_statement);
-    this->m_db_statement = nullptr;
-    TRC("Statement \"%s\" has been finalized.", insert_statement);
-    throw DailyTableException("Unable to prepare statement \"%s\"!", insert_statement);
+    this->__finalize_and_throw__(insert_statement);
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       insert_statement_handler);
@@ -112,28 +108,64 @@ Record DailyTable::addRecord(
   DBG("Description [\"%s\"] has been stored in SQLite database \"%s\".",
       description.c_str(), this->m_db_name.c_str());
   /*accumulate = accumulate &&
-      (sqlite3_bind_int(this->m_db_statement, 6, i_status.serialize()) == SQLITE_OK);
+      (sqlite3_bind_int64(this->m_db_statement, 6, i_status.serialize()) == SQLITE_OK);
   DBG("Status [\"%s\"] has been stored in SQLite database \"%s\".",
       <string representation of status>, this->m_db_name.c_str());*/
   // TODO: store Status as integer
   if (!accumulate) {
     ERR("Error during saving data into database \"%s\" by statement \"%s\"!",
         this->m_db_name.c_str(), insert_statement);
-    sqlite3_finalize(this->m_db_statement);
-    this->m_db_statement = nullptr;
-    TRC("Statement \"%s\" has been finalized.", insert_statement);
-    throw DailyTableException("Unable to insert data by statement \"%s\"!",
-                              insert_statement);
+    this->__finalize_and_throw__(insert_statement);
   } else {
     DBG("All insertions have succeeded.");
   }
-  // TODO: caching the record ???
-  sqlite3_finalize(this->m_db_statement);
-  this->m_db_statement = nullptr;
-  TRC("Statement \"%s\" has been finalized.", insert_statement);
-  Record record(i_balance, i_description, i_status);
+  // TODO: caching the record
+  this->__finalize__(insert_statement);
+  Record record(i_balance, i_description, i_status, current_datetime);
   DBG("Constructed output record.");
   DBG("exit DailyTable::addRecord().");
+  return (record);
+}
+
+Record DailyTable::readRecord(const ID_t& i_record_id) {
+  DBG("enter DailyTable::readRecord().");
+  const char* select_statement = "SELECT * FROM \"";
+  strcat(const_cast<char*>(select_statement), DailyTable::table_name.c_str());
+  const char* tail = "\" WHERE \"ID\" = \";";
+  const char* record_id_string = std::to_string(i_record_id).c_str();
+  strcat(const_cast<char*>(tail), record_id_string);
+  strcat(const_cast<char*>(tail), "\";");
+  strcat(const_cast<char*>(select_statement), tail);
+  int nByte = static_cast<int>(strlen(select_statement));
+  DBG("Provided string SQL statement: \"%s\" of length %i.", select_statement, nByte);
+  assert("Invalid database handler! Database probably was not open." &&
+         this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      select_statement,
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(select_statement);
+  }
+  DBG("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
+  assert("Input record id does not equal to primary key value from database!" &&
+         id == i_record_id);
+  std::string date(sqlite3_column_text(this->m_db_statement, 1));
+  std::string time(sqlite3_column_text(this->m_db_statement, 2));
+  DateTime datetime(date, time);
+  MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
+  void* description = sqlite3_column_text16(this->m_db_statement, 4);  // TODO: cast from void*
+  // TODO: get Status column
+
+  Record record(balance, "<description>", /* status */0, datetime);
+  // TODO: Add proper record construction
+  // TODO: caching the record
+  this->__finalize__(select_statement);
+  DBG("exit DailyTable::readRecord().");
   return (record);
 }
 
@@ -164,9 +196,7 @@ void DailyTable::__close_database__() {
   DBG("enter DailyTable::__close_database__().");
   if (this->m_db_statement) {
     DBG("Found prepared SQL statement at %p.", this->m_db_statement);
-    sqlite3_finalize(this->m_db_statement);
-    this->m_db_statement = nullptr;
-    DBG("Statement has been successfully finalized.");
+    this->__finalize__("");
   } else {
     DBG("Statement has been already finalized.");
   }
@@ -191,7 +221,8 @@ void DailyTable::__create_table__() {
       "'Date' TEXT,"
       "'Time' TEXT,"
       "'Balance' INTEGER,"
-      "'Description' TEXT);";
+      "'Description' TEXT,"
+      "'Status' INTEGER);";
   strcat(const_cast<char*>(statement), tail);
   int nByte = static_cast<int>(strlen(statement));
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement, nByte);
@@ -204,18 +235,12 @@ void DailyTable::__create_table__() {
       &(this->m_db_statement),
       nullptr);
   if (result != SQLITE_OK) {
-    ERR("Unable to prepare statement \"%s\"!", statement);
-    sqlite3_finalize(this->m_db_statement);
-    this->m_db_statement = nullptr;
-    TRC("Statement \"%s\" has been finalized.", statement);
-    throw DailyTableException("Unable to prepare statement \"%s\"!", statement);
+    this->__finalize_and_throw__(statement);
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   DBG("Table \"%s\" has been successfully created.", DailyTable::table_name.c_str());
-  sqlite3_finalize(this->m_db_statement);
-  this->m_db_statement = nullptr;
-  TRC("Statement \"%s\" has been finalized.", statement);
+  this->__finalize__(statement);
   DBG("exit DailyTable::__create_table__().");
 }
 
@@ -234,9 +259,7 @@ bool DailyTable::__does_table_exist__() {
       nByte,
       &(this->m_db_statement),
       nullptr);
-  sqlite3_finalize(this->m_db_statement);
-  this->m_db_statement = nullptr;
-  TRC("Statement \"%s\" has been finalized.", check_statement);
+  this->__finalize__(check_statement);
   bool table_exists = false;
   switch (result) {
     case SQLITE_OK:
@@ -259,6 +282,22 @@ void DailyTable::__terminate__(const char* i_message) {
   TRC("Database \"%s\" has been shut down.", this->m_db_name.c_str());
   sqlite3_free(nullptr);
   DBG("exit DailyTable::__terminate__().");
+}
+
+void DailyTable::__finalize__(const char* statement) {
+  DBG("enter DailyTable::__finalize__().");
+  sqlite3_finalize(this->m_db_statement);
+  this->m_db_statement = nullptr;
+  TRC("Statement \"%s\" has been finalized.", statement);
+  DBG("exit DailyTable::__finalize__().");
+}
+
+void DailyTable::__finalize_and_throw__(const char* statement) {
+  DBG("enter DailyTable::__finalize_and_throw__().");
+  ERR("Unable to prepare statement \"%s\"!", statement);
+  this->__finalize__(statement);
+  DBG("exit DailyTable::__finalize_and_throw__().");
+  throw DailyTableException("Unable to prepare statement \"%s\"!", statement);
 }
 
 /* Exception class implementation */
