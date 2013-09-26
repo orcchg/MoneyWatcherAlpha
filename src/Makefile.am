@@ -8,7 +8,7 @@ lib_LTLIBRARIES = libmoneywatcher.la
 # Build information for each library
 
 # Sources for libmoneywatcher
-libmoneywatcher_la_SOURCES = datetime.cc entry.cc record.cc
+libmoneywatcher_la_SOURCES = datetime.cc entry.cc record.cc status.cc
 
 # Linker options libTestProgram
 libmoneywatcher_la_LDFLAGS =
