@@ -16,11 +16,12 @@ namespace mw {
 Record::Record(
     const MoneyValue_t& balance,
     const std::wstring& description,
-    const Status& status)
+    const Status& status,
+    const DateTime& datetime)
   : m_id(0)
   , m_balance(balance)
   , m_description(description)
-  , m_datetime(DateTime())
+  , m_datetime(datetime)
   , m_status(status) {
 }
 

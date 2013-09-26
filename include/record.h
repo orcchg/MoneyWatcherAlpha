@@ -26,7 +26,8 @@ public:
   Record(
       const MoneyValue_t& balance,
       const std::wstring& description,
-      const Status& status);
+      const Status& status,
+      const DateTime& datetime = DateTime());
   virtual ~Record();
 
   // --------------------------------------------
