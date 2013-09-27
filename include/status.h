@@ -10,26 +10,33 @@
 #ifndef STATUS_H_
 #define STATUS_H_
 
+#include <string>
 #include "serializable.h"
 #include "types.h"
 
 
 namespace mw {
 
+enum StatusValue { SV_UNKNOWN = -1,
+	               SV_EXPENSE = 0,
+	               SV_INCOME = 1,
+	               SV_COUNT
+};
+
 /// @class Status
 /// @brief Represents various statuses of data.
-class Status : public iSerializable {
+class Status {
 public:
-  Status(const Status_t& status);
-  virtual ~Status();
+  Status();
+  virtual ~Status(const sqlite3_int64& status);
 
-  const Status_t& getStatus() const;
-  void setStatus(const Status_t& status);
+  const StatusValue& getStatus() const;
+  void setStatus(const StatusValue& status);
 
-  void serialize(std::string* output) const;
+  operator sqlite3_int64(const Status& status);
 
 private:
-  Status_t m_status;
+  StatusValue m_status;
 };
 
 }  /* namespace mw */

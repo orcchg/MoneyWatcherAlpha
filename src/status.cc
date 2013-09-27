@@ -12,23 +12,34 @@
 
 namespace mw {
 
-Status::Status(const Status_t& status)
-  : m_status(status) {
+Status::Status(const sqlite3_int64& i_status)
+  : m_status(SV_UNKNOWN) {
+	int status = i_status % 2;
+	switch (status) {
+	case 0:
+		m_status = SV_EXPENSE;
+		break;
+	case 1:
+		m_status = SV_INCOME;
+		break;
+	default:
+		break;
+	}
 }
 
 Status::~Status() {
 }
 
-const Status_t& Status::getStatus() const {
+const StatusValue& Status::getStatus() const {
   return (this->m_status);
 }
 
-void Status::setStatus(const Status_t& status) {
+void Status::setStatus(const StatusValue& status) {
   this->m_status = status;
 }
 
-void Status::serialize(std::string* output) const {
-  // TODO: serialize m_status to std::string
+Status::operator sqlite3_int64(const Status& status) {
+	return (static_cast<sqlite3_int64>(status.m_status));
 }
 
 }  /* namespace mw */
