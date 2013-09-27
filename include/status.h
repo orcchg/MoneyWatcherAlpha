@@ -27,13 +27,13 @@ enum StatusValue { SV_UNKNOWN = -1,
 /// @brief Represents various statuses of data.
 class Status {
 public:
-  Status();
-  virtual ~Status(const sqlite3_int64& status);
+  Status(const sqlite3_int64& status);
+  virtual ~Status();
 
   const StatusValue& getStatus() const;
   void setStatus(const StatusValue& status);
 
-  operator sqlite3_int64(const Status& status);
+  operator sqlite3_int64();
 
 private:
   StatusValue m_status;
