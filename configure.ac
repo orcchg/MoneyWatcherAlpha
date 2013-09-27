@@ -116,13 +116,14 @@ AS_IF([test "x$disable_tests" == "xyes"],
 AS_IF([test "x$disable_tests" != "xyes"],
   [AC_MSG_NOTICE([Enabled building unit-tests])
 ])
-AM_CONDITIONAL([ENABLE_TESTS], [test "x$enable_tests" == "xyes"])
-AM_COND_IF([ENABLE_TESTS], [
+AM_CONDITIONAL([ENABLE_TESTS], [test "x$disable_tests" != "xyes"])
+AM_COND_IF([ENABLE_TESTS], [dnl action-if-true
     MW_VAR_ENABLE_TESTS=true
 	MW_VAR_SUBDIR_TESTS=tests
 	AC_CONFIG_FILES(tests/Makefile
-					tests/google/Makefile)
-	], [
+					tests/google/Makefile
+					tests/core/Makefile)
+	], [dnl action-if-false
 	MW_VAR_ENABLE_TESTS=false
 	MW_VAR_SUBDIR_TESTS=
 ])

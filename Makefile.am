@@ -1,1 +1,1 @@
-SUBDIRS=sqlite3 src include main
+SUBDIRS = sqlite3 src include main tests
