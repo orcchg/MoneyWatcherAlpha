@@ -70,7 +70,7 @@ private:
 class DailyTableException : public std::exception {
 public:
   DailyTableException(const char* message);
-  virtual ~DailyTableException();
+  virtual ~DailyTableException() throw();
 
   const char* what() const throw();
 

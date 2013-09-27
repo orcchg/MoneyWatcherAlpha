@@ -107,11 +107,10 @@ Record DailyTable::addRecord(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Description [\"%s\"] has been stored in SQLite database \"%s\".",
       description.c_str(), this->m_db_name.c_str());
-  /*accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 6, i_status.serialize()) == SQLITE_OK);
+  accumulate = accumulate &&
+      (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
   DBG("Status [\"%s\"] has been stored in SQLite database \"%s\".",
-      <string representation of status>, this->m_db_name.c_str());*/
-  // TODO: store Status as integer
+	  static_cast<sqlite3_int64>(i_status), this->m_db_name.c_str());
   if (!accumulate) {
     ERR("Error during saving data into database \"%s\" by statement \"%s\"!",
         this->m_db_name.c_str(), insert_statement);
@@ -119,7 +118,9 @@ Record DailyTable::addRecord(
   } else {
     DBG("All insertions have succeeded.");
   }
+#if ENABLED_DB_CACHING
   // TODO: caching the record
+#endif
   this->__finalize__(insert_statement);
   Record record(i_balance, i_description, i_status, current_datetime);
   DBG("Constructed output record.");
@@ -160,11 +161,15 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
   const void* raw_description = sqlite3_column_text16(this->m_db_statement, 4);
   std::wstring description(static_cast<const wchar_t*>(raw_description));
-  // TODO: get Status column
-
-  Record record(balance, description, /* status */0, datetime);
-  // TODO: Add proper record construction
+  sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
+  Status status(raw_status);
+  DBG("Loaded column data: Date [\"%s\"]; Time [\"%s\"]; Balance [%lli]; Description [\"%s\"]; Status [%lli].",
+	  datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
+  Record record(balance, description, status, datetime);
+  DBG("Proper record instance has been constructed.");
+#if ENABLED_DB_CACHING
   // TODO: caching the record
+#endif
   this->__finalize__(select_statement);
   DBG("exit DailyTable::readRecord().");
   return (record);
@@ -172,7 +177,9 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
 
 bool DailyTable::load() {
   DBG("enter DailyTable::load().");
-  // TODO: for caching
+#if ENABLED_DB_CACHING
+  // TODO: caching the records
+#endif
   DBG("exit DailyTable::load().");
   return (false);
 }
