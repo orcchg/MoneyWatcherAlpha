@@ -158,10 +158,11 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   std::string time(sqlite3_column_text(this->m_db_statement, 2));
   DateTime datetime(date, time);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
-  void* description = sqlite3_column_text16(this->m_db_statement, 4);  // TODO: cast from void*
+  const void* raw_description = sqlite3_column_text16(this->m_db_statement, 4);
+  std::wstring description(static_cast<const wchar_t*>(raw_description));
   // TODO: get Status column
 
-  Record record(balance, "<description>", /* status */0, datetime);
+  Record record(balance, description, /* status */0, datetime);
   // TODO: Add proper record construction
   // TODO: caching the record
   this->__finalize__(select_statement);
