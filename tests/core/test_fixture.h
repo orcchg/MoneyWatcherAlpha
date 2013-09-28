@@ -12,18 +12,20 @@
 
 #include <string>
 #include "tests/google/gtest/gtest.h"
+#include "daily_table.h"
 
 
 namespace mw {
 
-class TestFixture: public ::testing::Test {
+class DailyTableFixture : public ::testing::Test {
 public:
-  TestFixture()
-    : m_daily_table_db_name("Test-DailyTable.db") {
+  DailyTableFixture()
+    : m_daily_table_db_name("Test-DailyTable.db")
+    , m_daily_table(DailyTable(m_daily_table_db_name)) {
       // initialization code here
   }
 
-  ~TestFixture() {
+  ~DailyTableFixture() {
       // cleanup any pending stuff, but no exceptions allowed
   }
 
@@ -43,6 +45,7 @@ public:
   // put in any custom data members that you need
 private:
   std::string m_daily_table_db_name;
+  DailyTable m_daily_table;
 };
 
 }  /* namespace mw */

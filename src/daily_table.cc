@@ -65,7 +65,6 @@ Record DailyTable::addRecord(
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
-  sqlite3_step(this->m_db_statement);
   bool accumulate = true;
   ID_t record_id = this->next_id++;
   accumulate = accumulate &&
@@ -108,8 +107,9 @@ Record DailyTable::addRecord(
       i_description.c_str(), this->m_db_name.c_str());
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
-  DBG("Status [\"%s\"] has been stored in SQLite database \"%s\".",
+  DBG("Status [%lli] has been stored in SQLite database \"%s\".",
 	  static_cast<sqlite3_int64>(i_status), this->m_db_name.c_str());
+  sqlite3_step(this->m_db_statement);
   if (!accumulate) {
     ERR("Error during saving data into database \"%s\" by statement \"%s\"!",
         this->m_db_name.c_str(), insert_statement.c_str());

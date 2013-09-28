@@ -8,6 +8,7 @@
  */
 
 #include <cstdio>
+#include <string>
 #include <thread>
 #include <unistd.h>
 #include "tests/google/gtest/gtest.h"
@@ -35,11 +36,21 @@ TEST (DailyTableTest, CreateDailyTable) {
   mw::DailyTable daily_table(test_daily_table_db_filename);
   int db_file_exists = access(test_daily_table_db_filename.c_str(), F_OK);
   ASSERT_TRUE(db_file_exists == 0);
-  //remove(test_daily_table_db_filename.c_str());
+  // TODO: SQL-query to check if table exists
+  remove(test_daily_table_db_filename.c_str());
 }
 
 TEST (DailyTableTest, AddRecord) {
-  //
+  mw::DailyTable daily_table("Test-DailyTable.db");
+  MoneyValue_t balance = 1000;
+  std::wstring description = L"Тестовая запись в таблице";
+  mw::Status status(mw::SV_INCOME);
+  mw::Record record = daily_table.addRecord(balance, description, status);
+  EXPECT_EQ(record.getBalance(), balance);
+  EXPECT_STREQ(record.getDescription().c_str(), description.c_str());
+  EXPECT_EQ(record.getStatus(), status);
+  // TODO: SQL-query to count rows in table
+  // TODO: SQL-query to get column values and compare with actual in memory
 }
 
 TEST (DailyTableTest, ReadRecord) {
