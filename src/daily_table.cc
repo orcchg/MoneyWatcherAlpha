@@ -8,7 +8,6 @@
  */
 
 #include <stdexcept>
-#include <cstring>
 #include "daily_table.h"
 #include "logger.h"
 #include "sqlite3.h"
@@ -49,21 +48,21 @@ Record DailyTable::addRecord(
     const std::wstring& i_description,
     const Status& i_status) {
   DBG("enter DailyTable::addRecord().");
-  const char* insert_statement = "INSERT INTO \"";
-  strcat(const_cast<char*>(insert_statement), DailyTable::table_name.c_str());
-  strcat(const_cast<char*>(insert_statement), "\" VALUES(?1, ?2, ?3, ?4, ?5, ?6);");
-  int nByte = static_cast<int>(strlen(insert_statement));
+  std::string insert_statement = "INSERT INTO \"";
+  insert_statement += DailyTable::table_name;
+  insert_statement += "\" VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
+  int nByte = static_cast<int>(insert_statement.length());
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare_v2(
         this->m_db_handler,
-        insert_statement,
+        insert_statement.c_str(),
         nByte,
         &(this->m_db_statement),
         nullptr);
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(insert_statement);
+    this->__finalize_and_throw__(insert_statement.c_str());
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       insert_statement_handler);
@@ -114,14 +113,14 @@ Record DailyTable::addRecord(
   if (!accumulate) {
     ERR("Error during saving data into database \"%s\" by statement \"%s\"!",
         this->m_db_name.c_str(), insert_statement);
-    this->__finalize_and_throw__(insert_statement);
+    this->__finalize_and_throw__(insert_statement.c_str());
   } else {
     DBG("All insertions have succeeded.");
   }
 #if ENABLED_DB_CACHING
   // TODO: caching the record
 #endif
-  this->__finalize__(insert_statement);
+  this->__finalize__(insert_statement.c_str());
   Record record(i_balance, i_description, i_status, current_datetime);
   DBG("Constructed output record.");
   DBG("exit DailyTable::addRecord().");
@@ -130,25 +129,23 @@ Record DailyTable::addRecord(
 
 Record DailyTable::readRecord(const ID_t& i_record_id) {
   DBG("enter DailyTable::readRecord().");
-  const char* select_statement = "SELECT * FROM \"";
-  strcat(const_cast<char*>(select_statement), DailyTable::table_name.c_str());
-  const char* tail = "\" WHERE \"ID\" = \";";
-  const char* record_id_string = std::to_string(i_record_id).c_str();
-  strcat(const_cast<char*>(tail), record_id_string);
-  strcat(const_cast<char*>(tail), "\";");
-  strcat(const_cast<char*>(select_statement), tail);
-  int nByte = static_cast<int>(strlen(select_statement));
+  std::string select_statement = "SELECT * FROM \"";
+  select_statement += DailyTable::table_name;
+  select_statement += "\" WHERE \"ID\" = \";";
+  select_statement += std::to_string(i_record_id);
+  select_statement += "\";";
+  int nByte = static_cast<int>(select_statement.length());
   DBG("Provided string SQL statement: \"%s\" of length %i.", select_statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
-      select_statement,
+      select_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(select_statement);
+    this->__finalize_and_throw__(select_statement.c_str());
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
@@ -170,7 +167,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
 #if ENABLED_DB_CACHING
   // TODO: caching the record
 #endif
-  this->__finalize__(select_statement);
+  this->__finalize__(select_statement.c_str());
   DBG("exit DailyTable::readRecord().");
   return (record);
 }
@@ -199,8 +196,7 @@ void DailyTable::__open_database__() {
   if (result != SQLITE_OK) {
     ERR("Unable to open database \"%s\"!", this->m_db_name.c_str());
     this->__terminate__("Error during open database.");
-    throw DailyTableException("Unable to open database \"%s\"!",
-                              this->m_db_name.c_str());
+    throw DailyTableException("Unable to open database!");
   }
   DBG("SQLite database has been successfully opened and placed into %p.",
       this->m_db_handler);
@@ -230,51 +226,50 @@ void DailyTable::__close_database__() {
 
 void DailyTable::__create_table__() {
   DBG("enter DailyTable::__create_table__().");
-  const char* statement = "CREATE TABLE ";
-  strcat(const_cast<char*>(statement), DailyTable::table_name.c_str());
-  const char* tail = "('ID' INTEGER PRIMARY KEY,"
+  std::string statement = "CREATE TABLE ";
+  statement += DailyTable::table_name;
+  statement += "('ID' INTEGER PRIMARY KEY,"
       "'Date' TEXT,"
       "'Time' TEXT,"
       "'Balance' INTEGER,"
       "'Description' TEXT,"
       "'Status' INTEGER);";
-  strcat(const_cast<char*>(statement), tail);
-  int nByte = static_cast<int>(strlen(statement));
+  int nByte = static_cast<int>(statement.length());
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
-      statement,
+      statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement);
+    this->__finalize_and_throw__(statement.c_str());
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   DBG("Table \"%s\" has been successfully created.", DailyTable::table_name.c_str());
-  this->__finalize__(statement);
+  this->__finalize__(statement.c_str());
   DBG("exit DailyTable::__create_table__().");
 }
 
 bool DailyTable::__does_table_exist__() {
   DBG("enter DailyTable::__does_table_exist__().");
-  const char* check_statement = "SELECT name FROM sqlite_master WHERE type='table' AND name=\"";
-  strcat(const_cast<char*>(check_statement), DailyTable::table_name.c_str());
-  strcat(const_cast<char*>(check_statement), "\";");
-  int nByte = static_cast<int>(strlen(check_statement));
+  std::string check_statement = "SELECT name FROM sqlite_master WHERE type='table' AND name=\"";
+  check_statement += DailyTable::table_name;
+  check_statement += "\";";
+  int nByte = static_cast<int>(check_statement.length());
   DBG("Provided string SQL statement: \"%s\" of length %i.", check_statement, nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
-      check_statement,
+      check_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
-  this->__finalize__(check_statement);
+  this->__finalize__(check_statement.c_str());
   bool table_exists = false;
   switch (result) {
     case SQLITE_OK:
