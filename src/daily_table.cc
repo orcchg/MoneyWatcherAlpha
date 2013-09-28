@@ -7,6 +7,7 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
+#include <cstring>
 #include <stdexcept>
 #include "daily_table.h"
 #include "logger.h"
@@ -152,8 +153,8 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
   assert("Input record id does not equal to primary key value from database!" &&
          id == i_record_id);
-  std::string date(sqlite3_column_text(this->m_db_statement, 1));
-  std::string time(sqlite3_column_text(this->m_db_statement, 2));
+  std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
+  std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2)));
   DateTime datetime(date, time);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
   const void* raw_description = sqlite3_column_text16(this->m_db_statement, 4);

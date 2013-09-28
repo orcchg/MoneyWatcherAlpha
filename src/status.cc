@@ -38,7 +38,7 @@ void Status::setStatus(const StatusValue& status) {
   this->m_status = status;
 }
 
-Status::operator sqlite3_int64() {
+Status::operator sqlite3_int64() const {
 	return (static_cast<sqlite3_int64>(this->m_status));
 }
 
