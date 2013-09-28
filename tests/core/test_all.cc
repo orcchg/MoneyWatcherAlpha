@@ -9,6 +9,7 @@
 
 #include <thread>
 #include "tests/google/gtest/gtest.h"
+#include "test_fixture.h"
 
 
 TEST (SimpleDemoTest, SimpleDemo) {
