@@ -26,9 +26,7 @@ DailyTable::DailyTable(const std::string& i_db_name)
   DBG("enter DailyTable constructor.");
   this->__open_database__();
   try {
-    if (!this->__does_table_exist__()) {
-      this->__create_table__();
-    }
+    this->__create_table__();
   } catch(DailyTableException& e) {
     //ERR(e.what());  // TODO: fix logs
     this->__terminate__("Error during create table.");
@@ -67,6 +65,7 @@ Record DailyTable::addRecord(
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
   bool accumulate = true;
   ID_t record_id = this->next_id++;
   accumulate = accumulate &&
@@ -150,6 +149,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
   assert("Input record id does not equal to primary key value from database!" &&
          id == i_record_id);
@@ -227,13 +227,13 @@ void DailyTable::__close_database__() {
 
 void DailyTable::__create_table__() {
   DBG("enter DailyTable::__create_table__().");
-  std::string statement = "CREATE TABLE ";
+  std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += DailyTable::table_name;
-  statement += "('ID' INTEGER PRIMARY KEY,"
-      "'Date' TEXT,"
-      "'Time' TEXT,"
-      "'Balance' INTEGER,"
-      "'Description' TEXT,"
+  statement += "('ID' INTEGER PRIMARY KEY, "
+      "'Date' TEXT, "
+      "'Time' TEXT, "
+      "'Balance' INTEGER, "
+      "'Description' TEXT, "
       "'Status' INTEGER);";
   int nByte = static_cast<int>(statement.length());
   DBG("Provided string SQL statement: \"%s\" of length %i.", statement.c_str(), nByte);
@@ -250,6 +250,7 @@ void DailyTable::__create_table__() {
   }
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
   DBG("Table \"%s\" has been successfully created.", DailyTable::table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit DailyTable::__create_table__().");
@@ -257,8 +258,7 @@ void DailyTable::__create_table__() {
 
 bool DailyTable::__does_table_exist__() {
   DBG("enter DailyTable::__does_table_exist__().");
-  // FIXME: Toggle check database existence. No table has created.
-  std::string check_statement = "SELECT * FROM "; //"SELECT name FROM sqlite_master WHERE type='table' AND name=\'";
+  std::string check_statement = "SELECT * FROM \'";
   check_statement += DailyTable::table_name;
   check_statement += "\';";
   int nByte = static_cast<int>(check_statement.length());
@@ -271,6 +271,7 @@ bool DailyTable::__does_table_exist__() {
       nByte,
       &(this->m_db_statement),
       nullptr);
+  sqlite3_step(this->m_db_statement);
   this->__finalize__(check_statement.c_str());
   bool table_exists = false;
   switch (result) {
