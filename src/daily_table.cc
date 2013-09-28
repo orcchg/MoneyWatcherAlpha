@@ -175,6 +175,13 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   return (record);
 }
 
+const std::string& DailyTable::getName() const {
+  DBG("enter DailyTable::getName().");
+  DBG("Return the name \"%s\" of DailyTable at %p.", this->m_db_name, this);
+  DBG("exit DailyTable::getName().");
+  return (this->m_db_name);
+}
+
 bool DailyTable::load() {
   DBG("enter DailyTable::load().");
 #if ENABLED_DB_CACHING

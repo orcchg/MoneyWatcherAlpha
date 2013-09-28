@@ -4,7 +4,7 @@ core_tests_all_SOURCES = test_all.cc
 
 core_tests_all_LDFLAGS =
 
-include_HEADERS = test_fixture.h
+include_HEADERS = test_fixture.h test_include_all.h
 
 core_tests_all_CPPFLAGS = -std=c++11 -fPIC -I$(top_srcdir)/include -I$(top_srcdir)/tests/google
 

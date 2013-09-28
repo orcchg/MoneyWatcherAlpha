@@ -27,6 +27,9 @@ public:
   DailyTable(const std::string& db_name = "MW_DailyTable.db");
   virtual ~DailyTable();
 
+  /// -------------------------------------------------------------------------
+  /// @defgroup RECORD Methods to produce or extract Record instance.
+  /// @{
   /// @brief Adds new record to DailyTable.
   /// @param balance - Value of money balance for record.
   /// @param description - Text description of record.
@@ -42,6 +45,15 @@ public:
   /// @param record_id - Primary key of record of interest in SQLite database.
   /// @return Newly read record.
   Record readRecord(const ID_t& record_id);
+  /// @}
+  /// -------------------------------------------------------------------------
+
+  /// -------------------------------------------------------------------------
+  /// @defgroup GET Access methods of Daily Table.
+  /// @{
+  const std::string& getName() const;
+  /// @}
+  /// -------------------------------------------------------------------------
 
   /// @brief Loads existing DailyTable from SQLite database.
   /// @return True, if loading has succeeded, False otherwise.

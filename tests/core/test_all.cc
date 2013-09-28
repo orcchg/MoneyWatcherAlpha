@@ -10,6 +10,7 @@
 #include <thread>
 #include "tests/google/gtest/gtest.h"
 #include "test_fixture.h"
+#include "test_include_all.h"
 
 
 TEST (SimpleDemoTest, SimpleDemo) {
@@ -19,6 +20,28 @@ TEST (SimpleDemoTest, SimpleDemo) {
   EXPECT_EQ(1.0, 1.0);
 }
 
+/* CylceTable testing */
+// ----------------------------------------------------------------------------
+TEST (CycleTableTest, CreateCycleTable) {
+  EXPECT_TRUE(true);
+}
+
+/* DailyTable testing */
+// ----------------------------------------------------------------------------
+TEST (DailyTableTest, CreateDailyTable) {
+  //
+}
+
+TEST (DailyTableTest, AddRecord) {
+  //
+}
+
+TEST (DailyTableTest, ReadRecord) {
+  //
+}
+
+/* Main */
+// ----------------------------------------------------------------------------
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
