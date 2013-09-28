@@ -29,7 +29,7 @@ TEST (CycleTableTest, CreateCycleTable) {
 /* DailyTable testing */
 // ----------------------------------------------------------------------------
 TEST (DailyTableTest, CreateDailyTable) {
-  //
+  mw::DailyTable("Test-DailyTable.db");
 }
 
 TEST (DailyTableTest, AddRecord) {

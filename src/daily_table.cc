@@ -312,7 +312,7 @@ void DailyTable::__finalize_and_throw__(const char* statement) {
   ERR("Unable to prepare statement \"%s\"!", statement);
   this->__finalize__(statement);
   DBG("exit DailyTable::__finalize_and_throw__().");
-  throw DailyTableException("Unable to prepare statement \"%s\"!", statement);
+  throw DailyTableException("Unable to prepare statement!");
 }
 
 /* Exception class implementation */
@@ -321,7 +321,7 @@ DailyTableException::DailyTableException(const char* i_message)
   : m_message(i_message) {
 }
 
-DailyTableException::~DailyTableException() {
+DailyTableException::~DailyTableException() throw() {
 }
 
 const char* DailyTableException::what() const throw() {

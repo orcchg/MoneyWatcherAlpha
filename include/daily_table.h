@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include "hash.h"
 #include "record.h"
+#include "tests/core/test_access_class.h"
 #include "types.h"
 
 
@@ -23,6 +24,7 @@ namespace mw {
 /// @class DailyTable
 /// @brief Represents a table of daily changes.
 class DailyTable {
+  friend TestAccess;
 public:
   DailyTable(const std::string& db_name = "MW_DailyTable.db");
   virtual ~DailyTable();
