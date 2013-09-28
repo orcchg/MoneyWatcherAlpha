@@ -14,6 +14,6 @@
 
 int main(int argc, char** argv) {
   std::cout << "Hello, World!" << std::endl;
-  mw::DailyTable("Test-DailyTable.db");
+  mw::DailyTable daily_table;
   return (0);
 }

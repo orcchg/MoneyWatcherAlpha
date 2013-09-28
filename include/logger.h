@@ -16,12 +16,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define CRT(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define ERR(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define WRN(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define INF(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define DBG(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define TRC(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define PROMPT_SUGGEST " >>> "
+#define CRT(fmt, ...) printf((/*"CRT" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
+#define ERR(fmt, ...) printf((/*"ERR" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
+#define WRN(fmt, ...) printf((/*"WRN" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
+#define INF(fmt, ...) printf((/*"INF" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
+#define DBG(fmt, ...) printf((/*"DBG" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
+#define TRC(fmt, ...) printf((/*"TRC" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
 
 #else
 

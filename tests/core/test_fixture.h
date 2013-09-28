@@ -10,6 +10,7 @@
 #ifndef TEST_FIXTURE_H_
 #define TEST_FIXTURE_H_
 
+#include <string>
 #include "tests/google/gtest/gtest.h"
 
 
@@ -17,7 +18,8 @@ namespace mw {
 
 class TestFixture: public ::testing::Test {
 public:
-  TestFixture() {
+  TestFixture()
+    : m_daily_table_db_name("Test-DailyTable.db") {
       // initialization code here
   }
 
@@ -34,7 +36,13 @@ public:
       // ok to through exceptions from here if need be
   }
 
+  const char* getDailyTableName() const {
+    return (this->m_daily_table_db_name.c_str());
+  }
+
   // put in any custom data members that you need
+private:
+  std::string m_daily_table_db_name;
 };
 
 }  /* namespace mw */
