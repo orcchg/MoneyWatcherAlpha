@@ -22,4 +22,4 @@ moneywatcher_SOURCES = main.cc
 moneywatcher_LDFLAGS = $(top_srcdir)/src/libmoneywatcher.la $(top_srcdir)/sqlite3/libsqlite3formw.la
 
 # Compiler options for a.out
-moneywatcher_CPPFLAGS = -I$(top_srcdir)/include -std=c++11
+moneywatcher_CPPFLAGS = -std=c++11 -I$(top_srcdir)/include
