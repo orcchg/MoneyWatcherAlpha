@@ -24,6 +24,7 @@ namespace mw {
 class Record {
 public:
   Record(
+      const ID_t& id,
       const MoneyValue_t& balance,
       const std::wstring& description,
       const Status& status,
