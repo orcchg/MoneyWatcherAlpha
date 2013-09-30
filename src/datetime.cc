@@ -40,8 +40,9 @@ DateTime::DateTime()
   oss.clear();
 }
 
-DateTime::DateTime(const std::string& date, const std::string& time) {
-  // TODO: provide proper implementation
+DateTime::DateTime(const std::string& date, const std::string& time)
+  : _dayMonthYearWeekday(date)
+  , _hoursMinutesSeconds(time) {
 }
 
 std::string DateTime::getDate() const {
