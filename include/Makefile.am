@@ -11,5 +11,4 @@ include_HEADERS = common.h \
 				  record.h \
 				  status.h \
 				  types.h \
-				  $(top_srcdir)/sqlite3/sqlite3.h \
-				  $(top_srcdir)/tests/core/test_access_class.h
+				  $(top_srcdir)/sqlite3/sqlite3.h
