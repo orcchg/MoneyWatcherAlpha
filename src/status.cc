@@ -14,17 +14,17 @@ namespace mw {
 
 Status::Status(const sqlite3_int64& i_status)
   : m_status(SV_UNKNOWN) {
-	int status = i_status % 2;
-	switch (status) {
-	case 0:
-		m_status = SV_EXPENSE;
-		break;
-	case 1:
-		m_status = SV_INCOME;
-		break;
-	default:
-		break;
-	}
+  int status = i_status % 2;
+  switch (status) {
+    case 0:
+      m_status = SV_EXPENSE;
+      break;
+    case 1:
+      m_status = SV_INCOME;
+      break;
+    default:
+      break;
+  }
 }
 
 Status::~Status() {
@@ -39,7 +39,14 @@ void Status::setStatus(const StatusValue& status) {
 }
 
 Status::operator sqlite3_int64() const {
-	return (static_cast<sqlite3_int64>(this->m_status));
+  return (static_cast<sqlite3_int64>(this->m_status));
+}
+
+bool Status::operator == (const Status& rhs) const {
+  return (this->m_status == rhs.m_status);
+}
+bool Status::operator != (const Status& rhs) const {
+  return (this->m_status != rhs.m_status);
 }
 
 }  /* namespace mw */

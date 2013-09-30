@@ -34,6 +34,8 @@ public:
   void setStatus(const StatusValue& status);
 
   operator sqlite3_int64() const;
+  bool operator == (const Status& rhs) const;
+  bool operator != (const Status& rhs) const;
 
 private:
   StatusValue m_status;
