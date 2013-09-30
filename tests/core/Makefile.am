@@ -1,6 +1,6 @@
 noinst_PROGRAMS = core_tests_all
 
-core_tests_all_SOURCES = test_all.cc
+core_tests_all_SOURCES = test_all.cc test_access_class.cc
 
 core_tests_all_LDFLAGS =
 
