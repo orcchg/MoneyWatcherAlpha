@@ -60,6 +60,8 @@ public:
   /// @return True, if loading has succeeded, False otherwise.
   bool load();
 
+  static int OPENED_DAILY_TABLES_COUNT;
+
 private:
   static ID_t next_id;
   static const std::string table_name;

@@ -16,6 +16,7 @@
 
 namespace mw {
 
+int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
 ID_t DailyTable::next_id = 0;
 const std::string DailyTable::table_name = "Daily_Table";
 
@@ -33,12 +34,14 @@ DailyTable::DailyTable(const std::string& i_db_name)
     // Do not allow invalid object of DailyTable to be instantiated.
     throw e;
   }
+  ++DailyTable::OPENED_DAILY_TABLES_COUNT;
   DBG("exit DailyTable constructor.");
 }
 
 DailyTable::~DailyTable() {
   DBG("enter DailyTable destructor.");
   this->__close_database__();
+  --DailyTable::OPENED_DAILY_TABLES_COUNT;
   DBG("exit DailyTable destructor.");
 }
 
@@ -96,12 +99,13 @@ Record DailyTable::addRecord(
       (sqlite3_bind_int64(this->m_db_statement, 4, i_balance) == SQLITE_OK);
   DBG("Balance [%lli] has been stored in SQLite database \"%s\".",
       i_balance, this->m_db_name.c_str());
+  int description_n_bytes = i_description.length() * sizeof(wchar_t);
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
           5,
           i_description.c_str(),
-          i_description.length(),
+          description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Description [\"%s\"] has been stored in SQLite database \"%s\".",
       i_description.c_str(), this->m_db_name.c_str());
