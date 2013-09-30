@@ -55,11 +55,11 @@ Record DailyTable::addRecord(
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare_v2(
-        this->m_db_handler,
-        insert_statement.c_str(),
-        nByte,
-        &(this->m_db_statement),
-        nullptr);
+      this->m_db_handler,
+      insert_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(insert_statement.c_str());
   }
@@ -121,7 +121,7 @@ Record DailyTable::addRecord(
   // TODO: caching the record
 #endif
   this->__finalize__(insert_statement.c_str());
-  Record record(i_balance, i_description, i_status, current_datetime);
+  Record record(record_id, i_balance, i_description, i_status, current_datetime);
   DBG("Constructed output record.");
   DBG("exit DailyTable::addRecord().");
   return (record);
@@ -163,7 +163,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   Status status(raw_status);
   DBG("Loaded column data: Date [\"%s\"]; Time [\"%s\"]; Balance [%lli]; Description [\"%s\"]; Status [%lli].",
 	  datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
-  Record record(balance, description, status, datetime);
+  Record record(id, balance, description, status, datetime);
   DBG("Proper record instance has been constructed.");
 #if ENABLED_DB_CACHING
   // TODO: caching the record
