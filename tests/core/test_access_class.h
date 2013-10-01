@@ -26,10 +26,10 @@ public:
   ID_t getNextID() const;
   const std::string& getTableName() const;
 
+  bool checkFinalized() const;
+
 private:
   DailyTable* m_ptr_daily_table;
-  ID_t m_next_id;
-  std::string m_table_name;
 };
 
 }  /* namespace mw */

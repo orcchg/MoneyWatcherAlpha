@@ -63,12 +63,11 @@ public:
   static int OPENED_DAILY_TABLES_COUNT;
 
 private:
-  static ID_t next_id;
-  static const std::string table_name;
-
   std::string m_db_name;
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;
+  ID_t m_next_record_id;
+  std::string m_table_name;
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 
   void __open_database__();

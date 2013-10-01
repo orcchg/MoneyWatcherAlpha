@@ -39,6 +39,7 @@ TEST (DailyTableTest, CreateDailyTable) {
     mw::DailyTable daily_table(test_daily_table_db_filename);
     ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccess accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
     int db_file_exists = access(test_daily_table_db_filename.c_str(), F_OK);
     ASSERT_TRUE(db_file_exists == 0);
     std::string statement = "SELECT * FROM \'";
@@ -56,6 +57,8 @@ TEST (DailyTableTest, CreateDailyTable) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
+
+    EXPECT_TRUE(accessor.checkFinalized());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
@@ -68,11 +71,13 @@ TEST (DailyTableTest, AddRecord) {
     mw::DailyTable daily_table(test_daily_table_db_filename);
     ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccess accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     std::wstring s_description = L"Тестовая запись в таблице";
     mw::Status s_status(mw::SV_INCOME);
     mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
-    EXPECT_EQ(record.getID(), accessor.getNextID());
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(record.getID(), accessor.getNextID() - 1);
     EXPECT_EQ(record.getBalance(), s_balance);
     EXPECT_STREQ(record.getDescription().c_str(), s_description.c_str());
     EXPECT_EQ(record.getStatus(), s_status);
@@ -121,20 +126,47 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_EQ(record.getBalance(), balance);
     const void* raw_description = sqlite3_column_text16(statement_handler, 4);
     std::wstring description(static_cast<const wchar_t*>(raw_description));
-    EXPECT_STREQ(record.getDescription().c_str(), description.c_str());  // TODO: written only 1st word
+    EXPECT_STREQ(record.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
     mw::Status status(raw_status);
     EXPECT_EQ(record.getStatus(), status);
     is_row = sqlite3_step(statement_handler);
     EXPECT_EQ(is_row, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
+
+    EXPECT_TRUE(accessor.checkFinalized());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
 }
 
 TEST (DailyTableTest, ReadRecord) {
-  //
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccess accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    MoneyValue_t s_balance = 1000;
+    std::wstring s_description = L"Тестовая запись в таблице";
+    mw::Status s_status(mw::SV_INCOME);
+    mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    mw::Record read_record = daily_table.readRecord(record.getID());
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(read_record.getID(), record.getID());
+    EXPECT_STREQ(read_record.getDateTime().getDate().c_str(), record.getDateTime().getDate().c_str());
+    EXPECT_STREQ(read_record.getDateTime().getTime().c_str(), record.getDateTime().getTime().c_str());
+    EXPECT_EQ(read_record.getBalance(), record.getBalance());
+    EXPECT_STREQ(read_record.getDescription().c_str(), record.getDescription().c_str());
+    EXPECT_EQ(read_record.getStatus(), record.getStatus());
+
+    EXPECT_TRUE(accessor.checkFinalized());
+  }
+  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
 }
 
 /* Main */
