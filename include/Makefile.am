@@ -3,6 +3,7 @@
 include_HEADERS = common.h \
 				  logger.h \
 				  serializable.h \
+				  singleton.h \
 				  cycle_table.h \
 				  daily_table.h \
 				  datetime.h \

@@ -6,8 +6,10 @@ core_tests_all_LDFLAGS =
 
 include_HEADERS = test_fixture.h test_include_all.h
 
-core_tests_all_CPPFLAGS = -std=c++11 -fPIC -I$(top_srcdir)/include -I$(top_srcdir)/tests/google
+core_tests_all_CPPFLAGS = -std=c++11 -fPIC -I$(top_srcdir)/include -I$(top_srcdir)/tests/google \
+						  @GOOGLE_LOGGING_CFLAGS@
 
 core_tests_all_LDADD = $(top_srcdir)/src/libmoneywatcher.la \
 					   $(top_srcdir)/sqlite3/libsqlite3formw.la \
-					   $(top_srcdir)/tests/google/lib_gtest.la
+					   $(top_srcdir)/tests/google/lib_gtest.la \
+					   @GOOGLE_LOGGING_LIBS@

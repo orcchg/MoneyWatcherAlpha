@@ -35,6 +35,9 @@ dnl Check if Libtool is present
 dnl Libtool is used for building share libraries 
 AC_PROG_LIBTOOL
 
+dnl Enable pkg-config      
+PKG_PROG_PKG_CONFIG
+
 dnl Link with Makefile.am in source directories
 AC_CONFIG_FILES(Makefile
                 sqlite3/Makefile
@@ -90,6 +93,7 @@ AS_IF([test "x$enable_logging" != "xno"],
   CXXFLAGS="$CXXFLAGS -DENABLE_LOGGING"
   AC_DEFINE([__MW_ENABLE_LOGGING__], [true], [Enabled logging in source code])
   MW_VAR_ENABLE_LOGGING=true
+  PKG_CHECK_MODULES([GOOGLE_LOGGING], [libglog >= 0.3.3])
   AC_MSG_NOTICE([Enabled logging in source code])
 ])
 AS_IF([test "x$enable_logging" == "xno"],
@@ -182,5 +186,26 @@ AC_SUBST(DYNAMIC_EXTENSION_FLAGS)
 #-----------------------------------------------------------------------
 
 AC_CHECK_FUNCS(posix_fallocate)
+
+dnl Security xFLAGS
+SECURITYFLAGS="-fstack-protector --param=ssp-buffer-size=4 -D_FORTIFY_SOURCE=2 -Wall -Wno-comment -Wformat-security"
+CXXFLAGS="$CXXFLAGS $SECURITYFLAGS"
+CFLAGS="$CFLAGS $SECURITYFLAGS"
+LDFLAGS="$LDFLAGS -Wl,-z,relro -Wl,--hash-style=gnu"
+
+dnl Compile with -rdynamic
+LDFLAGS="$LDFLAGS -rdynamic"
+
+dnl Do not link with unnecessary libraries
+LDFLAGS="$LDFLAGS -Wl,--as-needed"
+
+dnl Use the latest C++ standard 
+CXXFLAGS="$CXXFLAGS -std=c++0x"
+
+dnl Warn of unused precompiled headers
+CXXFLAGS="$CXXFLAGS -Winvalid-pch"
+
+dnl Use the modern C standard
+CFLAGS="$CFLAGS -std=c99"
 
 AC_OUTPUT

@@ -35,4 +35,18 @@
 
 #endif
 
+namespace mw {
+
+class Logger {
+public:
+  Logger();
+  virtual ~Logger();
+
+private:
+  void initialize();
+  void deinitialize();
+};
+
+}  /* namespace mw */
+
 #endif /* LOGGER_H_ */
