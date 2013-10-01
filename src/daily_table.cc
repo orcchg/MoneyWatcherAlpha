@@ -10,8 +10,8 @@
 #include <cstring>
 #include <stdexcept>
 #include "daily_table.h"
+#include "logger.h"
 #include "sqlite3.h"
-//#include <glog/logging.h>
 
 
 namespace mw {
@@ -25,7 +25,6 @@ DailyTable::DailyTable(const std::string& i_db_name)
   , m_next_record_id(0)
   , m_table_name("Daily_Table") {
   DBG("enter DailyTable constructor.");
-  //LOG(INFO) << "enter DailyTable constructor.";
   this->__open_database__();
   try {
     this->__create_table__();

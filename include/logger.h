@@ -15,14 +15,41 @@
 #if ENABLED_LOGGING
 #include <stdio.h>
 #include <stdarg.h>
+#include <glog/logging.h>
 
 #define PROMPT_SUGGEST " >>> "
-#define CRT(fmt, ...) printf((/*"CRT" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
-#define ERR(fmt, ...) printf((/*"ERR" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
-#define WRN(fmt, ...) printf((/*"WRN" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
-#define INF(fmt, ...) printf((/*"INF" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
-#define DBG(fmt, ...) printf((/*"DBG" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
-#define TRC(fmt, ...) printf((/*"TRC" PROMPT_SUGGEST "  " */fmt "\n"), ##__VA_ARGS__)
+#define COLOR_OPEN "0x1B[1;"
+#define COLOR_ENCLOSING "  m"
+#define NEWLINE "\n"
+#define PROMPT_CLOSE COLOR_ENCLOSING NEWLINE
+
+#define CRT_COLOR "01;31"
+#define ERR_COLOR "00;31"
+#define WRN_COLOR "00;33"
+#define INF_COLOR "00;32"
+#define DBG_COLOR "00;34"
+#define TRC_COLOR "01;37"
+
+#define CRT_STRING "  CRT"
+#define ERR_STRING "  ERR"
+#define WRN_STRING "  WRN"
+#define INF_STRING "  INF"
+#define DBG_STRING "  DBG"
+#define TRC_STRING "  TRC"
+
+#define CRT_SUGGEST COLOR_OPEN CRT_COLOR CRT_STRING PROMPT_SUGGEST
+#define ERR_SUGGEST COLOR_OPEN ERR_COLOR ERR_STRING PROMPT_SUGGEST
+#define WRN_SUGGEST COLOR_OPEN WRN_COLOR WRN_STRING PROMPT_SUGGEST
+#define INF_SUGGEST COLOR_OPEN INF_COLOR INF_STRING PROMPT_SUGGEST
+#define DBG_SUGGEST COLOR_OPEN DBG_COLOR DBG_STRING PROMPT_SUGGEST
+#define TRC_SUGGEST COLOR_OPEN TRC_COLOR TRC_STRING PROMPT_SUGGEST
+
+#define CRT(fmt, ...) printf((CRT_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define ERR(fmt, ...) printf((ERR_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define WRN(fmt, ...) printf((WRN_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define INF(fmt, ...) printf((INF_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define DBG(fmt, ...) printf((DBG_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define TRC(fmt, ...) printf((TRC_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
 
 #else
 

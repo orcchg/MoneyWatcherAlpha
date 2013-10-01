@@ -14,7 +14,6 @@
 #include <string>
 #include <unordered_map>
 #include "hash.h"
-#include "logger.h"
 #include "record.h"
 #include "types.h"
 
@@ -23,7 +22,7 @@ namespace mw {
 
 /// @class DailyTable
 /// @brief Represents a table of daily changes.
-class DailyTable /*: public Logger*/ {
+class DailyTable {
   friend class TestAccess;
 public:
   DailyTable(const std::string& db_name = "MW_DailyTable.db");

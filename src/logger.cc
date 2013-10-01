@@ -7,7 +7,6 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
-#include <glog/logging.h>
 #include "logger.h"
 
 
