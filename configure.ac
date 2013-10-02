@@ -89,8 +89,8 @@ AC_ARG_ENABLE(logging, [AS_HELP_STRING(
    esac], [enable_logging=no])
 AS_IF([test "x$enable_logging" != "xno"],
   [dnl Enable logging system for core sources debug
-  CFLAGS="$CFLAGS -DENABLE_LOGGING"
-  CXXFLAGS="$CXXFLAGS -DENABLE_LOGGING"
+  CFLAGS="$CFLAGS -DENABLE_LOGGING -DMW_LOG_LEVEL=$MW_LOG_LEVEL"
+  CXXFLAGS="$CXXFLAGS -DENABLE_LOGGING -DMW_LOG_LEVEL=$MW_LOG_LEVEL"
   AC_DEFINE([__MW_ENABLE_LOGGING__], [true], [Enabled logging in source code])
   MW_VAR_ENABLE_LOGGING=true
   AC_MSG_NOTICE([Enabled logging in source code])
@@ -101,6 +101,10 @@ AS_IF([test "x$enable_logging" == "xno"],
   AC_MSG_NOTICE([Disabled logging in source code])
 ])
 AM_CONDITIONAL([ENABLE_LOGGING], [test x$enable_logging != xno])
+AM_COND_IF([ENABLE_LOGGING], [
+  AC_DEFINE([__MW_LOG_LEVEL__], [MW_LOG_LEVEL], [Logging level])
+  AC_MSG_NOTICE([Logging level set to $MW_LOG_LEVEL])
+])
 AC_SUBST([MW_VAR_ENABLE_LOGGING])
 #-----------------------------------------------------------------------
 

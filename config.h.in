@@ -111,3 +111,6 @@
 
 /* Disabled logging in source code */
 #undef __MW_ENABLE_LOGGING__
+
+/* Logging level */
+#undef __MW_LOG_LEVEL__
