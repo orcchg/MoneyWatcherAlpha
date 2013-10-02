@@ -24,6 +24,18 @@ iDatabase::iDatabase(const std::string& i_db_name)
 iDatabase::~iDatabase() {
 }
 
+void iDatabase::__init__(const std::string& i_table_name) {
+  this->__open_database__();
+  try {
+    this->__create_table__(i_table_name);
+  } catch(TableException& e) {
+    ERR(e.what());
+    this->__terminate__("Error during create table.");
+    // Do not allow invalid object of DailyTable to be instantiated.
+    throw e;
+  }
+}
+
 void iDatabase::__open_database__() {
   int result = sqlite3_open(this->m_db_name.c_str(), &(this->m_db_handler));
   if (result != SQLITE_OK) {

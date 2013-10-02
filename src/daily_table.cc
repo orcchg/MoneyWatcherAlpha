@@ -23,15 +23,7 @@ DailyTable::DailyTable(const std::string& i_db_name)
   , m_next_record_id(0)
   , m_table_name("Daily_Table") {
   DBG("enter DailyTable constructor.");
-  this->__open_database__();
-  try {
-    this->__create_table__(this->m_table_name);
-  } catch(TableException& e) {
-    ERR(e.what());
-    this->__terminate__("Error during create table.");
-    // Do not allow invalid object of DailyTable to be instantiated.
-    throw e;
-  }
+  this->__init__(this->m_table_name);
   ++DailyTable::OPENED_DAILY_TABLES_COUNT;
   DBG("exit DailyTable constructor.");
 }
@@ -194,6 +186,12 @@ bool DailyTable::load() {
 
 /* Private members */
 // ----------------------------------------------------------------------------
+void DailyTable::__init__(const std::string& i_table_name) {
+  DBG("enter DailyTable::__init__().");
+  iDatabase::__init__(i_table_name);
+  DBG("exit DailyTable::__init__().");
+}
+
 void DailyTable::__open_database__() {
   DBG("enter DailyTable::__open_database__().");
   iDatabase::__open_database__();

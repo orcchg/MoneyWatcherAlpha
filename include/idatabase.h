@@ -26,6 +26,7 @@ protected:
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;
 
+  virtual void __init__(const std::string& i_table_name) = 0;
   virtual void __open_database__() = 0;
   virtual void __close_database__() = 0;
   virtual void __create_table__(const std::string& table_name) = 0;

@@ -68,6 +68,7 @@ private:
   std::string m_table_name;
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 
+  void __init__(const std::string& table_name);
   void __open_database__();
   void __close_database__();
   void __create_table__(const std::string& table_name);
