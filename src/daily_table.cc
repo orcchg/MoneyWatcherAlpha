@@ -29,7 +29,7 @@ DailyTable::DailyTable(const std::string& i_db_name)
   try {
     this->__create_table__();
   } catch(DailyTableException& e) {
-    //ERR(e.what());  // TODO: fix logs
+    ERR(e.what());  // TODO: fix logs
     this->__terminate__("Error during create table.");
     // Do not allow invalid object of DailyTable to be instantiated.
     throw e;
@@ -294,7 +294,7 @@ bool DailyTable::__does_table_exist__() {
 
 void DailyTable::__terminate__(const char* i_message) {
   DBG("enter DailyTable::__terminate__().");
-  //WRN(i_message);  // TODO: fix logs
+  WRN(i_message);
   sqlite3_close(this->m_db_handler);
   this->m_db_handler = nullptr;
   TRC("Database \"%s\" has been shut down.", this->m_db_name.c_str());

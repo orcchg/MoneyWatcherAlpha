@@ -18,17 +18,17 @@
 #include <glog/logging.h>
 
 #define PROMPT_SUGGEST " >>> "
-#define COLOR_OPEN "0x1B[1;"
-#define COLOR_ENCLOSING "  m"
+#define COLOR_OPEN "\e[5;"
+#define COLOR_ENCLOSING "\e[m"
 #define NEWLINE "\n"
 #define PROMPT_CLOSE COLOR_ENCLOSING NEWLINE
 
-#define CRT_COLOR "01;31"
-#define ERR_COLOR "00;31"
-#define WRN_COLOR "00;33"
-#define INF_COLOR "00;32"
-#define DBG_COLOR "00;34"
-#define TRC_COLOR "01;37"
+#define CRT_COLOR "01;31m"
+#define ERR_COLOR "00;31m"
+#define WRN_COLOR "00;33m"
+#define INF_COLOR "00;32m"
+#define DBG_COLOR "00;36m"
+#define TRC_COLOR "00;37m"
 
 #define CRT_STRING "  CRT"
 #define ERR_STRING "  ERR"
@@ -44,12 +44,12 @@
 #define DBG_SUGGEST COLOR_OPEN DBG_COLOR DBG_STRING PROMPT_SUGGEST
 #define TRC_SUGGEST COLOR_OPEN TRC_COLOR TRC_STRING PROMPT_SUGGEST
 
-#define CRT(fmt, ...) printf((CRT_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
-#define ERR(fmt, ...) printf((ERR_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
-#define WRN(fmt, ...) printf((WRN_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
-#define INF(fmt, ...) printf((INF_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
-#define DBG(fmt, ...) printf((DBG_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
-#define TRC(fmt, ...) printf((TRC_SUGGEST fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define CRT(fmt, ...) printf((CRT_SUGGEST #fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define ERR(fmt, ...) printf((ERR_SUGGEST #fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define WRN(fmt, ...) printf((WRN_SUGGEST #fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define INF(fmt, ...) printf((INF_SUGGEST #fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define DBG(fmt, ...) printf((DBG_SUGGEST #fmt PROMPT_CLOSE), ##__VA_ARGS__)
+#define TRC(fmt, ...) printf((TRC_SUGGEST #fmt PROMPT_CLOSE), ##__VA_ARGS__)
 
 #else
 
