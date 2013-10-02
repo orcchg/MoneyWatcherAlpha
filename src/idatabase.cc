@@ -54,35 +54,6 @@ void iDatabase::__close_database__() {
   sqlite3_free(nullptr);
 }
 
-void iDatabase::__create_table__(const std::string& i_table_name) {
-  std::string statement = "CREATE TABLE IF NOT EXISTS ";
-  statement += i_table_name;
-  statement += "('ID' INTEGER PRIMARY KEY, "
-      "'Date' TEXT, "
-      "'Time' TEXT, "
-      "'Balance' INTEGER, "
-      "'Description' TEXT, "
-      "'Status' INTEGER);";
-  int nByte = static_cast<int>(statement.length());
-  DBG("Provided string SQL statement: \"%s\" of length %i.", statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str());
-  }
-  DBG("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
-  sqlite3_step(this->m_db_statement);
-  DBG("Table \"%s\" has been successfully created.", i_table_name.c_str());
-  this->__finalize__(statement.c_str());
-}
-
 bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   std::string check_statement = "SELECT * FROM \'";
   check_statement += i_table_name;
