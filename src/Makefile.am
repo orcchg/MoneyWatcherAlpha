@@ -15,8 +15,7 @@ libmoneywatcher_la_LDFLAGS =
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
-libmoneywatcher_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/include -I$(top_srcdir)/sqlite3 \
-							  @GOOGLE_LOGGING_CFLAGS@
+libmoneywatcher_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/include -I$(top_srcdir)/sqlite3
 
-libmoneywatcher_la_LIBADD = @GOOGLE_LOGGING_LIBS@
+libmoneywatcher_la_LIBADD =
 

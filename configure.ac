@@ -93,7 +93,6 @@ AS_IF([test "x$enable_logging" != "xno"],
   CXXFLAGS="$CXXFLAGS -DENABLE_LOGGING"
   AC_DEFINE([__MW_ENABLE_LOGGING__], [true], [Enabled logging in source code])
   MW_VAR_ENABLE_LOGGING=true
-  PKG_CHECK_MODULES([GOOGLE_LOGGING], [libglog >= 0.3.3])
   AC_MSG_NOTICE([Enabled logging in source code])
 ])
 AS_IF([test "x$enable_logging" == "xno"],
