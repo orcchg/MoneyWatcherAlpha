@@ -38,8 +38,7 @@ public:
   /// @details Entry will also be stored into SQLite database.
   Entry addEntry(
       const std::wstring& name,
-      const MoneyValue_t& current_balance,
-      const Status& status = SV_UNKNOWN);
+      const MoneyValue_t& current_balance);
 
   /// @brief Reads entry from SQLite database.
   /// @param entry_id - Primary key of entry of interest in SQLite database.

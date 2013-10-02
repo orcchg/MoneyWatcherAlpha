@@ -102,7 +102,7 @@ Record DailyTable::addRecord(
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
   DBG("Status [%lli] has been stored in SQLite database \"%s\".",
-	  static_cast<sqlite3_int64>(i_status), this->m_db_name.c_str());
+	    static_cast<sqlite3_int64>(i_status), this->m_db_name.c_str());
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
     ERR("Error during saving data into database \"%s\" by statement \"%s\"!",
