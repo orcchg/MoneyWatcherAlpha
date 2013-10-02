@@ -32,12 +32,14 @@ public:
   std::string getDate() const;
   std::string getTime() const;
 
+  /// -------------------------------------------------------------------------
   /// @defgroup COMP Compare two date-time instances.
   /// @{
   bool operator < (const DateTime& rhs) const;
   bool operator == (const DateTime& rhs) const;
   bool operator != (const DateTime& rhs) const;
   /// @}
+  /// -------------------------------------------------------------------------
 
 private:
   boost::posix_time::ptime _datetime;

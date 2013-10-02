@@ -31,10 +31,9 @@ public:
       const DateTime& datetime = DateTime());
   virtual ~Record();
 
-  // --------------------------------------------
+  /// -------------------------------------------------------------------------
   /// @defgroup GET Getters for class members.
   /// @{
-
   /// @brief Gets an ID of the current record.
   ID_t getID() const;
   /// @brief Gets an actual money balance of the current record.
@@ -48,6 +47,7 @@ public:
   /// @brief Gets the status of the current record.
   const Status& getStatus() const;
   /// @}
+  /// -------------------------------------------------------------------------
 
 private:
   ID_t m_id;

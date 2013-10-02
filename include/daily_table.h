@@ -14,6 +14,7 @@
 #include <string>
 #include <unordered_map>
 #include "hash.h"
+#include "idatabase.h"
 #include "record.h"
 #include "types.h"
 
@@ -22,7 +23,7 @@ namespace mw {
 
 /// @class DailyTable
 /// @brief Represents a table of daily changes.
-class DailyTable {
+class DailyTable : private iDatabase {
   friend class TestAccess;
 public:
   DailyTable(const std::string& db_name = "MW_DailyTable.db");
@@ -40,7 +41,7 @@ public:
   Record addRecord(
       const MoneyValue_t& balance,
       const std::wstring& description,
-      const Status& status);
+      const Status& status = SV_UNKNOWN);
 
   /// @brief Reads record from SQLite database.
   /// @param record_id - Primary key of record of interest in SQLite database.
@@ -63,33 +64,17 @@ public:
   static int OPENED_DAILY_TABLES_COUNT;
 
 private:
-  std::string m_db_name;
-  DB_Handler m_db_handler;
-  DB_Statement m_db_statement;
   ID_t m_next_record_id;
   std::string m_table_name;
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 
   void __open_database__();
   void __close_database__();
-  void __create_table__();
-  bool __does_table_exist__();
+  void __create_table__(const std::string& table_name);
+  bool __does_table_exist__(const std::string& table_name);
   void __terminate__(const char* message);
   void __finalize__(const char* statement);
   void __finalize_and_throw__(const char* statement);
-};
-
-/// @class DailyTableException
-/// @brief Represents a common exception raised by DailyTable class methods.
-class DailyTableException : public std::exception {
-public:
-  DailyTableException(const char* message);
-  virtual ~DailyTableException() throw();
-
-  const char* what() const throw();
-
-private:
-  const char* m_message;
 };
 
 }  /* namespace mw */

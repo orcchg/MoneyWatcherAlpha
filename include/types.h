@@ -10,7 +10,6 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
-#include <stdint.h>
 #include "../sqlite3/sqlite3.h"
 
 

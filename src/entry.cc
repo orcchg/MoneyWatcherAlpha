@@ -13,7 +13,24 @@
 
 namespace mw {
 
-// ----------------------------------------------
+Entry::Entry(
+    const ID_t& id,
+    const std::wstring& name,
+    const MoneyValue_t& current_balance,
+    const MoneyValue_t& last_transaction,
+    const Status& status,
+    const DateTime& datetime)
+    : m_id(id)
+    , m_name(name)
+    , m_current_balance(current_balance)
+    , m_last_transaction(last_transaction)
+    , m_datetime(datetime)
+    , m_status(status) {
+}
+
+Entry::~Entry() {
+}
+
 ID_t Entry::getID() const {
   return (this->m_id);
 }
@@ -36,10 +53,6 @@ const DateTime& Entry::getDateTime() const {
 
 const Status& Entry::getStatus() const {
   return (this->m_status);
-}
-
-void* Entry::getData() const {
-  return (this->m_data);
 }
 
 // ----------------------------------------------

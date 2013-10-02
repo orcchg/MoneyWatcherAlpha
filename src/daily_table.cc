@@ -19,17 +19,15 @@ namespace mw {
 int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
 
 DailyTable::DailyTable(const std::string& i_db_name)
-  : m_db_name(i_db_name)
-  , m_db_handler(nullptr)
-  , m_db_statement(nullptr)
+  : iDatabase(i_db_name)
   , m_next_record_id(0)
   , m_table_name("Daily_Table") {
   DBG("enter DailyTable constructor.");
   this->__open_database__();
   try {
-    this->__create_table__();
-  } catch(DailyTableException& e) {
-    ERR(e.what());  // TODO: fix logs
+    this->__create_table__(this->m_table_name);
+  } catch(TableException& e) {
+    ERR(e.what());
     this->__terminate__("Error during create table.");
     // Do not allow invalid object of DailyTable to be instantiated.
     throw e;
@@ -198,137 +196,42 @@ bool DailyTable::load() {
 // ----------------------------------------------------------------------------
 void DailyTable::__open_database__() {
   DBG("enter DailyTable::__open_database__().");
-  int result = sqlite3_open(this->m_db_name.c_str(), &(this->m_db_handler));
-  if (result != SQLITE_OK) {
-    ERR("Unable to open database \"%s\"!", this->m_db_name.c_str());
-    this->__terminate__("Error during open database.");
-    throw DailyTableException("Unable to open database!");
-  }
-  DBG("SQLite database \"%s\" has been successfully opened and placed into %p.",
-      this->m_db_name.c_str(), this->m_db_handler);
+  iDatabase::__open_database__();
   DBG("exit DailyTable::__open_database__().");
 }
 
 void DailyTable::__close_database__() {
   DBG("enter DailyTable::__close_database__().");
-  if (this->m_db_statement) {
-    DBG("Found prepared SQL statement at %p.", this->m_db_statement);
-    this->__finalize__("");
-  } else {
-    DBG("Statement has been already finalized.");
-  }
-  if (this->m_db_handler) {
-    DBG("Found valid database handler at %p.", this->m_db_handler);
-    sqlite3_close(this->m_db_handler);
-    this->m_db_handler = nullptr;
-    DBG("Database \"%s\" has been successfully closed.",
-        this->m_db_name.c_str());
-  } else {
-    DBG("Database \"%s\" has been already shut down.", this->m_db_name.c_str());
-  }
-  sqlite3_free(nullptr);
+  iDatabase::__close_database__();
   DBG("exit DailyTable::__close_database__().");
 }
 
-void DailyTable::__create_table__() {
+void DailyTable::__create_table__(const std::string& i_table_name) {
   DBG("enter DailyTable::__create_table__().");
-  std::string statement = "CREATE TABLE IF NOT EXISTS ";
-  statement += this->m_table_name;
-  statement += "('ID' INTEGER PRIMARY KEY, "
-      "'Date' TEXT, "
-      "'Time' TEXT, "
-      "'Balance' INTEGER, "
-      "'Description' TEXT, "
-      "'Status' INTEGER);";
-  int nByte = static_cast<int>(statement.length());
-  DBG("Provided string SQL statement: \"%s\" of length %i.", statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str());
-  }
-  DBG("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
-  sqlite3_step(this->m_db_statement);
-  DBG("Table \"%s\" has been successfully created.", this->m_table_name.c_str());
-  this->__finalize__(statement.c_str());
+  iDatabase::__create_table__(i_table_name);
   DBG("exit DailyTable::__create_table__().");
 }
 
-bool DailyTable::__does_table_exist__() {
+bool DailyTable::__does_table_exist__(const std::string& i_table_name) {
   DBG("enter DailyTable::__does_table_exist__().");
-  std::string check_statement = "SELECT * FROM \'";
-  check_statement += this->m_table_name;
-  check_statement += "\';";
-  int nByte = static_cast<int>(check_statement.length());
-  DBG("Provided string SQL statement: \"%s\" of length %i.", check_statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      check_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  sqlite3_step(this->m_db_statement);
-  this->__finalize__(check_statement.c_str());
-  bool table_exists = false;
-  switch (result) {
-    case SQLITE_OK:
-      DBG("SQLite table \"%s\" already exists.", this->m_table_name.c_str());
-      table_exists = true;
-      break;
-    default:
-      DBG("SQLite table \"%s\" does not exist.", this->m_table_name.c_str());
-      break;
-  }
-  DBG("exit DailyTable::__does_table_exist__().");
-  return (table_exists);
+  return (iDatabase::__does_table_exist__(i_table_name));
 }
 
 void DailyTable::__terminate__(const char* i_message) {
   DBG("enter DailyTable::__terminate__().");
-  WRN(i_message);
-  sqlite3_close(this->m_db_handler);
-  this->m_db_handler = nullptr;
-  TRC("Database \"%s\" has been shut down.", this->m_db_name.c_str());
-  sqlite3_free(nullptr);
+  iDatabase::__terminate__(i_message);
   DBG("exit DailyTable::__terminate__().");
 }
 
-void DailyTable::__finalize__(const char* statement) {
+void DailyTable::__finalize__(const char* i_statement) {
   DBG("enter DailyTable::__finalize__().");
-  sqlite3_finalize(this->m_db_statement);
-  this->m_db_statement = nullptr;
-  TRC("Statement \"%s\" has been finalized.", statement);
+  iDatabase::__finalize__(i_statement);
   DBG("exit DailyTable::__finalize__().");
 }
 
-void DailyTable::__finalize_and_throw__(const char* statement) {
+void DailyTable::__finalize_and_throw__(const char* i_statement) {
   DBG("enter DailyTable::__finalize_and_throw__().");
-  ERR("Unable to prepare statement \"%s\"!", statement);
-  this->__finalize__(statement);
-  DBG("exit DailyTable::__finalize_and_throw__().");
-  throw DailyTableException("Unable to prepare statement!");
-}
-
-/* Exception class implementation */
-// ----------------------------------------------------------------------------
-DailyTableException::DailyTableException(const char* i_message)
-  : m_message(i_message) {
-}
-
-DailyTableException::~DailyTableException() throw() {
-}
-
-const char* DailyTableException::what() const throw() {
-  return (this->m_message);
+  iDatabase::__finalize_and_throw__(i_statement);
 }
 
 }  /* namespace mw */

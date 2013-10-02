@@ -22,10 +22,18 @@ namespace mw {
 /// @brief Represents an element of Cycle Table.
 class Entry {
 public:
-  // --------------------------------------------
+  Entry(
+      const ID_t& id,
+      const std::wstring& name,
+      const MoneyValue_t& current_balance,
+      const MoneyValue_t& last_transaction,
+      const Status& status,
+      const DateTime& datetime = DateTime());
+  virtual ~Entry();
+
+  /// -------------------------------------------------------------------------
   /// @defgroup GET Getters for class members.
   /// @{
-
   /// @brief Gets an ID of the current entry.
   ID_t getID() const;
   /// @brief Gets a name of the current entry.
@@ -43,8 +51,9 @@ public:
   /// @brief Gets other data.
   void* getData() const;
   /// @}
+  /// -------------------------------------------------------------------------
 
-  // --------------------------------------------
+  /// -------------------------------------------------------------------------
   /// @defgroup SET Setters for class members.
   /// @{
   /// @brief Updates an actual money balance of the current entry.
@@ -54,11 +63,11 @@ public:
   /// @details This action will generate an event for the Update Manager.
   void updateBalance(const MoneyValue_t& value);
   /// @}
+  /// -------------------------------------------------------------------------
 
-  // --------------------------------------------
+  /// -------------------------------------------------------------------------
   /// @defgroup SERVICE Various service functions.
   /// @{
-
   /// @brief Cancels the last action performed on the current entry
   /// and rolls the state of the entry back for the previous one.
   /// @note This action cannot be undone.
@@ -70,6 +79,7 @@ public:
   /// so the updateBalance() function should be invoked after.
   void clear();
   /// @}
+  /// -------------------------------------------------------------------------
 
 private:
   ID_t m_id;
@@ -78,7 +88,6 @@ private:
   MoneyValue_t m_last_transaction;
   DateTime m_datetime;
   Status m_status;
-  void* m_data;
 
 };
 
