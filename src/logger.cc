@@ -11,21 +11,4 @@
 
 
 namespace mw {
-
-Logger::Logger() {
-  initialize();
-}
-
-Logger::~Logger() {
-  this->deinitialize();
-}
-
-void Logger::initialize() {
-  google::InitGoogleLogging(nullptr);
-}
-
-void Logger::deinitialize() {
-  google::ShutdownGoogleLogging();
-}
-
 }  /* namespace mw */
