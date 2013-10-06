@@ -15,6 +15,7 @@ libmoneywatcher_la_SOURCES = cycle_table.cc \
 							 idatabase.cc \
 							 logger.cc \
 							 record.cc \
+							 service.cc \
 							 status.cc
 
 # Linker options libTestProgram

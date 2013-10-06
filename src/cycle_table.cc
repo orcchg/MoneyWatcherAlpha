@@ -9,6 +9,7 @@
 
 #include "cycle_table.h"
 #include "logger.h"
+#include "service.h"
 
 
 namespace mw {
@@ -61,7 +62,7 @@ Entry CycleTable::addEntry(
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database "%s".",
       entry_id, this->m_db_name.c_str());
-  int name_n_bytes = i_name.length() * sizeof(wchar_t);
+  int name_n_bytes = static_cast<int>(i_name.length()) * sizeof(wchar_t);
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
@@ -71,7 +72,7 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Name ["%ls"] has been stored in SQLite database "%s".",
       i_name.c_str(), this->m_db_name.c_str());
-  int description_n_bytes = i_description.length() * sizeof(wchar_t);
+  int description_n_bytes = static_cast<int>(i_description.length()) * sizeof(wchar_t);
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
@@ -184,10 +185,60 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   Entry entry(id, name, description, balance, transaction, status, datetime);
   DBG("Proper entry instance has been constructed.");
 #if ENABLED_DB_CACHING
-  // TODO: caching the record
+  // TODO: caching the entry
 #endif
   this->__finalize__(select_statement.c_str());
   INF("exit CycleTable::readEntry().");
+  return (entry);
+}
+
+Entry CycleTable::updateEntry(
+    const ID_t& i_entry_id,
+    const MoneyValue_t& i_value,
+    const std::wstring& i_description) {
+  INF("enter CycleTable::updateEntry().");
+  Entry entry = this->readEntry(i_entry_id);
+  DBG("Got entry from SQLite database.");
+  entry.updateBalance(i_value, i_description);
+  DBG("Updated entry.");
+  std::wstring update_statement = L"UPDATE \'";
+  update_statement += widenString(this->m_table_name);
+  update_statement += L"\' SET Description = \'";
+  update_statement += i_description;
+  update_statement += L"\', CurrentBalance = \'";
+  update_statement += std::to_wstring(entry.getBalance());
+  update_statement += L"\', LastTransaction = \'";
+  update_statement += std::to_wstring(i_value);
+  update_statement += L"\', Date = \'";
+  update_statement += widenString(entry.getDateTime().getDate());
+  update_statement += L"\', Time = \'";
+  update_statement += widenString(entry.getDateTime().getTime());
+  update_statement += L"\', Status = \'";
+  update_statement += std::to_wstring(static_cast<sqlite3_int64>(entry.getStatus()));
+  update_statement += L"\' WHERE ID == \'";
+  update_statement += std::to_wstring(i_entry_id);
+  update_statement += L"\';";
+  int nByte = static_cast<int>(update_statement.length()) * sizeof(wchar_t);
+  TRC("Provided string SQL statement: "%ls" of length %i.", update_statement.c_str(), nByte);
+  assert("Invalid database handler! Database probably was not open." &&
+         this->m_db_handler);
+  int result = sqlite3_prepare16_v2(
+      this->m_db_handler,
+      update_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(update_statement.c_str());
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+#if ENABLED_DB_CACHING
+  // TODO: caching the entry
+#endif
+  this->__finalize__(update_statement.c_str());
+  INF("exit CycleTable::updateEntry().");
   return (entry);
 }
 
@@ -263,6 +314,17 @@ void CycleTable::__finalize__(const char* i_statement) {
 }
 
 void CycleTable::__finalize_and_throw__(const char* i_statement) {
+  DBG("enter CycleTable::__finalize_and_throw__().");
+  iDatabase::__finalize_and_throw__(i_statement);
+}
+
+void CycleTable::__finalize__(const wchar_t* i_statement) {
+  DBG("enter CycleTable::__finalize__().");
+  iDatabase::__finalize__(i_statement);
+  DBG("exit CycleTable::__finalize__().");
+}
+
+void CycleTable::__finalize_and_throw__(const wchar_t* i_statement) {
   DBG("enter CycleTable::__finalize_and_throw__().");
   iDatabase::__finalize_and_throw__(i_statement);
 }

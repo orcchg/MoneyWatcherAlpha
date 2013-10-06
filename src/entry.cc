@@ -77,7 +77,8 @@ Status Entry::updateBalance(const MoneyValue_t& i_value, const std::wstring& i_d
     status.setStatus(SV_INCOME);
     TRC("Balance update as income.");
   }
-  TRC("Updated current balance of entry \"%ls\" at \"%s\" \"%s\" for value %lli.",
+  this->m_status = status;
+  TRC("Updated current balance of entry "%ls" at "%s" "%s" for value %lli.",
       this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), i_value);
   DBG("exit Entry::updateBalance().");
   return (status);

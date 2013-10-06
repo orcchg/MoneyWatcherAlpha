@@ -34,6 +34,8 @@ protected:
   virtual void __terminate__(const char* message) = 0;
   virtual void __finalize__(const char* statement) = 0;
   virtual void __finalize_and_throw__(const char* statement) = 0;
+  virtual void __finalize__(const wchar_t* statement) = 0;
+  virtual void __finalize_and_throw__(const wchar_t* statement) = 0;
 };
 
 /// @class TableException

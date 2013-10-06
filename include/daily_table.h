@@ -77,6 +77,8 @@ private:
   void __terminate__(const char* message);
   void __finalize__(const char* statement);
   void __finalize_and_throw__(const char* statement);
+  void __finalize__(const wchar_t* statement);
+  void __finalize_and_throw__(const wchar_t* statement);
 };
 
 }  /* namespace mw */

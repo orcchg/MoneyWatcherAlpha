@@ -10,6 +10,7 @@ include_HEADERS = common.h \
 				  logger.h \
 				  record.h \
 				  serializable.h \
+				  service.h \
 				  singleton.h \
 				  status.h \
 				  $(top_srcdir)/sqlite3/sqlite3.h \

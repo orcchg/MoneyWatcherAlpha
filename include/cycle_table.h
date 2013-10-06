@@ -47,6 +47,18 @@ public:
   /// @param entry_id - Primary key of entry of interest in SQLite database.
   /// @return Newly read entry.
   Entry readEntry(const ID_t& entry_id);
+
+  /// @brief Updates current balance of existing entry.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @param value - Amount to which the actual money balance should
+  /// be updated - it could be both positive (income) or negative (expense)
+  /// value.
+  /// @param description - Description of provided transaction.
+  /// @return Updated entry.
+  Entry updateEntry(
+      const ID_t& entry_id,
+      const MoneyValue_t& value,
+      const std::wstring& description);
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -65,6 +77,8 @@ private:
   void __terminate__(const char* message);
   void __finalize__(const char* statement);
   void __finalize_and_throw__(const char* statement);
+  void __finalize__(const wchar_t* statement);
+  void __finalize_and_throw__(const wchar_t* statement);
 };
 
 }  /* namespace mw */

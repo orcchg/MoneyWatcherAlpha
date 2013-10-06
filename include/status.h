@@ -18,9 +18,9 @@
 namespace mw {
 
 enum StatusValue { SV_UNKNOWN = -1,
-	               SV_EXPENSE = 0,
-	               SV_INCOME = 1,
-	               SV_COUNT
+	                 SV_EXPENSE = 0,
+	                 SV_INCOME = 1,
+	                 SV_COUNT
 };
 
 /// @class Status

@@ -89,7 +89,7 @@ Record DailyTable::addRecord(
       (sqlite3_bind_int64(this->m_db_statement, 4, i_balance) == SQLITE_OK);
   DBG("Balance [%lli] has been stored in SQLite database "%s".",
       i_balance, this->m_db_name.c_str());
-  int description_n_bytes = i_description.length() * sizeof(wchar_t);
+  int description_n_bytes = static_cast<int>(i_description.length()) * sizeof(wchar_t);
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
@@ -254,6 +254,17 @@ void DailyTable::__finalize__(const char* i_statement) {
 }
 
 void DailyTable::__finalize_and_throw__(const char* i_statement) {
+  DBG("enter DailyTable::__finalize_and_throw__().");
+  iDatabase::__finalize_and_throw__(i_statement);
+}
+
+void DailyTable::__finalize__(const wchar_t* i_statement) {
+  DBG("enter DailyTable::__finalize__().");
+  iDatabase::__finalize__(i_statement);
+  DBG("exit DailyTable::__finalize__().");
+}
+
+void DailyTable::__finalize_and_throw__(const wchar_t* i_statement) {
   DBG("enter DailyTable::__finalize_and_throw__().");
   iDatabase::__finalize_and_throw__(i_statement);
 }

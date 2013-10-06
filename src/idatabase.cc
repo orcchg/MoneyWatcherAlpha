@@ -117,6 +117,19 @@ void iDatabase::__finalize_and_throw__(const char* statement) {
   throw TableException("Unable to prepare statement!");
 }
 
+void iDatabase::__finalize__(const wchar_t* statement) {
+  sqlite3_finalize(this->m_db_statement);
+  this->m_db_statement = nullptr;
+  TRC("Statement "%ls" has been finalized.", statement);
+}
+
+void iDatabase::__finalize_and_throw__(const wchar_t* statement) {
+  ERR("Unable to prepare statement "%ls"!", statement);
+  this->__finalize__(statement);
+  DBG("exit iDatabase::__finalize_and_throw__().");
+  throw TableException("Unable to prepare statement!");
+}
+
 
 /* Table exception */
 // ----------------------------------------------------------------------------
