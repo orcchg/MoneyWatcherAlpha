@@ -33,10 +33,6 @@ public:
       const DateTime& datetime = DateTime());
   virtual ~Entry();
 
-  /// @brief Makes record from current entry.
-  /// @return Newly created record.
-  Record makeRecord() const;
-
   /// -------------------------------------------------------------------------
   /// @defgroup GET Getters for class members.
   /// @{
@@ -57,8 +53,6 @@ public:
   const DateTime& getDateTime() const;
   /// @brief Gets the status of the last transaction.
   const Status& getStatus() const;
-  /// @brief Gets other data.
-  void* getData() const;
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -69,8 +63,10 @@ public:
   /// @param value - Amount to which the actual money balance should
   /// be updated - it could be both positive (income) or negative (expense)
   /// value.
+  /// @param description - Description of provided transaction.
+  /// @return Status of last transaction.
   /// @details This action will generate an event for the Update Manager.
-  void updateBalance(const MoneyValue_t& value);
+  Status updateBalance(const MoneyValue_t& value, const std::wstring& description);
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -99,6 +95,9 @@ private:
   DateTime m_datetime;
   Status m_status;
 
+  /// @brief Makes record from current entry.
+  /// @return Newly created record.
+  Record __make_record__() const;
 };
 
 }  /* namespace mw */

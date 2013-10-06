@@ -9,6 +9,7 @@
 
 #include <string>
 #include "entry.h"
+#include "logger.h"
 
 
 namespace mw {
@@ -31,16 +32,6 @@ Entry::Entry(
 }
 
 Entry::~Entry() {
-}
-
-Record Entry::makeRecord() const {
-  Record record(
-      0,
-      this->m_last_transaction,
-      this->m_description,
-      this->m_status,
-      this->m_datetime);
-  return (record);
 }
 
 ID_t Entry::getID() const {
@@ -72,8 +63,24 @@ const Status& Entry::getStatus() const {
 }
 
 // ----------------------------------------------
-void Entry::updateBalance(const MoneyValue_t& value) {
-  // TODO(m.alov): Implement.
+Status Entry::updateBalance(const MoneyValue_t& i_value, const std::wstring& i_description) {
+  DBG("enter Entry::updateBalance().");
+  Status status(SV_UNKNOWN);
+  this->m_description = i_description;
+  this->m_last_transaction = i_value;
+  this->m_current_balance += i_value;  // update current balance
+  this->m_datetime = DateTime();  // time of update
+  if (i_value < 0) {
+    status.setStatus(SV_EXPENSE);
+    TRC("Balance update as expense.");
+  } else {
+    status.setStatus(SV_INCOME);
+    TRC("Balance update as income.");
+  }
+  TRC("Updated current balance of entry \"%ls\" at \"%s\" \"%s\" for value %lli.",
+      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), i_value);
+  DBG("exit Entry::updateBalance().");
+  return (status);
 }
 
 // ----------------------------------------------
@@ -83,6 +90,18 @@ void Entry::undo() {
 
 void Entry::clear() {
   // TODO(m.alov): Implement.
+}
+
+
+// ----------------------------------------------------------------------------
+Record Entry::__make_record__() const {
+  Record record(
+      -1,  // proper ID will be assigned during database writing.
+      this->m_last_transaction,
+      this->m_description,
+      this->m_status,
+      this->m_datetime);
+  return (record);
 }
 
 }  /* namespace mw */
