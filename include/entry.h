@@ -12,6 +12,7 @@
 
 #include <string>
 #include "datetime.h"
+#include "record.h"
 #include "status.h"
 #include "types.h"
 
@@ -25,11 +26,16 @@ public:
   Entry(
       const ID_t& id,
       const std::wstring& name,
+      const std::wstring& description,
       const MoneyValue_t& current_balance,
       const MoneyValue_t& last_transaction,
       const Status& status,
       const DateTime& datetime = DateTime());
   virtual ~Entry();
+
+  /// @brief Makes record from current entry.
+  /// @return Newly created record.
+  Record makeRecord() const;
 
   /// -------------------------------------------------------------------------
   /// @defgroup GET Getters for class members.
@@ -38,6 +44,9 @@ public:
   ID_t getID() const;
   /// @brief Gets a name of the current entry.
   const std::wstring& getName() const;
+  /// @brief Gets the descriptive comment supplied with the
+  /// last transaction.
+  const std::wstring& getDescription() const;
   /// @brief Gets an actual money balance of the current entry.
   const MoneyValue_t& getBalance() const;
   /// @brief Gets a money value of the last transaction
@@ -84,6 +93,7 @@ public:
 private:
   ID_t m_id;
   std::wstring m_name;
+  std::wstring m_description;
   MoneyValue_t m_current_balance;
   MoneyValue_t m_last_transaction;
   DateTime m_datetime;

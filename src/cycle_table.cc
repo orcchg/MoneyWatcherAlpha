@@ -34,11 +34,12 @@ CycleTable::~CycleTable() {
 
 Entry CycleTable::addEntry(
     const std::wstring& i_name,
+    const std::wstring& i_description,
     const MoneyValue_t& i_current_balance) {
   DBG("enter CycleTable::addEntry().");
   std::string insert_statement = "INSERT INTO \'";
   insert_statement += this->m_table_name;
-  insert_statement += "\' VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7);";
+  insert_statement += "\' VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
   int nByte = static_cast<int>(insert_statement.length());
   DBG("Provided string SQL statement: \"%s\" of length %i.", insert_statement.c_str(), nByte);
   assert("Invalid database handler! Database probably was not open." &&
@@ -70,13 +71,23 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Name [\"%ls\"] has been stored in SQLite database \"%s\".",
       i_name.c_str(), this->m_db_name.c_str());
+  int description_n_bytes = i_description.length() * sizeof(wchar_t);
   accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 3, i_current_balance) == SQLITE_OK);
+      (sqlite3_bind_text16(
+          this->m_db_statement,
+          3,
+          i_description.c_str(),
+          description_n_bytes,
+          SQLITE_TRANSIENT) == SQLITE_OK);
+  DBG("Description [\"%ls\"] has been stored in SQLite database \"%s\".",
+      i_description.c_str(), this->m_db_name.c_str());
+  accumulate = accumulate &&
+      (sqlite3_bind_int64(this->m_db_statement, 4, i_current_balance) == SQLITE_OK);
   DBG("Current balance [%lli] has been stored in SQLite database \"%s\".",
       i_current_balance, this->m_db_name.c_str());
   MoneyValue_t last_transaction = 0;
   accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 4, last_transaction) == SQLITE_OK);
+      (sqlite3_bind_int64(this->m_db_statement, 5, last_transaction) == SQLITE_OK);
   DBG("Last transaction balance [%lli] has been stored in SQLite database \"%s\".",
       last_transaction, this->m_db_name.c_str());
   DateTime current_datetime;
@@ -84,7 +95,7 @@ Entry CycleTable::addEntry(
   accumulate = accumulate &&
       (sqlite3_bind_text(
           this->m_db_statement,
-          5,
+          6,
           date.c_str(),
           date.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
@@ -94,7 +105,7 @@ Entry CycleTable::addEntry(
   accumulate = accumulate &&
       (sqlite3_bind_text(
           this->m_db_statement,
-          6,
+          7,
           time.c_str(),
           time.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
@@ -102,7 +113,7 @@ Entry CycleTable::addEntry(
       time.c_str(), this->m_db_name.c_str());
   Status status = SV_UNKNOWN;
   accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 7, static_cast<sqlite3_int64>(status)) == SQLITE_OK);
+      (sqlite3_bind_int64(this->m_db_statement, 8, static_cast<sqlite3_int64>(status)) == SQLITE_OK);
   DBG("Status [%lli] has been stored in SQLite database \"%s\".",
       static_cast<sqlite3_int64>(status), this->m_db_name.c_str());
   sqlite3_step(this->m_db_statement);
@@ -120,6 +131,7 @@ Entry CycleTable::addEntry(
   Entry entry(
       entry_id,
       i_name,
+      i_description,
       i_current_balance,
       last_transaction,
       status,
@@ -158,16 +170,18 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
          id == i_entry_id);
   const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 1));
   std::wstring name(static_cast<const wchar_t*>(raw_name));
-  MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 2);
-  MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 3);
-  std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 4)));
-  std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 5)));
+  const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 2));
+  std::wstring description(static_cast<const wchar_t*>(raw_description));
+  MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
+  MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 4);
+  std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 5)));
+  std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 6)));
   DateTime datetime(date, time);
-  sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 6);
+  sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 7);
   Status status(raw_status);
-  DBG("Loaded column data: Name [\"%ls\"]; Balance [%lli]; Transaction [%lli]; Date [\"%s\"]; Time [\"%s\"]; Status [%lli].",
-      name.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
-  Entry entry(id, name, balance, transaction, status, datetime);
+  DBG("Loaded column data: Name [\"%ls\"]; Description [\"%ls\"]; Balance [%lli]; Transaction [%lli]; Date [\"%s\"]; Time [\"%s\"]; Status [%lli].",
+      name.c_str(), description.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
+  Entry entry(id, name, description, balance, transaction, status, datetime);
   DBG("Proper entry instance has been constructed.");
 #if ENABLED_DB_CACHING
   // TODO: caching the record
@@ -204,6 +218,7 @@ void CycleTable::__create_table__(const std::string& i_table_name) {
   statement += i_table_name;
   statement += "('ID' INTEGER PRIMARY KEY, "
       "'Name' TEXT, "
+      "'Description' TEXT, "
       "'CurrentBalance' INTEGER, "
       "'LastTransaction' INTEGER, "
       "'Date' TEXT, "

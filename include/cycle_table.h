@@ -34,12 +34,13 @@ public:
   /// @{
   /// @brief Adds new entry to CycleTable.
   /// @param name - Name of entry.
+  /// @param description - Text description of last transaction.
   /// @param current_balace - Value of current money balance of entry.
-  /// @param status - Status of last transaction performed over entry.
   /// @return Newly created entry.
   /// @details Entry will also be stored into SQLite database.
   Entry addEntry(
       const std::wstring& name,
+      const std::wstring& description,
       const MoneyValue_t& current_balance);
 
   /// @brief Reads entry from SQLite database.
