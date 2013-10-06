@@ -224,7 +224,7 @@ Entry CycleTable::updateEntry(
          this->m_db_handler);
   int result = sqlite3_prepare16_v2(
       this->m_db_handler,
-      update_statement.c_str(),
+      reinterpret_cast<const wchar_t*>(update_statement.c_str()),
       nByte,
       &(this->m_db_statement),
       nullptr);

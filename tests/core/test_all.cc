@@ -30,7 +30,7 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
 TEST (CycleTableTest, CreateCycleTable) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  {
+  try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
@@ -54,6 +54,9 @@ TEST (CycleTableTest, CreateCycleTable) {
     sqlite3_finalize(statement_handler);
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
@@ -62,7 +65,7 @@ TEST (CycleTableTest, CreateCycleTable) {
 TEST (CycleTableTest, AddEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  {
+  try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
@@ -139,6 +142,9 @@ TEST (CycleTableTest, AddEntry) {
     sqlite3_finalize(statement_handler);
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
@@ -147,7 +153,7 @@ TEST (CycleTableTest, AddEntry) {
 TEST (CycleTableTest, ReadEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  {
+  try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
@@ -178,6 +184,9 @@ TEST (CycleTableTest, ReadEntry) {
     EXPECT_EQ(read_entry.getStatus(), entry.getStatus());
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
@@ -186,7 +195,7 @@ TEST (CycleTableTest, ReadEntry) {
 TEST (CycleTableTest, UpdateEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  {
+  try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
@@ -227,6 +236,9 @@ TEST (CycleTableTest, UpdateEntry) {
     EXPECT_EQ(read_entry.getStatus(), entry.getStatus());
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
@@ -238,7 +250,7 @@ TEST (CycleTableTest, UpdateEntry) {
 TEST (DailyTableTest, CreateDailyTable) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  {
+  try {
     mw::DailyTable daily_table(test_daily_table_db_filename);
     ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
@@ -262,6 +274,9 @@ TEST (DailyTableTest, CreateDailyTable) {
     sqlite3_finalize(statement_handler);
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_daily_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
@@ -270,7 +285,7 @@ TEST (DailyTableTest, CreateDailyTable) {
 TEST (DailyTableTest, AddRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  {
+  try {
     mw::DailyTable daily_table(test_daily_table_db_filename);
     ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
@@ -338,6 +353,9 @@ TEST (DailyTableTest, AddRecord) {
     sqlite3_finalize(statement_handler);
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_daily_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
@@ -346,7 +364,7 @@ TEST (DailyTableTest, AddRecord) {
 TEST (DailyTableTest, ReadRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  {
+  try {
     mw::DailyTable daily_table(test_daily_table_db_filename);
     ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
@@ -367,6 +385,9 @@ TEST (DailyTableTest, ReadRecord) {
     EXPECT_EQ(read_record.getStatus(), record.getStatus());
 
     EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    remove(test_daily_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());

@@ -8,6 +8,8 @@
  */
 
 #include <cassert>
+#include <cstring>
+#include <cwchar>
 #include "common.h"
 #include "idatabase.h"
 #include "logger.h"
@@ -107,11 +109,13 @@ void iDatabase::__terminate__(const char* message) {
 void iDatabase::__finalize__(const char* statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
-  TRC("Statement "%s" has been finalized.", statement);
+  TRC("Statement "%s" (%i bytes) has been finalized.",
+      statement, static_cast<int>(strlen(statement)) * sizeof(char));
 }
 
 void iDatabase::__finalize_and_throw__(const char* statement) {
-  ERR("Unable to prepare statement "%s"!", statement);
+  ERR("Unable to prepare statement "%s" (%i bytes)!",
+      statement, static_cast<int>(strlen(statement)) * sizeof(char));
   this->__finalize__(statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!");
@@ -120,11 +124,13 @@ void iDatabase::__finalize_and_throw__(const char* statement) {
 void iDatabase::__finalize__(const wchar_t* statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
-  TRC("Statement "%ls" has been finalized.", statement);
+  TRC("Statement "%ls" (%i bytes) has been finalized.",
+      statement, static_cast<int>(wcslen(statement)) * sizeof(wchar_t));
 }
 
 void iDatabase::__finalize_and_throw__(const wchar_t* statement) {
-  ERR("Unable to prepare statement "%ls"!", statement);
+  ERR("Unable to prepare statement "%ls" (%i bytes)!",
+      statement, static_cast<int>(wcslen(statement)) * sizeof(wchar_t));
   this->__finalize__(statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!");
