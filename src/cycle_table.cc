@@ -195,25 +195,25 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
 /* Private members */
 // ----------------------------------------------------------------------------
 void CycleTable::__init__(const std::string& i_table_name) {
-  INF("enter CycleTable::__init__().");
+  DBG("enter CycleTable::__init__().");
   iDatabase::__init__(i_table_name);
-  INF("exit CycleTable::__init__().");
+  DBG("exit CycleTable::__init__().");
 }
 
 void CycleTable::__open_database__() {
-  INF("enter CycleTable::__open_database__().");
+  DBG("enter CycleTable::__open_database__().");
   iDatabase::__open_database__();
-  INF("exit CycleTable::__open_database__().");
+  DBG("exit CycleTable::__open_database__().");
 }
 
 void CycleTable::__close_database__() {
-  INF("enter CycleTable::__close_database__().");
+  DBG("enter CycleTable::__close_database__().");
   iDatabase::__close_database__();
-  INF("exit CycleTable::__close_database__().");
+  DBG("exit CycleTable::__close_database__().");
 }
 
 void CycleTable::__create_table__(const std::string& i_table_name) {
-  INF("enter CycleTable::__create_table__().");
+  DBG("enter CycleTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += i_table_name;
   statement += "('ID' INTEGER PRIMARY KEY, "
@@ -242,28 +242,28 @@ void CycleTable::__create_table__(const std::string& i_table_name) {
   sqlite3_step(this->m_db_statement);
   DBG("Table "%s" has been successfully created.", i_table_name.c_str());
   this->__finalize__(statement.c_str());
-  INF("exit CycleTable::__create_table__().");
+  DBG("exit CycleTable::__create_table__().");
 }
 
 bool CycleTable::__does_table_exist__(const std::string& i_table_name) {
-  INF("enter CycleTable::__does_table_exist__().");
+  DBG("enter CycleTable::__does_table_exist__().");
   return (iDatabase::__does_table_exist__(i_table_name));
 }
 
 void CycleTable::__terminate__(const char* i_message) {
-  INF("enter CycleTable::__terminate__().");
+  DBG("enter CycleTable::__terminate__().");
   iDatabase::__terminate__(i_message);
-  INF("exit CycleTable::__terminate__().");
+  DBG("exit CycleTable::__terminate__().");
 }
 
 void CycleTable::__finalize__(const char* i_statement) {
-  INF("enter CycleTable::__finalize__().");
+  DBG("enter CycleTable::__finalize__().");
   iDatabase::__finalize__(i_statement);
-  INF("exit CycleTable::__finalize__().");
+  DBG("exit CycleTable::__finalize__().");
 }
 
 void CycleTable::__finalize_and_throw__(const char* i_statement) {
-  INF("enter CycleTable::__finalize_and_throw__().");
+  DBG("enter CycleTable::__finalize_and_throw__().");
   iDatabase::__finalize_and_throw__(i_statement);
 }
 

@@ -188,25 +188,25 @@ bool DailyTable::load() {
 /* Private members */
 // ----------------------------------------------------------------------------
 void DailyTable::__init__(const std::string& i_table_name) {
-  INF("enter DailyTable::__init__().");
+  DBG("enter DailyTable::__init__().");
   iDatabase::__init__(i_table_name);
-  INF("exit DailyTable::__init__().");
+  DBG("exit DailyTable::__init__().");
 }
 
 void DailyTable::__open_database__() {
-  INF("enter DailyTable::__open_database__().");
+  DBG("enter DailyTable::__open_database__().");
   iDatabase::__open_database__();
-  INF("exit DailyTable::__open_database__().");
+  DBG("exit DailyTable::__open_database__().");
 }
 
 void DailyTable::__close_database__() {
-  INF("enter DailyTable::__close_database__().");
+  DBG("enter DailyTable::__close_database__().");
   iDatabase::__close_database__();
-  INF("exit DailyTable::__close_database__().");
+  DBG("exit DailyTable::__close_database__().");
 }
 
 void DailyTable::__create_table__(const std::string& i_table_name) {
-  INF("enter DailyTable::__create_table__().");
+  DBG("enter DailyTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += i_table_name;
   statement += "('ID' INTEGER PRIMARY KEY, "
@@ -233,28 +233,28 @@ void DailyTable::__create_table__(const std::string& i_table_name) {
   sqlite3_step(this->m_db_statement);
   DBG("Table "%s" has been successfully created.", i_table_name.c_str());
   this->__finalize__(statement.c_str());
-  INF("exit DailyTable::__create_table__().");
+  DBG("exit DailyTable::__create_table__().");
 }
 
 bool DailyTable::__does_table_exist__(const std::string& i_table_name) {
-  INF("enter DailyTable::__does_table_exist__().");
+  DBG("enter DailyTable::__does_table_exist__().");
   return (iDatabase::__does_table_exist__(i_table_name));
 }
 
 void DailyTable::__terminate__(const char* i_message) {
-  INF("enter DailyTable::__terminate__().");
+  DBG("enter DailyTable::__terminate__().");
   iDatabase::__terminate__(i_message);
-  INF("exit DailyTable::__terminate__().");
+  DBG("exit DailyTable::__terminate__().");
 }
 
 void DailyTable::__finalize__(const char* i_statement) {
-  INF("enter DailyTable::__finalize__().");
+  DBG("enter DailyTable::__finalize__().");
   iDatabase::__finalize__(i_statement);
-  INF("exit DailyTable::__finalize__().");
+  DBG("exit DailyTable::__finalize__().");
 }
 
 void DailyTable::__finalize_and_throw__(const char* i_statement) {
-  INF("enter DailyTable::__finalize_and_throw__().");
+  DBG("enter DailyTable::__finalize_and_throw__().");
   iDatabase::__finalize_and_throw__(i_statement);
 }
 

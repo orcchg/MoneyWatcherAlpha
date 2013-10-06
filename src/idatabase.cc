@@ -92,7 +92,7 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
       DBG("SQLite table "%s" does not exist.", i_table_name.c_str());
       break;
   }
-  INF("exit iDatabase::__does_table_exist__().");
+  DBG("exit iDatabase::__does_table_exist__().");
   return (table_exists);
 }
 
@@ -113,7 +113,7 @@ void iDatabase::__finalize__(const char* statement) {
 void iDatabase::__finalize_and_throw__(const char* statement) {
   ERR("Unable to prepare statement "%s"!", statement);
   this->__finalize__(statement);
-  INF("exit iDatabase::__finalize_and_throw__().");
+  DBG("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!");
 }
 
