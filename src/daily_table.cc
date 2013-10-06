@@ -20,7 +20,7 @@ int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
 
 DailyTable::DailyTable(const std::string& i_db_name)
   : iDatabase(i_db_name)
-  , m_next_record_id(0)
+  , m_next_id(0)
   , m_table_name("Daily_Table") {
   DBG("enter DailyTable constructor.");
   this->__init__(this->m_table_name);
@@ -59,7 +59,7 @@ Record DailyTable::addRecord(
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   bool accumulate = true;
-  ID_t record_id = this->m_next_record_id++;
+  ID_t record_id = this->m_next_id++;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, record_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database \"%s\".",
@@ -97,7 +97,7 @@ Record DailyTable::addRecord(
           i_description.c_str(),
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Description [\"%S\"] has been stored in SQLite database \"%s\".",
+  DBG("Description [\"%ls\"] has been stored in SQLite database \"%s\".",
       i_description.c_str(), this->m_db_name.c_str());
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
@@ -156,8 +156,8 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   std::wstring description(static_cast<const wchar_t*>(raw_description));
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
   Status status(raw_status);
-  DBG("Loaded column data: Date [\"%s\"]; Time [\"%s\"]; Balance [%lli]; Description [\"%S\"]; Status [%lli].",
-	  datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
+  DBG("Loaded column data: Date [\"%s\"]; Time [\"%s\"]; Balance [%lli]; Description [\"%ls\"]; Status [%lli].",
+	    datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
   Record record(id, balance, description, status, datetime);
   DBG("Proper record instance has been constructed.");
 #if ENABLED_DB_CACHING

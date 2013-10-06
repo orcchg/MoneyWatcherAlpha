@@ -23,6 +23,8 @@ namespace mw {
 /// @class CycleTable
 /// @brief Represents a table of entries, updating once per certain cycle.
 class CycleTable : private iDatabase {
+  template <typename Table>
+  friend class TestAccessTable;
 public:
   CycleTable(const std::string& db_name = "MW_CycleTable.db");
   virtual ~CycleTable();
@@ -50,7 +52,7 @@ public:
   static int OPENED_CYCLE_TABLES_COUNT;
 
 private:
-  ID_t m_next_entry_id;
+  ID_t m_next_id;
   std::string m_table_name;
   __MW_DB_CACHED__ std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
 

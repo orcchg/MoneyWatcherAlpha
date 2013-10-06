@@ -24,7 +24,8 @@ namespace mw {
 /// @class DailyTable
 /// @brief Represents a table of daily changes.
 class DailyTable : private iDatabase {
-  friend class TestAccess;
+  template <typename Table>
+  friend class TestAccessTable;
 public:
   DailyTable(const std::string& db_name = "MW_DailyTable.db");
   virtual ~DailyTable();
@@ -64,7 +65,7 @@ public:
   static int OPENED_DAILY_TABLES_COUNT;
 
 private:
-  ID_t m_next_record_id;
+  ID_t m_next_id;
   std::string m_table_name;
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 

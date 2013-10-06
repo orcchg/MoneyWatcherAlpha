@@ -17,7 +17,7 @@ int CycleTable::OPENED_CYCLE_TABLES_COUNT = 0;
 
 CycleTable::CycleTable(const std::string& i_db_name)
   : iDatabase(i_db_name)
-  , m_next_entry_id(0)
+  , m_next_id(0)
   , m_table_name("Cycle_Table") {
   DBG("enter CycleTable constructor.");
   this->__init__(this->m_table_name);
@@ -55,7 +55,7 @@ Entry CycleTable::addEntry(
   DBG("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   bool accumulate = true;
-  ID_t entry_id = this->m_next_entry_id++;
+  ID_t entry_id = this->m_next_id++;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database \"%s\".",
@@ -68,7 +68,7 @@ Entry CycleTable::addEntry(
           i_name.c_str(),
           name_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Name [\"%S\"] has been stored in SQLite database \"%s\".",
+  DBG("Name [\"%ls\"] has been stored in SQLite database \"%s\".",
       i_name.c_str(), this->m_db_name.c_str());
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 3, i_current_balance) == SQLITE_OK);
@@ -129,8 +129,52 @@ Entry CycleTable::addEntry(
   return (entry);
 }
 
-Entry CycleTable::readEntry(const ID_t& entry_id) {
-  //
+Entry CycleTable::readEntry(const ID_t& i_entry_id) {
+  DBG("enter CycleTable::readEntry().");
+  std::string select_statement = "SELECT * FROM \'";
+  select_statement += this->m_table_name;
+  select_statement += "\' WHERE ID == \'";
+  select_statement += std::to_string(i_entry_id);
+  select_statement += "\';";
+  int nByte = static_cast<int>(select_statement.length());
+  DBG("Provided string SQL statement: \"%s\" of length %i.", select_statement.c_str(), nByte);
+  assert("Invalid database handler! Database probably was not open." &&
+         this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      select_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(select_statement.c_str());
+  }
+  DBG("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
+  DBG("Read id [%lli] from database, input id was [%lli].", id, i_entry_id);
+  assert("Input entry id does not equal to primary key value from database!" &&
+         id == i_entry_id);
+  const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 1));
+  std::wstring name(static_cast<const wchar_t*>(raw_name));
+  MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 2);
+  MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 3);
+  std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 4)));
+  std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 5)));
+  DateTime datetime(date, time);
+  sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 6);
+  Status status(raw_status);
+  DBG("Loaded column data: Name [\"%ls\"]; Balance [%lli]; Transaction [%lli]; Date [\"%s\"]; Time [\"%s\"]; Status [%lli].",
+      name.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
+  Entry entry(id, name, balance, transaction, status, datetime);
+  DBG("Proper entry instance has been constructed.");
+#if ENABLED_DB_CACHING
+  // TODO: caching the record
+#endif
+  this->__finalize__(select_statement.c_str());
+  DBG("exit CycleTable::readEntry().");
+  return (entry);
 }
 
 /* Private members */
