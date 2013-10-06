@@ -175,6 +175,7 @@ TEST (CycleTableTest, ReadEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
+
 /* DailyTable testing */
 // ----------------------------------------------------------------------------
 TEST (DailyTableTest, CreateDailyTable) {
@@ -313,6 +314,7 @@ TEST (DailyTableTest, ReadRecord) {
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
 }
+
 
 /* Main */
 // ----------------------------------------------------------------------------
