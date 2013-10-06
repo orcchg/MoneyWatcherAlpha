@@ -39,11 +39,11 @@ void iDatabase::__init__(const std::string& i_table_name) {
 void iDatabase::__open_database__() {
   int result = sqlite3_open(this->m_db_name.c_str(), &(this->m_db_handler));
   if (result != SQLITE_OK) {
-    ERR("Unable to open database \"%s\"!", this->m_db_name.c_str());
+    ERR("Unable to open database "%s"!", this->m_db_name.c_str());
     this->__terminate__("Error during open database.");
     throw TableException("Unable to open database!");
   }
-  DBG("SQLite database \"%s\" has been successfully opened and placed into %p.",
+  DBG("SQLite database "%s" has been successfully opened and placed into %p.",
       this->m_db_name.c_str(), this->m_db_handler);
 }
 
@@ -58,10 +58,10 @@ void iDatabase::__close_database__() {
     DBG("Found valid database handler at %p.", this->m_db_handler);
     sqlite3_close(this->m_db_handler);
     this->m_db_handler = nullptr;
-    DBG("Database \"%s\" has been successfully closed.",
+    DBG("Database "%s" has been successfully closed.",
         this->m_db_name.c_str());
   } else {
-    DBG("Database \"%s\" has been already shut down.", this->m_db_name.c_str());
+    DBG("Database "%s" has been already shut down.", this->m_db_name.c_str());
   }
   sqlite3_free(nullptr);
 }
@@ -71,7 +71,7 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   check_statement += i_table_name;
   check_statement += "\';";
   int nByte = static_cast<int>(check_statement.length());
-  DBG("Provided string SQL statement: \"%s\" of length %i.", check_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: "%s" of length %i.", check_statement.c_str(), nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -85,14 +85,14 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   bool table_exists = false;
   switch (result) {
     case SQLITE_OK:
-      DBG("SQLite table \"%s\" already exists.", i_table_name.c_str());
+      DBG("SQLite table "%s" already exists.", i_table_name.c_str());
       table_exists = true;
       break;
     default:
-      DBG("SQLite table \"%s\" does not exist.", i_table_name.c_str());
+      DBG("SQLite table "%s" does not exist.", i_table_name.c_str());
       break;
   }
-  DBG("exit iDatabase::__does_table_exist__().");
+  INF("exit iDatabase::__does_table_exist__().");
   return (table_exists);
 }
 
@@ -100,20 +100,20 @@ void iDatabase::__terminate__(const char* message) {
   WRN(i_message);
   sqlite3_close(this->m_db_handler);
   this->m_db_handler = nullptr;
-  TRC("Database \"%s\" has been shut down.", this->m_db_name.c_str());
+  TRC("Database "%s" has been shut down.", this->m_db_name.c_str());
   sqlite3_free(nullptr);
 }
 
 void iDatabase::__finalize__(const char* statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
-  TRC("Statement \"%s\" has been finalized.", statement);
+  TRC("Statement "%s" has been finalized.", statement);
 }
 
 void iDatabase::__finalize_and_throw__(const char* statement) {
-  ERR("Unable to prepare statement \"%s\"!", statement);
+  ERR("Unable to prepare statement "%s"!", statement);
   this->__finalize__(statement);
-  DBG("exit iDatabase::__finalize_and_throw__().");
+  INF("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!");
 }
 
