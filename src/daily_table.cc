@@ -184,6 +184,7 @@ bool DailyTable::load() {
   return (false);
 }
 
+
 /* Private members */
 // ----------------------------------------------------------------------------
 void DailyTable::__init__(const std::string& i_table_name) {

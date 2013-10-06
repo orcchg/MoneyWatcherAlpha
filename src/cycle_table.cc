@@ -177,6 +177,7 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   return (entry);
 }
 
+
 /* Private members */
 // ----------------------------------------------------------------------------
 void CycleTable::__init__(const std::string& i_table_name) {
