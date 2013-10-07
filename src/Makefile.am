@@ -16,7 +16,8 @@ libmoneywatcher_la_SOURCES = cycle_table.cc \
 							 logger.cc \
 							 record.cc \
 							 service.cc \
-							 status.cc
+							 status.cc \
+							 unistring.cc
 
 # Linker options libTestProgram
 libmoneywatcher_la_LDFLAGS =

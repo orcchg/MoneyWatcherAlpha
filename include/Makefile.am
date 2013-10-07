@@ -14,4 +14,5 @@ include_HEADERS = common.h \
 				  singleton.h \
 				  status.h \
 				  $(top_srcdir)/sqlite3/sqlite3.h \
-				  types.h
+				  types.h \
+				  unistring.h
