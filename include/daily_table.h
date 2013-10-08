@@ -17,6 +17,7 @@
 #include "idatabase.h"
 #include "record.h"
 #include "types.h"
+#include "unistring.h"
 
 
 namespace mw {
@@ -41,7 +42,7 @@ public:
   /// @details Record will also be stored into SQLite database.
   Record addRecord(
       const MoneyValue_t& balance,
-      const std::wstring& description,
+      const WrappedString& description,
       const Status& status = SV_UNKNOWN);
 
   /// @brief Reads record from SQLite database.

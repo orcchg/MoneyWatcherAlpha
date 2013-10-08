@@ -16,6 +16,7 @@
 #include "entry.h"
 #include "hash.h"
 #include "idatabase.h"
+#include "unistring.h"
 
 
 namespace mw {
@@ -39,8 +40,8 @@ public:
   /// @return Newly created entry.
   /// @details Entry will also be stored into SQLite database.
   Entry addEntry(
-      const std::wstring& name,
-      const std::wstring& description,
+      const WrappedString& name,
+      const WrappedString& description,
       const MoneyValue_t& current_balance);
 
   /// @brief Reads entry from SQLite database.
@@ -58,7 +59,7 @@ public:
   Entry updateEntry(
       const ID_t& entry_id,
       const MoneyValue_t& value,
-      const std::wstring& description);
+      const WrappedString& description);
   /// @}
   /// -------------------------------------------------------------------------
 

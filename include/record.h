@@ -15,6 +15,7 @@
 #include "datetime.h"
 #include "status.h"
 #include "types.h"
+#include "unistring.h"
 
 
 namespace mw {
@@ -26,7 +27,7 @@ public:
   Record(
       const ID_t& id,
       const MoneyValue_t& balance,
-      const std::wstring& description,
+      const WrappedString& description,
       const Status& status,
       const DateTime& datetime = DateTime());
   virtual ~Record();
@@ -40,7 +41,7 @@ public:
   const MoneyValue_t& getBalance() const;
   /// @brief Gets the descriptive comment supplied with the
   /// current record.
-  const std::wstring& getDescription() const;
+  const WrappedString& getDescription() const;
   /// @brief Gets the date and the clock time, when the current record
   /// has been created.
   const DateTime& getDateTime() const;
@@ -52,7 +53,7 @@ public:
 private:
   ID_t m_id;
   MoneyValue_t m_balance;
-  std::wstring m_description;
+  WrappedString m_description;
   DateTime m_datetime;
   Status m_status;
 };

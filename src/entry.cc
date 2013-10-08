@@ -16,8 +16,8 @@ namespace mw {
 
 Entry::Entry(
     const ID_t& id,
-    const std::wstring& name,
-    const std::wstring& description,
+    const WrappedString& name,
+    const WrappedString& description,
     const MoneyValue_t& current_balance,
     const MoneyValue_t& last_transaction,
     const Status& status,
@@ -38,11 +38,11 @@ ID_t Entry::getID() const {
   return (this->m_id);
 }
 
-const std::wstring& Entry::getName() const {
+const WrappedString& Entry::getName() const {
   return (this->m_name);
 }
 
-const std::wstring& Entry::getDescription() const {
+const WrappedString& Entry::getDescription() const {
   return (this->m_description);
 }
 
@@ -63,7 +63,7 @@ const Status& Entry::getStatus() const {
 }
 
 // ----------------------------------------------
-Status Entry::updateBalance(const MoneyValue_t& i_value, const std::wstring& i_description) {
+Status Entry::updateBalance(const MoneyValue_t& i_value, const WrappedString& i_description) {
   DBG("enter Entry::updateBalance().");
   Status status(SV_UNKNOWN);
   this->m_description = i_description;

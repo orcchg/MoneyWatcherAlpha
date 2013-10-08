@@ -16,7 +16,7 @@ namespace mw {
 Record::Record(
 	const ID_t& id,
     const MoneyValue_t& balance,
-    const std::wstring& description,
+    const WrappedString& description,
     const Status& status,
     const DateTime& datetime)
   : m_id(id)
@@ -37,7 +37,7 @@ const MoneyValue_t& Record::getBalance() const {
   return (this->m_balance);
 }
 
-const std::wstring& Record::getDescription() const {
+const WrappedString& Record::getDescription() const {
   return (this->m_description);
 }
 

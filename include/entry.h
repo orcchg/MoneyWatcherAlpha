@@ -15,6 +15,7 @@
 #include "record.h"
 #include "status.h"
 #include "types.h"
+#include "unistring.h"
 
 
 namespace mw {
@@ -25,8 +26,8 @@ class Entry {
 public:
   Entry(
       const ID_t& id,
-      const std::wstring& name,
-      const std::wstring& description,
+      const WrappedString& name,
+      const WrappedString& description,
       const MoneyValue_t& current_balance,
       const MoneyValue_t& last_transaction,
       const Status& status,
@@ -39,10 +40,10 @@ public:
   /// @brief Gets an ID of the current entry.
   ID_t getID() const;
   /// @brief Gets a name of the current entry.
-  const std::wstring& getName() const;
+  const WrappedString& getName() const;
   /// @brief Gets the descriptive comment supplied with the
   /// last transaction.
-  const std::wstring& getDescription() const;
+  const WrappedString& getDescription() const;
   /// @brief Gets an actual money balance of the current entry.
   const MoneyValue_t& getBalance() const;
   /// @brief Gets a money value of the last transaction
@@ -66,7 +67,7 @@ public:
   /// @param description - Description of provided transaction.
   /// @return Status of last transaction.
   /// @details This action will generate an event for the Update Manager.
-  Status updateBalance(const MoneyValue_t& value, const std::wstring& description);
+  Status updateBalance(const MoneyValue_t& value, const WrappedString& description);
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -88,8 +89,8 @@ public:
 
 private:
   ID_t m_id;
-  std::wstring m_name;
-  std::wstring m_description;
+  WrappedString m_name;
+  WrappedString m_description;
   MoneyValue_t m_current_balance;
   MoneyValue_t m_last_transaction;
   DateTime m_datetime;

@@ -21,6 +21,7 @@
 #include "serializable.h"
 #include "status.h"
 #include "types.h"
+#include "unistring.h"
 
 
 #endif /* TEST_INCLUDE_ALL_H_ */

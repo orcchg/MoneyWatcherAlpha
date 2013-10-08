@@ -37,7 +37,7 @@ DailyTable::~DailyTable() {
 
 Record DailyTable::addRecord(
     const MoneyValue_t& i_balance,
-    const std::wstring& i_description,
+    const WrappedString& i_description,
     const Status& i_status) {
   INF("enter DailyTable::addRecord().");
   std::string insert_statement = "INSERT INTO \'";
@@ -89,7 +89,7 @@ Record DailyTable::addRecord(
       (sqlite3_bind_int64(this->m_db_statement, 4, i_balance) == SQLITE_OK);
   DBG("Balance [%lli] has been stored in SQLite database "%s".",
       i_balance, this->m_db_name.c_str());
-  int description_n_bytes = static_cast<int>(i_description.length()) * sizeof(wchar_t);
+  int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
@@ -153,7 +153,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   DateTime datetime(date, time);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
   const void* raw_description = sqlite3_column_text16(this->m_db_statement, 4);
-  std::wstring description(static_cast<const wchar_t*>(raw_description));
+  WrappedString description(raw_description);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
   Status status(raw_status);
   DBG("Loaded column data: Date ["%s"]; Time ["%s"]; Balance [%lli]; Description ["%ls"]; Status [%lli].",

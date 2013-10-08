@@ -34,8 +34,8 @@ CycleTable::~CycleTable() {
 }
 
 Entry CycleTable::addEntry(
-    const std::wstring& i_name,
-    const std::wstring& i_description,
+    const WrappedString& i_name,
+    const WrappedString& i_description,
     const MoneyValue_t& i_current_balance) {
   INF("enter CycleTable::addEntry().");
   std::string insert_statement = "INSERT INTO \'";
@@ -62,7 +62,7 @@ Entry CycleTable::addEntry(
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database "%s".",
       entry_id, this->m_db_name.c_str());
-  int name_n_bytes = static_cast<int>(i_name.length()) * sizeof(wchar_t);
+  int name_n_bytes = i_name.n_bytes();
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
@@ -72,7 +72,7 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Name ["%ls"] has been stored in SQLite database "%s".",
       i_name.c_str(), this->m_db_name.c_str());
-  int description_n_bytes = static_cast<int>(i_description.length()) * sizeof(wchar_t);
+  int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
       (sqlite3_bind_text16(
           this->m_db_statement,
@@ -170,9 +170,9 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   assert("Input entry id does not equal to primary key value from database!" &&
          id == i_entry_id);
   const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 1));
-  std::wstring name(static_cast<const wchar_t*>(raw_name));
+  WrappedString name(raw_name);
   const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 2));
-  std::wstring description(static_cast<const wchar_t*>(raw_description));
+  WrappedString description(raw_description);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
   MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 4);
   std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 5)));
@@ -195,13 +195,13 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
 Entry CycleTable::updateEntry(
     const ID_t& i_entry_id,
     const MoneyValue_t& i_value,
-    const std::wstring& i_description) {
-  INF("enter CycleTable::updateEntry().");
+    const WrappedString& i_description) {
+  /*INF("enter CycleTable::updateEntry().");
   Entry entry = this->readEntry(i_entry_id);
   DBG("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
   DBG("Updated entry.");
-  std::wstring update_statement = L"UPDATE \'";
+  WrappedString update_statement = L"UPDATE \'";
   update_statement += widenString(this->m_table_name);
   update_statement += L"\' SET Description = \'";
   update_statement += i_description;
@@ -218,7 +218,7 @@ Entry CycleTable::updateEntry(
   update_statement += L"\' WHERE ID == \'";
   update_statement += std::to_wstring(i_entry_id);
   update_statement += L"\';";
-  int nByte = static_cast<int>(update_statement.length()) * sizeof(wchar_t);
+  int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: "%ls" of length %i.", update_statement.c_str(), nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
@@ -239,7 +239,7 @@ Entry CycleTable::updateEntry(
 #endif
   this->__finalize__(update_statement.c_str());
   INF("exit CycleTable::updateEntry().");
-  return (entry);
+  return (entry);*/
 }
 
 
