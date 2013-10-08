@@ -196,27 +196,27 @@ Entry CycleTable::updateEntry(
     const ID_t& i_entry_id,
     const MoneyValue_t& i_value,
     const WrappedString& i_description) {
-  /*INF("enter CycleTable::updateEntry().");
+  INF("enter CycleTable::updateEntry().");
   Entry entry = this->readEntry(i_entry_id);
   DBG("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
   DBG("Updated entry.");
   WrappedString update_statement = L"UPDATE \'";
-  update_statement += widenString(this->m_table_name);
+  update_statement += WrappedString(this->m_table_name);
   update_statement += L"\' SET Description = \'";
   update_statement += i_description;
   update_statement += L"\', CurrentBalance = \'";
-  update_statement += std::to_wstring(entry.getBalance());
+  update_statement += WrappedString::to_string(entry.getBalance());
   update_statement += L"\', LastTransaction = \'";
-  update_statement += std::to_wstring(i_value);
+  update_statement += WrappedString::to_string(i_value);
   update_statement += L"\', Date = \'";
-  update_statement += widenString(entry.getDateTime().getDate());
+  update_statement += WrappedString(entry.getDateTime().getDate());
   update_statement += L"\', Time = \'";
-  update_statement += widenString(entry.getDateTime().getTime());
+  update_statement += WrappedString(entry.getDateTime().getTime());
   update_statement += L"\', Status = \'";
-  update_statement += std::to_wstring(static_cast<sqlite3_int64>(entry.getStatus()));
+  update_statement += WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
   update_statement += L"\' WHERE ID == \'";
-  update_statement += std::to_wstring(i_entry_id);
+  update_statement += WrappedString::to_string(i_entry_id);
   update_statement += L"\';";
   int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: "%ls" of length %i.", update_statement.c_str(), nByte);
@@ -239,7 +239,7 @@ Entry CycleTable::updateEntry(
 #endif
   this->__finalize__(update_statement.c_str());
   INF("exit CycleTable::updateEntry().");
-  return (entry);*/
+  return (entry);
 }
 
 

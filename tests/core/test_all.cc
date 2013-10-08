@@ -192,7 +192,7 @@ TEST (CycleTableTest, ReadEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
-TEST (CycleTableTest, DISABLED_UpdateEntry) {
+TEST (CycleTableTest, UpdateEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   try {

@@ -18,6 +18,10 @@ WrappedString::WrappedString(const String_t& str)  // private
   : m_string(str) {
 }
 
+WrappedString::WrappedString(const std::string& ordinary_str)
+  : m_string(ordinary_str.begin(), ordinary_str.end()) {
+}
+
 WrappedString::WrappedString() {
 }
 

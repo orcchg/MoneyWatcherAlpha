@@ -13,7 +13,7 @@
 #include <exception>
 #include <string>
 
-#define __UNISTRING_FORMAT_SPECIFIER__ "%ls"
+#define __UNISTRING_FORMAT_SPECIFIER__ %ls
 
 
 namespace mw {
@@ -25,6 +25,7 @@ class WrappedString {
 
 public:
   WrappedString();
+  WrappedString(const std::string& ordinary_str);
   WrappedString(const void* raw_char_data);
   virtual ~WrappedString();
 
