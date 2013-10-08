@@ -219,7 +219,8 @@ Entry CycleTable::updateEntry(
   update_statement += WrappedString::to_string(i_entry_id);
   update_statement += L"\';";
   int nByte = update_statement.n_bytes();
-  TRC("Provided string SQL statement: "%ls" of length %i.", update_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: "%ls" of length %lli and bytes %i.",
+      update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
   int result = sqlite3_prepare16_v2(

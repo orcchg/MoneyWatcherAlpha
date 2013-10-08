@@ -56,6 +56,11 @@ TEST (CycleTableTest, CreateCycleTable) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -144,6 +149,11 @@ TEST (CycleTableTest, AddEntry) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -186,6 +196,11 @@ TEST (CycleTableTest, ReadEntry) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -238,6 +253,11 @@ TEST (CycleTableTest, UpdateEntry) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -276,6 +296,11 @@ TEST (DailyTableTest, CreateDailyTable) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
@@ -355,6 +380,11 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
@@ -387,6 +417,11 @@ TEST (DailyTableTest, ReadRecord) {
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);

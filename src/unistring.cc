@@ -9,8 +9,6 @@
 
 #include "unistring.h"
 
-#define __TO_STRING__(val) (std::to_wstring(val))
-
 
 namespace mw {
 

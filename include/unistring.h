@@ -13,7 +13,7 @@
 #include <exception>
 #include <string>
 
-#define __UNISTRING_FORMAT_SPECIFIER__ %ls
+#define __TO_STRING__(val) (std::to_wstring(val))
 
 
 namespace mw {
