@@ -13,15 +13,15 @@
 #include <exception>
 #include <string>
 
-#define __TO_STRING__(val) (std::to_wstring(val))
+#define __TO_STRING__(val) (std::to_string(val))
 
 
 namespace mw {
 
 class WrappedString {
-  typedef std::wstring::value_type Char_t;
-  typedef std::wstring String_t;
-  WrappedString(const String_t& str);
+  typedef std::string::value_type Char_t;
+  typedef std::string String_t;
+  //WrappedString(const String_t& str);
 
 public:
   WrappedString();

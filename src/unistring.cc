@@ -12,9 +12,9 @@
 
 namespace mw {
 
-WrappedString::WrappedString(const String_t& str)  // private
+/*WrappedString::WrappedString(const String_t& str)  // private
   : m_string(str) {
-}
+}*/
 
 WrappedString::WrappedString(const std::string& ordinary_str)
   : m_string(ordinary_str.begin(), ordinary_str.end()) {
@@ -36,7 +36,7 @@ size_t WrappedString::length() const {
 }
 
 int WrappedString::n_bytes() const {
-  return (static_cast<int>(this->m_string.length()) * sizeof(Char_t));
+  return (static_cast<int>(this->m_string.length()) * sizeof(Char_t) * 2);
 }
 
 const WrappedString::Char_t* WrappedString::c_str() const {

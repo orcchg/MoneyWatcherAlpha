@@ -215,14 +215,14 @@ TEST (CycleTableTest, UpdateEntry) {
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
-    mw::WrappedString s_name = L"Имя слота";
-    mw::WrappedString s_description = L"Тестовое описание слота";
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
     mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
     EXPECT_TRUE(accessor.checkFinalized());
 
     MoneyValue_t s_expense = -700;
-    mw::WrappedString s_transaction_comment = L"Расход на 700 единиц";
+    mw::WrappedString s_transaction_comment = "Расход на 700 единиц";
     entry.updateBalance(s_expense, s_transaction_comment);
     EXPECT_EQ(entry.getBalance(), s_balance + s_expense);
     EXPECT_EQ(entry.getLastTransaction(), s_expense);
@@ -243,7 +243,7 @@ TEST (CycleTableTest, UpdateEntry) {
     EXPECT_TRUE(accessor.checkFinalized());
     EXPECT_EQ(read_entry.getID(), entry.getID());
     EXPECT_STREQ(read_entry.getName().c_str(), entry.getName().c_str());
-    EXPECT_STREQ(read_entry.getDescription().c_str(), entry.getDescription().c_str());
+    EXPECT_STREQ(read_entry.getDescription().c_str(), updated_entry.getDescription().c_str());
     EXPECT_EQ(read_entry.getBalance(), entry.getBalance());
     EXPECT_EQ(read_entry.getLastTransaction(), entry.getLastTransaction());
     EXPECT_STREQ(read_entry.getDateTime().getDate().c_str(), updated_entry.getDateTime().getDate().c_str());
@@ -261,7 +261,7 @@ TEST (CycleTableTest, UpdateEntry) {
     remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  remove(test_cycle_table_db_filename.c_str());
+  //remove(test_cycle_table_db_filename.c_str());
 }
 
 

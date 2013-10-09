@@ -64,7 +64,7 @@ Entry CycleTable::addEntry(
       entry_id, this->m_db_name.c_str());
   int name_n_bytes = i_name.n_bytes();
   accumulate = accumulate &&
-      (sqlite3_bind_text16(
+      (sqlite3_bind_text(
           this->m_db_statement,
           2,
           i_name.c_str(),
@@ -74,7 +74,7 @@ Entry CycleTable::addEntry(
       i_name.c_str(), this->m_db_name.c_str());
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
-      (sqlite3_bind_text16(
+      (sqlite3_bind_text(
           this->m_db_statement,
           3,
           i_description.c_str(),
@@ -169,9 +169,9 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   DBG("Read id [%lli] from database, input id was [%lli].", id, i_entry_id);
   assert("Input entry id does not equal to primary key value from database!" &&
          id == i_entry_id);
-  const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 1));
+  const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1));
   WrappedString name(raw_name);
-  const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text16(this->m_db_statement, 2));
+  const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2));
   WrappedString description(raw_description);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
   MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 4);
@@ -201,29 +201,29 @@ Entry CycleTable::updateEntry(
   DBG("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
   DBG("Updated entry.");
-  WrappedString update_statement = L"UPDATE \'";
+  WrappedString update_statement = "UPDATE \'";
   update_statement += WrappedString(this->m_table_name);
-  update_statement += L"\' SET Description = \'";
+  update_statement += "\' SET Description = \'";
   update_statement += i_description;
-  update_statement += L"\', CurrentBalance = \'";
+  update_statement += "\', CurrentBalance = \'";
   update_statement += WrappedString::to_string(entry.getBalance());
-  update_statement += L"\', LastTransaction = \'";
+  update_statement += "\', LastTransaction = \'";
   update_statement += WrappedString::to_string(i_value);
-  update_statement += L"\', Date = \'";
+  update_statement += "\', Date = \'";
   update_statement += WrappedString(entry.getDateTime().getDate());
-  update_statement += L"\', Time = \'";
+  update_statement += "\', Time = \'";
   update_statement += WrappedString(entry.getDateTime().getTime());
-  update_statement += L"\', Status = \'";
+  update_statement += "\', Status = \'";
   update_statement += WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
-  update_statement += L"\' WHERE ID == \'";
+  update_statement += "\' WHERE ID == \'";
   update_statement += WrappedString::to_string(i_entry_id);
-  update_statement += L"\';";
+  update_statement += "\';";
   int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: "%ls" of length %lli and bytes %i.",
       update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
-  int result = sqlite3_prepare16_v2(
+  int result = sqlite3_prepare_v2(
       this->m_db_handler,
       update_statement.c_str(),
       nByte,
