@@ -105,6 +105,8 @@ AM_CONDITIONAL([ENABLE_LOGGING], [test x$enable_logging != xno])
 AM_COND_IF([ENABLE_LOGGING], [
   AC_DEFINE([__MW_LOG_LEVEL__], [MW_LOG_LEVEL], [Logging level])
   AC_MSG_NOTICE([Logging level set to $MW_LOG_LEVEL])
+], [
+  AC_DEFINE([__MW_LOG_LEVEL__], [-1], [Logging level])
 ])
 AC_SUBST([MW_VAR_ENABLE_LOGGING])
 #-----------------------------------------------------------------------
