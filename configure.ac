@@ -193,6 +193,12 @@ AC_SUBST(DYNAMIC_EXTENSION_FLAGS)
 
 AC_CHECK_FUNCS(posix_fallocate)
 
+dnl Check for Boost libraries
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([boost/foreach.hpp], [],
+    [AC_MSG_ERROR(You need the Boost libraries.)])
+AC_LANG_POP([C++])
+
 dnl Security xFLAGS
 SECURITYFLAGS="-fstack-protector --param=ssp-buffer-size=4 -D_FORTIFY_SOURCE=2 -Wall -Wno-comment -Wformat-security"
 CXXFLAGS="$CXXFLAGS $SECURITYFLAGS"
