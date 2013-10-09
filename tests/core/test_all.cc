@@ -75,8 +75,8 @@ TEST (CycleTableTest, AddEntry) {
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
-    mw::WrappedString s_name = L"Имя слота";
-    mw::WrappedString s_description = L"Тестовое описание слота";
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
     MoneyValue_t s_transaction = 0;
     mw::Status s_status(mw::SV_UNKNOWN);
@@ -124,10 +124,10 @@ TEST (CycleTableTest, AddEntry) {
     EXPECT_EQ(is_row, SQLITE_ROW);
     ID_t id = sqlite3_column_int64(statement_handler, 0);
     EXPECT_EQ(entry.getID(), id);
-    const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text16(statement_handler, 1));
+    const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
     mw::WrappedString name(static_cast<const wchar_t*>(raw_name));
     EXPECT_STREQ(entry.getName().c_str(), name.c_str());
-    const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text16(statement_handler, 2));
+    const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(entry.getDescription().c_str(), description.c_str());
     MoneyValue_t balance = sqlite3_column_int64(statement_handler, 3);
@@ -168,8 +168,8 @@ TEST (CycleTableTest, ReadEntry) {
     ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
-    mw::WrappedString s_name = L"Имя слота";
-    mw::WrappedString s_description = L"Тестовое описание слота";
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
     MoneyValue_t s_transaction = 0;
     mw::Status s_status(mw::SV_UNKNOWN);
@@ -261,7 +261,7 @@ TEST (CycleTableTest, UpdateEntry) {
     remove(test_cycle_table_db_filename.c_str());
   }
   ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  //remove(test_cycle_table_db_filename.c_str());
+  remove(test_cycle_table_db_filename.c_str());
 }
 
 
@@ -316,7 +316,7 @@ TEST (DailyTableTest, AddRecord) {
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
-    mw::WrappedString s_description = L"Тестовая запись в таблице";
+    mw::WrappedString s_description = "Тестовая запись в таблице";
     mw::Status s_status(mw::SV_INCOME);
     mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_TRUE(accessor.checkFinalized());
@@ -367,7 +367,7 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_STREQ(record.getDateTime().getTime().c_str(), datetime.getTime().c_str());
     MoneyValue_t balance = sqlite3_column_int64(statement_handler, 3);
     EXPECT_EQ(record.getBalance(), balance);
-    const void* raw_description = sqlite3_column_text16(statement_handler, 4);
+    const void* raw_description = sqlite3_column_text(statement_handler, 4);
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(record.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
@@ -400,7 +400,7 @@ TEST (DailyTableTest, ReadRecord) {
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
-    mw::WrappedString s_description = L"Тестовая запись в таблице";
+    mw::WrappedString s_description = "Тестовая запись в таблице";
     mw::Status s_status(mw::SV_INCOME);
     mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_TRUE(accessor.checkFinalized());

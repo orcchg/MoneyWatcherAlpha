@@ -91,7 +91,7 @@ Record DailyTable::addRecord(
       i_balance, this->m_db_name.c_str());
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
-      (sqlite3_bind_text16(
+      (sqlite3_bind_text(
           this->m_db_statement,
           5,
           i_description.c_str(),
@@ -152,7 +152,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2)));
   DateTime datetime(date, time);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
-  const void* raw_description = sqlite3_column_text16(this->m_db_statement, 4);
+  const void* raw_description = sqlite3_column_text(this->m_db_statement, 4);
   WrappedString description(raw_description);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
   Status status(raw_status);
