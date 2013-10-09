@@ -97,7 +97,7 @@ Record DailyTable::addRecord(
           i_description.c_str(),
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Description ["%ls"] has been stored in SQLite database "%s".",
+  DBG("Description ["%s"] has been stored in SQLite database "%s".",
       i_description.c_str(), this->m_db_name.c_str());
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
@@ -156,7 +156,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   WrappedString description(raw_description);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
   Status status(raw_status);
-  DBG("Loaded column data: Date ["%s"]; Time ["%s"]; Balance [%lli]; Description ["%ls"]; Status [%lli].",
+  DBG("Loaded column data: Date ["%s"]; Time ["%s"]; Balance [%lli]; Description ["%s"]; Status [%lli].",
 	    datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
   Record record(id, balance, description, status, datetime);
   DBG("Proper record instance has been constructed.");

@@ -70,7 +70,7 @@ Entry CycleTable::addEntry(
           i_name.c_str(),
           name_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Name ["%ls"] has been stored in SQLite database "%s".",
+  DBG("Name ["%s"] has been stored in SQLite database "%s".",
       i_name.c_str(), this->m_db_name.c_str());
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
@@ -80,7 +80,7 @@ Entry CycleTable::addEntry(
           i_description.c_str(),
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Description ["%ls"] has been stored in SQLite database "%s".",
+  DBG("Description ["%s"] has been stored in SQLite database "%s".",
       i_description.c_str(), this->m_db_name.c_str());
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 4, i_current_balance) == SQLITE_OK);
@@ -180,7 +180,7 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   DateTime datetime(date, time);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 7);
   Status status(raw_status);
-  DBG("Loaded column data: Name ["%ls"]; Description ["%ls"]; Balance [%lli]; Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
+  DBG("Loaded column data: Name ["%s"]; Description ["%s"]; Balance [%lli]; Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
       name.c_str(), description.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
   Entry entry(id, name, description, balance, transaction, status, datetime);
   DBG("Proper entry instance has been constructed.");
@@ -219,7 +219,7 @@ Entry CycleTable::updateEntry(
   update_statement += WrappedString::to_string(i_entry_id);
   update_statement += "\';";
   int nByte = update_statement.n_bytes();
-  TRC("Provided string SQL statement: "%ls" of length %lli and bytes %i.",
+  TRC("Provided string SQL statement: "%s" of length %lli and bytes %i.",
       update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
   assert("Invalid database handler! Database probably was not open." &&
          this->m_db_handler);
