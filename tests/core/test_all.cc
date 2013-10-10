@@ -221,11 +221,11 @@ TEST (CycleTableTest, AddManyentries) {
     mw::TestAccessTable<mw::CycleTable> accessor(&Cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
     mw::WrappedString s_name = "Имя слота";
-	mw::WrappedString s_description = "Тестовое описание слота";
-	MoneyValue_t s_balance = 1000;
-	MoneyValue_t s_transaction = 0;
-	mw::Status s_status(mw::SV_UNKNOWN);
-	std::vector<mw::Entry> entries;
+    mw::WrappedString s_description = "Тестовое описание слота";
+    MoneyValue_t s_balance = 1000;
+    MoneyValue_t s_transaction = 0;
+    mw::Status s_status(mw::SV_UNKNOWN);
+    std::vector<mw::Entry> entries;
     entries.reserve(10);
     EXPECT_EQ(entries.size(), 0);
     mw::Entry entry_1 = Cycle_table.addEntry(s_name, s_description, s_balance);
@@ -268,53 +268,53 @@ TEST (CycleTableTest, AddManyentries) {
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
     int type = sqlite3_column_type(statement_handler, 0);
-	EXPECT_EQ(type, SQLITE_INTEGER);
-	int value = sqlite3_column_int(statement_handler, 0);
-	EXPECT_EQ(value, 5);
+    EXPECT_EQ(type, SQLITE_INTEGER);
+    int value = sqlite3_column_int(statement_handler, 0);
+    EXPECT_EQ(value, 5);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
 
     std::string value_statement = "SELECT * FROM \'";
-	value_statement += accessor.getTableName();
-	value_statement += "\';";
-	nByte = static_cast<int>(value_statement.length());
+    value_statement += accessor.getTableName();
+    value_statement += "\';";
+    nByte = static_cast<int>(value_statement.length());
     int loop_result =
-    	sqlite3_prepare_v2(
-			accessor.getDbHandler(),
-			value_statement.c_str(),
-			nByte,
-			&statement_handler,
-			nullptr);
+        sqlite3_prepare_v2(
+            accessor.getDbHandler(),
+            value_statement.c_str(),
+            nByte,
+            &statement_handler,
+            nullptr);
     EXPECT_TRUE(statement_handler);
     EXPECT_EQ(loop_result, SQLITE_OK);
     for (auto it = entries.begin(); it != entries.end(); ++it) {
         loop_result = sqlite3_step(statement_handler);
         EXPECT_EQ(loop_result, SQLITE_ROW);
         ID_t read_id = sqlite3_column_int64(statement_handler, 0);
-		EXPECT_EQ(it->getID(), read_id);
-		const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
-		mw::WrappedString name(static_cast<const wchar_t*>(raw_name));
-		EXPECT_STREQ(it->getName().c_str(), name.c_str());
-		const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
-		mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
-		EXPECT_STREQ(it->getDescription().c_str(), description.c_str());
-		MoneyValue_t balance = sqlite3_column_int64(statement_handler, 3);
-		EXPECT_EQ(it->getBalance(), balance);
-		MoneyValue_t transaction = sqlite3_column_int64(statement_handler, 4);
-		EXPECT_EQ(it->getLastTransaction(), transaction);
-		std::string date(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 5)));
-		std::string time(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 6)));
-		mw::DateTime datetime(date, time);
-		EXPECT_STREQ(it->getDateTime().getDate().c_str(), datetime.getDate().c_str());
-		EXPECT_STREQ(it->getDateTime().getTime().c_str(), datetime.getTime().c_str());
-		sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
-		mw::Status status(raw_status);
-		EXPECT_EQ(it->getStatus(), status);
+        EXPECT_EQ(it->getID(), read_id);
+        const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
+        mw::WrappedString name(static_cast<const wchar_t*>(raw_name));
+        EXPECT_STREQ(it->getName().c_str(), name.c_str());
+        const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
+        mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
+        EXPECT_STREQ(it->getDescription().c_str(), description.c_str());
+        MoneyValue_t balance = sqlite3_column_int64(statement_handler, 3);
+        EXPECT_EQ(it->getBalance(), balance);
+        MoneyValue_t transaction = sqlite3_column_int64(statement_handler, 4);
+        EXPECT_EQ(it->getLastTransaction(), transaction);
+        std::string date(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 5)));
+        std::string time(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 6)));
+        mw::DateTime datetime(date, time);
+        EXPECT_STREQ(it->getDateTime().getDate().c_str(), datetime.getDate().c_str());
+        EXPECT_STREQ(it->getDateTime().getTime().c_str(), datetime.getTime().c_str());
+        sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
+        mw::Status status(raw_status);
+        EXPECT_EQ(it->getStatus(), status);
     }
     loop_result = sqlite3_step(statement_handler);
-	EXPECT_EQ(loop_result, SQLITE_DONE);
-	sqlite3_finalize(statement_handler);
+    EXPECT_EQ(loop_result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
@@ -465,9 +465,9 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
     int type = sqlite3_column_type(statement_handler, 0);
-	EXPECT_EQ(type, SQLITE_INTEGER);
-	int value = sqlite3_column_int(statement_handler, 0);
-	EXPECT_EQ(value, 1);
+    EXPECT_EQ(type, SQLITE_INTEGER);
+    int value = sqlite3_column_int(statement_handler, 0);
+    EXPECT_EQ(value, 1);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -610,24 +610,24 @@ TEST (DailyTableTest, AddManyRecords) {
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
     int type = sqlite3_column_type(statement_handler, 0);
-	EXPECT_EQ(type, SQLITE_INTEGER);
-	int value = sqlite3_column_int(statement_handler, 0);
-	EXPECT_EQ(value, 5);
+    EXPECT_EQ(type, SQLITE_INTEGER);
+    int value = sqlite3_column_int(statement_handler, 0);
+    EXPECT_EQ(value, 5);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
 
     std::string value_statement = "SELECT * FROM \'";
-	value_statement += accessor.getTableName();
-	value_statement += "\';";
-	nByte = static_cast<int>(value_statement.length());
+    value_statement += accessor.getTableName();
+    value_statement += "\';";
+    nByte = static_cast<int>(value_statement.length());
     int loop_result =
-    	sqlite3_prepare_v2(
-			accessor.getDbHandler(),
-			value_statement.c_str(),
-			nByte,
-			&statement_handler,
-			nullptr);
+        sqlite3_prepare_v2(
+            accessor.getDbHandler(),
+            value_statement.c_str(),
+            nByte,
+            &statement_handler,
+            nullptr);
     EXPECT_TRUE(statement_handler);
     EXPECT_EQ(loop_result, SQLITE_OK);
     for (auto it = records.begin(); it != records.end(); ++it) {
@@ -650,8 +650,8 @@ TEST (DailyTableTest, AddManyRecords) {
         EXPECT_EQ(it->getStatus(), status);
     }
     loop_result = sqlite3_step(statement_handler);
-	EXPECT_EQ(loop_result, SQLITE_DONE);
-	sqlite3_finalize(statement_handler);
+    EXPECT_EQ(loop_result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
@@ -729,9 +729,9 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
     int type = sqlite3_column_type(statement_handler, 0);
-	EXPECT_EQ(type, SQLITE_INTEGER);
-	int value = sqlite3_column_int(statement_handler, 0);
-	EXPECT_EQ(value, 2);
+    EXPECT_EQ(type, SQLITE_INTEGER);
+    int value = sqlite3_column_int(statement_handler, 0);
+    EXPECT_EQ(value, 2);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
