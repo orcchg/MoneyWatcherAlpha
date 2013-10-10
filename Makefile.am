@@ -1,1 +1,1 @@
-SUBDIRS = sqlite3 utf8 src include main tests
+SUBDIRS = sqlite3 src include main tests

@@ -10,5 +10,4 @@ core_tests_all_CPPFLAGS = -std=c++11 -fPIC -I$(top_srcdir)/include -I$(top_srcdi
 
 core_tests_all_LDADD = $(top_srcdir)/src/libmoneywatcher.la \
 					   $(top_srcdir)/sqlite3/libsqlite3formw.la \
-					   $(top_srcdir)/utf8/libutf8formw.la \
 					   $(top_srcdir)/tests/google/lib_gtest.la

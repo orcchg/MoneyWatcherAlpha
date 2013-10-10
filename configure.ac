@@ -42,7 +42,6 @@ dnl Link with Makefile.am in source directories
 AC_CONFIG_FILES(Makefile
                 sqlite3/Makefile
                 src/Makefile
-                utf8/Makefile
                 main/Makefile
                 include/Makefile)
                 
