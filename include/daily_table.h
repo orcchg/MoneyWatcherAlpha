@@ -43,7 +43,7 @@ public:
   Record addRecord(
       const MoneyValue_t& balance,
       const WrappedString& description,
-      const Status& status = SV_UNKNOWN);
+      const Status& status);
 
   /// @brief Reads record from SQLite database.
   /// @param record_id - Primary key of record of interest in SQLite database.
