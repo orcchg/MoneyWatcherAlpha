@@ -29,14 +29,14 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
 // ----------------------------------------------------------------------------
 TEST (CycleTableTest, CreateCycleTable) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
-    ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
     int db_file_exists = access(test_cycle_table_db_filename.c_str(), F_OK);
-    ASSERT_TRUE(db_file_exists == 0);
+    EXPECT_TRUE(db_file_exists == 0);
     std::string statement = "SELECT * FROM \'";
     statement += accessor.getTableName();
     statement += "\';";
@@ -47,6 +47,7 @@ TEST (CycleTableTest, CreateCycleTable) {
         statement.length(),
         &statement_handler,
         nullptr);
+    EXPECT_TRUE(statement_handler);
     EXPECT_EQ(result, SQLITE_OK);
     result = SQLITE_ERROR;
     result = sqlite3_step(statement_handler);
@@ -63,16 +64,16 @@ TEST (CycleTableTest, CreateCycleTable) {
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
 }
 
 TEST (CycleTableTest, AddEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
-    ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
     mw::WrappedString s_name = "Имя слота";
@@ -118,6 +119,7 @@ TEST (CycleTableTest, AddEntry) {
         nByte,
         &statement_handler,
         nullptr);
+    EXPECT_TRUE(statement_handler);
     is_row = SQLITE_ERROR;
     is_row = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_OK);
@@ -156,16 +158,16 @@ TEST (CycleTableTest, AddEntry) {
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
 }
 
 TEST (CycleTableTest, ReadEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
-    ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
     mw::WrappedString s_name = "Имя слота";
@@ -203,16 +205,16 @@ TEST (CycleTableTest, ReadEntry) {
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
 }
 
 TEST (CycleTableTest, UpdateEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   try {
     mw::CycleTable cycle_table(test_cycle_table_db_filename);
-    ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
     EXPECT_TRUE(accessor.checkFinalized());
     mw::WrappedString s_name = "Имя слота";
@@ -260,7 +262,7 @@ TEST (CycleTableTest, UpdateEntry) {
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
 }
 
@@ -269,14 +271,14 @@ TEST (CycleTableTest, UpdateEntry) {
 // ----------------------------------------------------------------------------
 TEST (DailyTableTest, CreateDailyTable) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   try {
     mw::DailyTable daily_table(test_daily_table_db_filename);
-    ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     int db_file_exists = access(test_daily_table_db_filename.c_str(), F_OK);
-    ASSERT_TRUE(db_file_exists == 0);
+    EXPECT_TRUE(db_file_exists == 0);
     std::string statement = "SELECT * FROM \'";
     statement += accessor.getTableName();
     statement += "\';";
@@ -287,6 +289,7 @@ TEST (DailyTableTest, CreateDailyTable) {
         statement.length(),
         &statement_handler,
         nullptr);
+    EXPECT_TRUE(statement_handler);
     EXPECT_EQ(result, SQLITE_OK);
     result = SQLITE_ERROR;
     result = sqlite3_step(statement_handler);
@@ -303,16 +306,16 @@ TEST (DailyTableTest, CreateDailyTable) {
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
 }
 
 TEST (DailyTableTest, AddRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   try {
     mw::DailyTable daily_table(test_daily_table_db_filename);
-    ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
@@ -354,6 +357,7 @@ TEST (DailyTableTest, AddRecord) {
         nByte,
         &statement_handler,
         nullptr);
+    EXPECT_TRUE(statement_handler);
     is_row = SQLITE_ERROR;
     is_row = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_OK);
@@ -387,16 +391,16 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
 }
 
 TEST (DailyTableTest, ReadRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   try {
     mw::DailyTable daily_table(test_daily_table_db_filename);
-    ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
@@ -424,8 +428,93 @@ TEST (DailyTableTest, ReadRecord) {
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
-  ASSERT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
+}
+
+
+/* SQLite database testing */
+// ----------------------------------------------------------------------------
+TEST (SQLiteDatabaseTest, SingleTable) {
+  std::string test_single_db_filename = "Test-SingleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::CycleTable cycle_table(test_single_db_filename);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    mw::DailyTable daily_table(test_single_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::CycleTable> cycle_accessor(&cycle_table);
+    EXPECT_TRUE(cycle_accessor.checkFinalized());
+    mw::TestAccessTable<mw::DailyTable> daily_accessor(&daily_table);
+    EXPECT_TRUE(daily_accessor.checkFinalized());
+    EXPECT_NE(cycle_accessor.getDbHandler(), daily_accessor.getDbHandler());
+    DB_Handler db_handler = cycle_accessor.getDbHandler();
+    EXPECT_TRUE(db_handler);
+
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_entry_description = "Тестовое описание слота";
+    mw::WrappedString s_record_description = "Тестовая запись в таблице";
+    MoneyValue_t s_entry_balance = 1000;
+    MoneyValue_t s_record_balance = 500;
+    MoneyValue_t s_transaction = -700;
+    mw::Status unknown_status(mw::SV_UNKNOWN);
+    mw::Status s_entry_status(mw::SV_EXPENSE);
+    mw::Status s_record_status(mw::SV_INCOME);
+
+    mw::Entry entry = cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+    EXPECT_TRUE(cycle_accessor.checkFinalized());
+    EXPECT_EQ(entry.getID(), cycle_accessor.getNextID() - 1);
+    EXPECT_STREQ(entry.getName().c_str(), s_name.c_str());
+    EXPECT_STREQ(entry.getDescription().c_str(), s_entry_description.c_str());
+    EXPECT_EQ(entry.getBalance(), s_entry_balance);
+    EXPECT_EQ(entry.getLastTransaction(), 0);
+    EXPECT_EQ(entry.getStatus(), unknown_status);
+
+    mw::Record record = daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+    EXPECT_TRUE(daily_accessor.checkFinalized());
+    EXPECT_EQ(record.getID(), daily_accessor.getNextID() - 1);
+    EXPECT_EQ(record.getBalance(), s_record_balance);
+    EXPECT_STREQ(record.getDescription().c_str(), s_record_description.c_str());
+    EXPECT_EQ(record.getStatus(), s_record_status);
+
+    std::string count_statement = "SELECT count(*) FROM "
+        "sqlite_master WHERE type == 'table' "
+        "AND name != 'android_metadata' AND name != 'sqlite_sequence';";
+    int nByte = static_cast<int>(count_statement.length());
+    DB_Statement statement_handler = nullptr;
+    int result = sqlite3_prepare_v2(
+        db_handler,
+        count_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    int tables_count = 0;
+    do {
+      result = sqlite3_step(statement_handler);
+      ++tables_count;
+    } while(result == SQLITE_ROW);
+    EXPECT_EQ(result, SQLITE_DONE);
+    result = SQLITE_ERROR;
+    EXPECT_EQ(tables_count , 2);
+    sqlite3_finalize(statement_handler);
+
+    EXPECT_TRUE(cycle_accessor.checkFinalized());
+    EXPECT_TRUE(daily_accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    EXPECT_TRUE(false);
+    remove(test_single_db_filename.c_str());
+  } catch(...) {
+    ERR("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_single_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_single_db_filename.c_str());
 }
 
 
