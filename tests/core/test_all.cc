@@ -105,7 +105,10 @@ TEST (CycleTableTest, AddEntry) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    // TODO: evaluate count
+    int type = sqlite3_column_type(statement_handler, 0);
+    EXPECT_EQ(type, SQLITE_INTEGER);
+    int value = sqlite3_column_int(statement_handler, 0);
+    EXPECT_EQ(value, 1);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -264,7 +267,10 @@ TEST (CycleTableTest, AddManyentries) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    // TODO: evaluate count
+    int type = sqlite3_column_type(statement_handler, 0);
+	EXPECT_EQ(type, SQLITE_INTEGER);
+	int value = sqlite3_column_int(statement_handler, 0);
+	EXPECT_EQ(value, 5);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -458,7 +464,10 @@ TEST (DailyTableTest, AddRecord) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    // TODO: evaluate count
+    int type = sqlite3_column_type(statement_handler, 0);
+	EXPECT_EQ(type, SQLITE_INTEGER);
+	int value = sqlite3_column_int(statement_handler, 0);
+	EXPECT_EQ(value, 1);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -600,7 +609,10 @@ TEST (DailyTableTest, AddManyRecords) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    // TODO: evaluate count
+    int type = sqlite3_column_type(statement_handler, 0);
+	EXPECT_EQ(type, SQLITE_INTEGER);
+	int value = sqlite3_column_int(statement_handler, 0);
+	EXPECT_EQ(value, 5);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -716,7 +728,10 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    // TODO: evaluate count
+    int type = sqlite3_column_type(statement_handler, 0);
+	EXPECT_EQ(type, SQLITE_INTEGER);
+	int value = sqlite3_column_int(statement_handler, 0);
+	EXPECT_EQ(value, 2);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
