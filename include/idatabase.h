@@ -53,10 +53,10 @@ protected:
   void __finalize_and_throw__(const char* statement, int error_code);
   const char* __get_last_statement__() const;  // soft invocation
   void __set_last_statement__(const char* statement);  // soft invocation
+  void __create_table_for_last_id__(const std::string& table_name);
   void __write_last_id__(
       const std::string& table_name,
       const ID_t& last_id);
-  void __create_table_for_last_id__(const std::string& table_name);
   ID_t __read_last_id__(const std::string& table_name);
 };
 

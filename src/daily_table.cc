@@ -117,6 +117,7 @@ Record DailyTable::addRecord(
 #endif
   this->__finalize__(insert_statement.c_str());
   this->__increment_rows__();
+  this->__write_last_id__(last_row_id_table_name, record_id);
   Record record(record_id, i_balance, i_description, i_status, current_datetime);
   DBG("Constructed output record.");
   INF("exit DailyTable::addRecord().");
