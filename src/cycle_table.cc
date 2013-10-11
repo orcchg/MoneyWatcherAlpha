@@ -43,14 +43,15 @@ Entry CycleTable::addEntry(
   insert_statement += "\' VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
   int nByte = static_cast<int>(insert_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       insert_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(insert_statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(insert_statement.c_str(), result);
   }
@@ -151,14 +152,15 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   select_statement += "\';";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", select_statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       select_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(select_statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(select_statement.c_str(), result);
   }
@@ -167,8 +169,9 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
   DBG("Read id [%lli] from database, input id was [%lli].", id, i_entry_id);
-  assert("Input entry id does not equal to primary key value from database!" &&
-         id == i_entry_id);
+  TABLE_ASSERT("Input entry id does not equal to primary key value from database!" &&
+               id == i_entry_id);
+
   const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1));
   WrappedString name(raw_name);
   const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2));
@@ -221,14 +224,15 @@ Entry CycleTable::updateEntry(
   int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: "%s" of length %lli and bytes %i.",
       update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       update_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(update_statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(update_statement.c_str(), result);
   }
@@ -282,14 +286,15 @@ void CycleTable::__create_table__(const std::string& i_table_name) {
       "'Status' INTEGER);";
   int nByte = static_cast<int>(statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(statement.c_str(), result);
   }
@@ -332,6 +337,17 @@ void CycleTable::__finalize__(const wchar_t* i_statement) {
 void CycleTable::__finalize_and_throw__(const wchar_t* i_statement, int i_error_code) {
   DBG("enter CycleTable::__finalize_and_throw__().");
   iDatabase::__finalize_and_throw__(i_statement, i_error_code);
+}
+
+const char* CycleTable::__get_last_statement__() const {
+  DBG("enter CycleTable::__get_last_statement__().");
+  return (iDatabase::__get_last_statement__());
+}
+
+void CycleTable::__set_last_statement__(const char* i_statement) {
+  DBG("enter CycleTable::__set_last_statement().");
+  iDatabase::__set_last_statement__(i_statement);
+  DBG("exit CycleTable::__set_last_statement().");
 }
 
 }  /* namespace mw */

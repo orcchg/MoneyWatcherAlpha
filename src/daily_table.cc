@@ -45,14 +45,15 @@ Record DailyTable::addRecord(
   insert_statement += "\' VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
   int nByte = static_cast<int>(insert_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       insert_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(insert_statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(insert_statement.c_str(), result);
   }
@@ -130,14 +131,15 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   select_statement += "\';";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", select_statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       select_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(select_statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(select_statement.c_str(), result);
   }
@@ -146,8 +148,8 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
   DBG("Read id [%lli] from database, input id was [%lli].", id, i_record_id);
-  assert("Input record id does not equal to primary key value from database!" &&
-         id == i_record_id);
+  TABLE_ASSERT("Input record id does not equal to primary key value from database!" &&
+               id == i_record_id);
   std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
   std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2)));
   DateTime datetime(date, time);
@@ -221,14 +223,15 @@ void DailyTable::__create_table__(const std::string& i_table_name) {
       "'Status' INTEGER);";
   int nByte = static_cast<int>(statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(statement.c_str());
   if (result != SQLITE_OK) {
     this->__finalize_and_throw__(statement.c_str(), result);
   }
@@ -271,6 +274,17 @@ void DailyTable::__finalize__(const wchar_t* i_statement) {
 void DailyTable::__finalize_and_throw__(const wchar_t* i_statement, int i_error_code) {
   DBG("enter DailyTable::__finalize_and_throw__().");
   iDatabase::__finalize_and_throw__(i_statement, i_error_code);
+}
+
+const char* DailyTable::__get_last_statement__() const {
+  DBG("enter DailyTable::__get_last_statement__().");
+  return (iDatabase::__get_last_statement__());
+}
+
+void DailyTable::__set_last_statement__(const char* i_statement) {
+  DBG("enter DailyTable::__set_last_statement().");
+  iDatabase::__set_last_statement__(i_statement);
+  DBG("exit DailyTable::__set_last_statement().");
 }
 
 }  /* namespace mw */

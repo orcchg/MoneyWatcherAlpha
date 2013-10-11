@@ -14,6 +14,13 @@
 #include "types.h"
 
 #define SQLITE_ACCUMULATED_PREPARE_ERROR -1
+#define TABLE_ASSERTION_ERROR_CODE -2
+
+#define EXPR_TO_STRING(x)	#x
+#define TABLE_ASSERT(expr)                                                     \
+  ((expr)                                                                      \
+   ? static_cast<void>(0)                                                      \
+   : throw TableException(EXPR_TO_STRING(expr), TABLE_ASSERTION_ERROR_CODE))
 
 
 namespace mw {
@@ -27,6 +34,7 @@ protected:
   std::string m_db_name;
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;
+  const char* m_last_statement;
 
   virtual void __init__(const std::string& i_table_name) = 0;
   virtual void __open_database__() = 0;
@@ -38,6 +46,8 @@ protected:
   virtual void __finalize_and_throw__(const char* statement, int error_code) = 0;
   virtual void __finalize__(const wchar_t* statement) = 0;
   virtual void __finalize_and_throw__(const wchar_t* statement, int error_code) = 0;
+  virtual const char* __get_last_statement__() const = 0;
+  virtual void __set_last_statement__(const char* statement) = 0;
 };
 
 /// @class TableException

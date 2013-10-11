@@ -89,6 +89,8 @@ private:
   void __finalize_and_throw__(const char* statement, int error_code);
   void __finalize__(const wchar_t* statement);
   void __finalize_and_throw__(const wchar_t* statement, int error_code);
+  const char* __get_last_statement__() const;
+  void __set_last_statement__(const char* statement);
 };
 
 }  /* namespace mw */

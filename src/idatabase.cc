@@ -20,7 +20,8 @@ namespace mw {
 iDatabase::iDatabase(const std::string& i_db_name)
   : m_db_name(i_db_name)
   , m_db_handler(nullptr)
-  , m_db_statement(nullptr) {
+  , m_db_statement(nullptr)
+  , m_last_statement("") {
 }
 
 iDatabase::~iDatabase() {
@@ -52,7 +53,7 @@ void iDatabase::__open_database__() {
 void iDatabase::__close_database__() {
   if (this->m_db_statement) {
     DBG("Found prepared SQL statement at %p.", this->m_db_statement);
-    this->__finalize__("");
+    this->__finalize__(this->m_last_statement);
   } else {
     DBG("Statement has been already finalized.");
   }
@@ -74,14 +75,15 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   check_statement += "\';";
   int nByte = static_cast<int>(check_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", check_statement.c_str(), nByte);
-  assert("Invalid database handler! Database probably was not open." &&
-         this->m_db_handler);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
       check_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
+  this->__set_last_statement__(check_statement.c_str());
   sqlite3_step(this->m_db_statement);
   this->__finalize__(check_statement.c_str());
   bool table_exists = false;
@@ -102,6 +104,7 @@ void iDatabase::__terminate__(const char* i_message) {
   WRN(i_message);
   sqlite3_close(this->m_db_handler);
   this->m_db_handler = nullptr;
+  this->m_last_statement = "";
   TRC("Database "%s" has been shut down.", this->m_db_name.c_str());
   sqlite3_free(nullptr);
 }
@@ -109,6 +112,7 @@ void iDatabase::__terminate__(const char* i_message) {
 void iDatabase::__finalize__(const char* i_statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
+  this->m_last_statement = "";
   TRC("Statement "%s" (%i bytes) has been finalized.",
       i_statement, static_cast<int>(strlen(i_statement)) * sizeof(char));
 }
@@ -124,6 +128,7 @@ void iDatabase::__finalize_and_throw__(const char* i_statement, int i_error_code
 void iDatabase::__finalize__(const wchar_t* i_statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
+  this->m_last_statement = "";
   TRC("Statement "%ls" (%i bytes) has been finalized.",
       i_statement, static_cast<int>(wcslen(i_statement)) * sizeof(wchar_t));
 }
@@ -134,6 +139,17 @@ void iDatabase::__finalize_and_throw__(const wchar_t* i_statement, int i_error_c
   this->__finalize__(i_statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!", i_error_code);
+}
+
+const char* iDatabase::__get_last_statement__() const {
+  TRC("Got last recorded statement "%s".", this->m_last_statement);
+  DBG("exit iDatabase::__get_last_statement__().");
+  return (this->m_last_statement);
+}
+
+void iDatabase::__set_last_statement__(const char* i_statement) {
+  TRC("Set new last statement "%s".", i_statement);
+  this->m_last_statement = i_statement;
 }
 
 
