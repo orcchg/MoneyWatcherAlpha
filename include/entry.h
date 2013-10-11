@@ -71,22 +71,6 @@ public:
   /// @}
   /// -------------------------------------------------------------------------
 
-  /// -------------------------------------------------------------------------
-  /// @defgroup SERVICE Various service functions.
-  /// @{
-  /// @brief Cancels the last action performed on the current entry
-  /// and rolls the state of the entry back for the previous one.
-  /// @note This action cannot be undone.
-  void undo();
-
-  /// @brief Clears the data of the current entry.
-  /// @details This action will generate an event for the Update Manager.
-  /// @note After this action the current entry will become empty,
-  /// so the updateBalance() function should be invoked after.
-  void clear();
-  /// @}
-  /// -------------------------------------------------------------------------
-
 private:
   ID_t m_id;
   WrappedString m_name;

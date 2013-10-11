@@ -61,6 +61,14 @@ public:
       const MoneyValue_t& value,
       const WrappedString& description);
   /// @}
+
+  /// @brief Undoes last operation with existing entry, rolling its state
+  /// back to last transaction.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @return Rolled back entry.
+  /// @note If there is no last transaction provided with entry, the entry
+  /// becomes empty.
+  Entry undo(const ID_t& entry_id);
   /// -------------------------------------------------------------------------
 
   static int OPENED_CYCLE_TABLES_COUNT;
@@ -68,7 +76,9 @@ public:
 private:
   ID_t m_next_id;
   std::string m_table_name;
+#if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
+#endif
 
   void __init__(const std::string& table_name);
   void __open_database__();

@@ -168,6 +168,10 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   return (record);
 }
 
+Record DailyTable::deleteRecord(const ID_t& record_id) {
+  // TODO: implement
+}
+
 const std::string& DailyTable::getName() const {
   INF("enter DailyTable::getName().");
   DBG("Return the name "%s" of DailyTable at %p.", this->m_db_name.c_str(), this);

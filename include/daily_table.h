@@ -50,6 +50,13 @@ public:
   /// @return Newly read record.
   Record readRecord(const ID_t& record_id);
   /// @}
+
+  /// @brief Removes record from SQLite database.
+  /// @param record_id - Primary key of record of interest in SQLite database.
+  /// @return Deleted record.
+  /// @note Value of next_id remains incremented in case the record
+  /// to be deleted is not the last one, otherwise next_id will be decreased.
+  Record deleteRecord(const ID_t& record_id);
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------
@@ -68,7 +75,9 @@ public:
 private:
   ID_t m_next_id;
   std::string m_table_name;
+#if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
+#endif
 
   void __init__(const std::string& table_name);
   void __open_database__();

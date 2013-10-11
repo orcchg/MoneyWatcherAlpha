@@ -243,6 +243,10 @@ Entry CycleTable::updateEntry(
   return (entry);
 }
 
+Entry CycleTable::undo(const ID_t& entry_id) {
+  // TODO: implement
+}
+
 
 /* Private members */
 // ----------------------------------------------------------------------------

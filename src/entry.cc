@@ -84,15 +84,6 @@ Status Entry::updateBalance(const MoneyValue_t& i_value, const WrappedString& i_
   return (status);
 }
 
-// ----------------------------------------------
-void Entry::undo() {
-  // TODO(m.alov): Implement.
-}
-
-void Entry::clear() {
-  // TODO(m.alov): Implement.
-}
-
 
 // ----------------------------------------------------------------------------
 Record Entry::__make_record__() const {
