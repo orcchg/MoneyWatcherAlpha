@@ -16,7 +16,7 @@
 #define SQLITE_ACCUMULATED_PREPARE_ERROR -1
 #define TABLE_ASSERTION_ERROR_CODE -2
 
-#define EXPR_TO_STRING(x)	#x
+#define EXPR_TO_STRING(x) #x
 #define TABLE_ASSERT(expr)                                                     \
   ((expr)                                                                      \
    ? static_cast<void>(0)                                                      \

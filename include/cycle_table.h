@@ -65,10 +65,9 @@ public:
   /// @brief Undoes last operation with existing entry, rolling its state
   /// back to last transaction.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
-  /// @return Rolled back entry.
   /// @note If there is no last transaction provided with entry, the entry
   /// becomes empty.
-  Entry undo(const ID_t& entry_id);
+  void undo(const ID_t& entry_id);
   /// -------------------------------------------------------------------------
 
   static int OPENED_CYCLE_TABLES_COUNT;

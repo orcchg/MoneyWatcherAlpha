@@ -53,10 +53,9 @@ public:
 
   /// @brief Removes record from SQLite database.
   /// @param record_id - Primary key of record of interest in SQLite database.
-  /// @return Deleted record.
   /// @note Value of next_id remains incremented in case the record
   /// to be deleted is not the last one, otherwise next_id will be decreased.
-  Record deleteRecord(const ID_t& record_id);
+  void deleteRecord(const ID_t& record_id);
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------
