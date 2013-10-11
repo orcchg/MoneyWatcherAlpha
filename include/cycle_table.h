@@ -70,6 +70,14 @@ public:
   void undo(const ID_t& entry_id);
   /// -------------------------------------------------------------------------
 
+  /// -------------------------------------------------------------------------
+  /// @defgroup GET Access methods of Daily Table.
+  /// @{
+  /// @brief Gets name of table in SQLite database.
+  const std::string& getName() const;
+  /// @}
+  /// -------------------------------------------------------------------------
+
   static int OPENED_CYCLE_TABLES_COUNT;
 
 private:

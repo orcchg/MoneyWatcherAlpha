@@ -253,6 +253,13 @@ void CycleTable::undo(const ID_t& entry_id) {
   // TODO: implement
 }
 
+const std::string& CycleTable::getName() const {
+  INF("enter CycleTable::getName().");
+  DBG("Return the name "%s" of CycleTable at %p.", this->m_table_name.c_str(), this);
+  INF("exit CycleTable::getName().");
+  return (this->m_table_name);
+}
+
 
 /* Private members */
 // ----------------------------------------------------------------------------

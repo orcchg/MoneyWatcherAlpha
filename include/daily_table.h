@@ -61,6 +61,7 @@ public:
   /// -------------------------------------------------------------------------
   /// @defgroup GET Access methods of Daily Table.
   /// @{
+  /// @brief Gets name of table in SQLite database.
   const std::string& getName() const;
   /// @}
   /// -------------------------------------------------------------------------

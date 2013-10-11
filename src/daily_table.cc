@@ -210,9 +210,9 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
 
 const std::string& DailyTable::getName() const {
   INF("enter DailyTable::getName().");
-  DBG("Return the name "%s" of DailyTable at %p.", this->m_db_name.c_str(), this);
+  DBG("Return the name "%s" of DailyTable at %p.", this->m_table_name.c_str(), this);
   INF("exit DailyTable::getName().");
-  return (this->m_db_name);
+  return (this->m_table_name);
 }
 
 bool DailyTable::load() {
