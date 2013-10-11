@@ -260,8 +260,6 @@ void CycleTable::__init__(const std::string& i_table_name) {
   DBG("enter CycleTable::__init__().");
   iDatabase::__init__(i_table_name);
   iDatabase::__create_table_for_last_id__(last_row_id_table_name);
-  // SQLITE 3: If the table has a column of type INTEGER PRIMARY KEY
-  // then that column is another alias for the rowid.
   ID_t last_row_id = this->__read_last_id__(last_row_id_table_name);
   this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
   TRC("Initialization has completed: total rows [%i], last row id [%lli], next_id [%lli].",
