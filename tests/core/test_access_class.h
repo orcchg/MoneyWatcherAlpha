@@ -26,6 +26,7 @@ public:
   const DB_Handler& getDbHandler() const;
   ID_t getNextID() const;
   const std::string& getTableName() const;
+  int countRows(const std::string& table_name) const;
 
   bool checkFinalized() const;
 
@@ -56,6 +57,11 @@ ID_t TestAccessTable<Table>::getNextID() const {
 template <typename Table>
 const std::string& TestAccessTable<Table>::getTableName() const {
   return (this->m_ptr_table->m_table_name);
+}
+
+template <typename Table>
+int TestAccessTable<Table>::countRows(const std::string& i_table_name) const {
+  return (this->m_ptr_table->__count__(i_table_name));
 }
 
 template <typename Table>
