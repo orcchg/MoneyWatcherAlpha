@@ -78,6 +78,9 @@ private:
   __MW_DB_CACHED__ std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
 #endif
 
+  static const std::string last_row_id_table_name;
+
+  void __init__(const std::string& table_name);
   void __create_table__(const std::string& table_name);
 };
 

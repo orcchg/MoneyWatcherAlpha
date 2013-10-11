@@ -15,6 +15,7 @@
 namespace mw {
 
 int CycleTable::OPENED_CYCLE_TABLES_COUNT = 0;
+const std::string CycleTable::last_row_id_table_name = "Last_Entry_ID";
 
 CycleTable::CycleTable(const std::string& i_db_name)
   : iDatabase(i_db_name)
@@ -37,9 +38,9 @@ Entry CycleTable::addEntry(
     const WrappedString& i_description,
     const MoneyValue_t& i_current_balance) {
   INF("enter CycleTable::addEntry().");
-  std::string insert_statement = "INSERT INTO \'";
+  std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
-  insert_statement += "\' VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
+  insert_statement += "' VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
   int nByte = static_cast<int>(insert_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
@@ -145,11 +146,11 @@ Entry CycleTable::addEntry(
 
 Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   INF("enter CycleTable::readEntry().");
-  std::string select_statement = "SELECT * FROM \'";
+  std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
-  select_statement += "\' WHERE ID == \'";
+  select_statement += "' WHERE ID == '";
   select_statement += std::to_string(i_entry_id);
-  select_statement += "\';";
+  select_statement += "';";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", select_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
@@ -204,23 +205,23 @@ Entry CycleTable::updateEntry(
   DBG("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
   DBG("Updated entry.");
-  WrappedString update_statement = "UPDATE \'";
+  WrappedString update_statement = "UPDATE '";
   update_statement += WrappedString(this->m_table_name);
-  update_statement += "\' SET Description = \'";
+  update_statement += "' SET Description = '";
   update_statement += i_description;
-  update_statement += "\', CurrentBalance = \'";
+  update_statement += "', CurrentBalance = '";
   update_statement += WrappedString::to_string(entry.getBalance());
-  update_statement += "\', LastTransaction = \'";
+  update_statement += "', LastTransaction = '";
   update_statement += WrappedString::to_string(i_value);
-  update_statement += "\', Date = \'";
+  update_statement += "', Date = '";
   update_statement += WrappedString(entry.getDateTime().getDate());
-  update_statement += "\', Time = \'";
+  update_statement += "', Time = '";
   update_statement += WrappedString(entry.getDateTime().getTime());
-  update_statement += "\', Status = \'";
+  update_statement += "', Status = '";
   update_statement += WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
-  update_statement += "\' WHERE ID == \'";
+  update_statement += "' WHERE ID == '";
   update_statement += WrappedString::to_string(i_entry_id);
-  update_statement += "\';";
+  update_statement += "';";
   int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: "%s" of length %lli and bytes %i.",
       update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
@@ -254,6 +255,19 @@ void CycleTable::undo(const ID_t& entry_id) {
 
 /* Private members */
 // ----------------------------------------------------------------------------
+void CycleTable::__init__(const std::string& i_table_name) {
+  DBG("enter CycleTable::__init__().");
+  iDatabase::__init__(i_table_name);
+  iDatabase::__create_table_for_last_id__(last_row_id_table_name);
+  // SQLITE 3: If the table has a column of type INTEGER PRIMARY KEY
+  // then that column is another alias for the rowid.
+  ID_t last_row_id = this->__read_last_id__(last_row_id_table_name);
+  this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
+  TRC("Initialization has completed: total rows [%i], last row id [%lli], next_id [%lli].",
+      this->m_rows, last_row_id, this->m_next_id);
+  DBG("exit CycleTable::__init__().");
+}
+
 void CycleTable::__create_table__(const std::string& i_table_name) {
   DBG("enter CycleTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";

@@ -962,7 +962,11 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
 
     std::string count_statement = "SELECT COUNT(*) FROM "
         "sqlite_master WHERE type == 'table' "
-        "AND name != 'android_metadata' AND name != 'sqlite_sequence';";
+        "AND name != '";
+    count_statement += cycle_accessor.getLastRowIdTableName();
+    count_statement += "' AND name != '";
+    count_statement += daily_accessor.getLastRowIdTableName();
+    count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
     int result = sqlite3_prepare_v2(

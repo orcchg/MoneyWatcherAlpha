@@ -17,6 +17,7 @@
 namespace mw {
 
 int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
+const std::string DailyTable::last_row_id_table_name = "Last_Record_ID";
 
 DailyTable::DailyTable(const std::string& i_db_name)
   : iDatabase(i_db_name)
@@ -39,9 +40,9 @@ Record DailyTable::addRecord(
     const WrappedString& i_description,
     const Status& i_status) {
   INF("enter DailyTable::addRecord().");
-  std::string insert_statement = "INSERT INTO \'";
+  std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
-  insert_statement += "\' VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
+  insert_statement += "' VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
   int nByte = static_cast<int>(insert_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
@@ -124,11 +125,11 @@ Record DailyTable::addRecord(
 
 Record DailyTable::readRecord(const ID_t& i_record_id) {
   INF("enter DailyTable::readRecord().");
-  std::string select_statement = "SELECT * FROM \'";
+  std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
-  select_statement += "\' WHERE ID == \'";
+  select_statement += "' WHERE ID == '";
   select_statement += std::to_string(i_record_id);
-  select_statement += "\';";
+  select_statement += "';";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", select_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
@@ -172,11 +173,11 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
 
 void DailyTable::deleteRecord(const ID_t& i_record_id) {
   INF("enter DailyTable::deleteRecord().");
-  std::string delete_statement = "DELETE FROM \'";
+  std::string delete_statement = "DELETE FROM '";
   delete_statement += this->m_table_name;
-  delete_statement += "\' WHERE ID == \'";
+  delete_statement += "' WHERE ID == '";
   delete_statement += std::to_string(i_record_id);
-  delete_statement += "\';";
+  delete_statement += "';";
   int nByte = static_cast<int>(delete_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", delete_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
@@ -225,6 +226,19 @@ bool DailyTable::load() {
 
 /* Private members */
 // ----------------------------------------------------------------------------
+void DailyTable::__init__(const std::string& i_table_name) {
+  DBG("enter DailyTable::__init__().");
+  iDatabase::__init__(i_table_name);
+  iDatabase::__create_table_for_last_id__(last_row_id_table_name);
+  // SQLITE 3: If the table has a column of type INTEGER PRIMARY KEY
+  // then that column is another alias for the rowid.
+  ID_t last_row_id = this->__read_last_id__(last_row_id_table_name);
+  this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
+  TRC("Initialization has completed: total rows [%i], last row id [%lli], next_id [%lli].",
+      this->m_rows, last_row_id, this->m_next_id);
+  DBG("exit DailyTable::__init__().");
+}
+
 void DailyTable::__create_table__(const std::string& i_table_name) {
   DBG("enter DailyTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";

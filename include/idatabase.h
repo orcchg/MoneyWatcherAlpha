@@ -38,9 +38,9 @@ protected:
   int m_rows;
   ID_t m_next_id;
 
+  virtual void __init__(const std::string& table_name) = 0;
   virtual void __create_table__(const std::string& table_name) = 0;
 
-  void __init__(const std::string& table_name);
   void __open_database__();
   void __close_database__();
   bool __does_table_exist__(const std::string& table_name);
@@ -53,13 +53,11 @@ protected:
   void __finalize_and_throw__(const char* statement, int error_code);
   const char* __get_last_statement__() const;  // soft invocation
   void __set_last_statement__(const char* statement);  // soft invocation
-  void __write_last_id__(const ID_t& last_id);
-
-private:
-  static const std::string& last_row_id_table_name;
-
-  void __create_table_for_last_id__();
-  ID_t __read_last_id__();
+  void __write_last_id__(
+      const std::string& table_name,
+      const ID_t& last_id);
+  void __create_table_for_last_id__(const std::string& table_name);
+  ID_t __read_last_id__(const std::string& table_name);
 };
 
 /// @class TableException
