@@ -87,6 +87,32 @@ static const char* intToSQLiteError(int i_error_code) {
   }
 }
 
+static int countRows(const std::string& table_name, const DB_Handler& handler) {
+  std::string count_statement = "SELECT COUNT(*) FROM \'";
+  count_statement += table_name;
+  count_statement += "\';";
+  int nByte = static_cast<int>(count_statement.length());
+  DB_Statement statement_handler = nullptr;
+  int result = sqlite3_prepare_v2(
+	  handler,
+	  count_statement.c_str(),
+	  nByte,
+	  &statement_handler,
+	  nullptr);
+  EXPECT_TRUE(statement_handler);
+  EXPECT_EQ(result, SQLITE_OK);
+  result = sqlite3_step(statement_handler);
+  EXPECT_EQ(result, SQLITE_ROW);
+  EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
+  int type = sqlite3_column_type(statement_handler, 0);
+  EXPECT_EQ(type, SQLITE_INTEGER);
+  int value = sqlite3_column_int(statement_handler, 0);
+  result = sqlite3_step(statement_handler);
+  EXPECT_EQ(result, SQLITE_DONE);
+  sqlite3_finalize(statement_handler);
+  return value;
+}
+
 
 // ----------------------------------------------
 TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
@@ -95,6 +121,30 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
   });*/
   EXPECT_EQ(1.0, 1.0);
 }
+
+/*TEST (SampleTableTest, Sample) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    //
+  } catch (mw::TableException& e) {
+	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+		e.what(), intToSQLiteError(e.error()));
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  } catch (...) {
+	WRN("Got exception!");
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
+}*/
+
 
 /* CylceTable testing */
 // ----------------------------------------------------------------------------
@@ -161,35 +211,15 @@ TEST (CycleTableTest, AddEntry) {
     EXPECT_EQ(entry.getLastTransaction(), s_transaction);
     EXPECT_EQ(entry.getStatus(), s_status);
 
-    std::string count_statement = "SELECT COUNT(*) FROM \'";
-    count_statement += accessor.getTableName();
-    count_statement += "\';";
-    int nByte = static_cast<int>(count_statement.length());
-    DB_Statement statement_handler = nullptr;
-    int result = sqlite3_prepare_v2(
-        accessor.getDbHandler(),
-        count_statement.c_str(),
-        nByte,
-        &statement_handler,
-        nullptr);
-    EXPECT_TRUE(statement_handler);
-    EXPECT_EQ(result, SQLITE_OK);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_ROW);
-    EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    int type = sqlite3_column_type(statement_handler, 0);
-    EXPECT_EQ(type, SQLITE_INTEGER);
-    int value = sqlite3_column_int(statement_handler, 0);
-    EXPECT_EQ(value, 1);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_DONE);
-    sqlite3_finalize(statement_handler);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
 
+    DB_Statement statement_handler = nullptr;
     std::string value_statement = "SELECT * FROM \'";
     value_statement += accessor.getTableName();
     value_statement += "\';";
-    nByte = static_cast<int>(value_statement.length());
-    result = sqlite3_prepare_v2(
+    int nByte = static_cast<int>(value_statement.length());
+    int result = sqlite3_prepare_v2(
         accessor.getDbHandler(),
         value_statement.c_str(),
         nByte,
@@ -276,34 +306,14 @@ TEST (CycleTableTest, AddManyEntries) {
     EXPECT_EQ(accessor.getNextID(), 5);
     EXPECT_EQ(entries.size(), 5);
 
-    std::string count_statement = "SELECT COUNT(*) FROM \'";
-    count_statement += accessor.getTableName();
-    count_statement += "\';";
-    int nByte = static_cast<int>(count_statement.length());
-    DB_Statement statement_handler = nullptr;
-    int result = sqlite3_prepare_v2(
-        accessor.getDbHandler(),
-        count_statement.c_str(),
-        nByte,
-        &statement_handler,
-        nullptr);
-    EXPECT_TRUE(statement_handler);
-    EXPECT_EQ(result, SQLITE_OK);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_ROW);
-    EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    int type = sqlite3_column_type(statement_handler, 0);
-    EXPECT_EQ(type, SQLITE_INTEGER);
-    int value = sqlite3_column_int(statement_handler, 0);
-    EXPECT_EQ(value, 5);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_DONE);
-    sqlite3_finalize(statement_handler);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 5);
 
+    DB_Statement statement_handler = nullptr;
     std::string value_statement = "SELECT * FROM \'";
     value_statement += accessor.getTableName();
     value_statement += "\';";
-    nByte = static_cast<int>(value_statement.length());
+    int nByte = static_cast<int>(value_statement.length());
     int loop_result =
         sqlite3_prepare_v2(
             accessor.getDbHandler(),
@@ -559,35 +569,15 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_STREQ(record.getDescription().c_str(), s_description.c_str());
     EXPECT_EQ(record.getStatus(), s_status);
 
-    std::string count_statement = "SELECT COUNT(*) FROM \'";
-    count_statement += accessor.getTableName();
-    count_statement += "\';";
-    int nByte = static_cast<int>(count_statement.length());
-    DB_Statement statement_handler = nullptr;
-    int result = sqlite3_prepare_v2(
-        accessor.getDbHandler(),
-        count_statement.c_str(),
-        nByte,
-        &statement_handler,
-        nullptr);
-    EXPECT_TRUE(statement_handler);
-    EXPECT_EQ(result, SQLITE_OK);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_ROW);
-    EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    int type = sqlite3_column_type(statement_handler, 0);
-    EXPECT_EQ(type, SQLITE_INTEGER);
-    int value = sqlite3_column_int(statement_handler, 0);
-    EXPECT_EQ(value, 1);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_DONE);
-    sqlite3_finalize(statement_handler);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
 
+    DB_Statement statement_handler = nullptr;
     std::string value_statement = "SELECT * FROM \'";
     value_statement += accessor.getTableName();
     value_statement += "\';";
-    nByte = static_cast<int>(value_statement.length());
-    result = sqlite3_prepare_v2(
+    int nByte = static_cast<int>(value_statement.length());
+    int result = sqlite3_prepare_v2(
         accessor.getDbHandler(),
         value_statement.c_str(),
         nByte,
@@ -668,34 +658,14 @@ TEST (DailyTableTest, AddManyRecords) {
     EXPECT_EQ(accessor.getNextID(), 5);
     EXPECT_EQ(records.size(), 5);
 
-    std::string count_statement = "SELECT COUNT(*) FROM \'";
-    count_statement += accessor.getTableName();
-    count_statement += "\';";
-    int nByte = static_cast<int>(count_statement.length());
-    DB_Statement statement_handler = nullptr;
-    int result = sqlite3_prepare_v2(
-        accessor.getDbHandler(),
-        count_statement.c_str(),
-        nByte,
-        &statement_handler,
-        nullptr);
-    EXPECT_TRUE(statement_handler);
-    EXPECT_EQ(result, SQLITE_OK);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_ROW);
-    EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
-    int type = sqlite3_column_type(statement_handler, 0);
-    EXPECT_EQ(type, SQLITE_INTEGER);
-    int value = sqlite3_column_int(statement_handler, 0);
-    EXPECT_EQ(value, 5);
-    result = sqlite3_step(statement_handler);
-    EXPECT_EQ(result, SQLITE_DONE);
-    sqlite3_finalize(statement_handler);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 5);
 
+    DB_Statement statement_handler = nullptr;
     std::string value_statement = "SELECT * FROM \'";
     value_statement += accessor.getTableName();
     value_statement += "\';";
-    nByte = static_cast<int>(value_statement.length());
+    int nByte = static_cast<int>(value_statement.length());
     int loop_result =
         sqlite3_prepare_v2(
             accessor.getDbHandler(),
@@ -811,6 +781,135 @@ TEST (DailyTableTest, ReadRecordWrongId) {
     WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (DailyTableTest, DeleteRecord) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    MoneyValue_t s_balance = 1000;
+	mw::WrappedString s_description = "Тестовая запись в таблице";
+	mw::Status s_status(mw::SV_INCOME);
+	mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+	mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+	mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+	EXPECT_EQ(accessor.getNextID(), 3);
+	EXPECT_TRUE(accessor.checkFinalized());
+
+	daily_table.deleteRecord(record_3.getID());
+	EXPECT_EQ(accessor.getNextID(), 2);
+	int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+	EXPECT_EQ(rows, 2);
+
+	daily_table.deleteRecord(record_1.getID());
+	EXPECT_EQ(accessor.getNextID(), 2);
+	rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+	EXPECT_EQ(rows, 1);
+
+	daily_table.deleteRecord(record_2.getID());
+//TODO: uncomment, when impl empty()	EXPECT_EQ(accessor.getNextID(), 0);
+	rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+	EXPECT_EQ(rows, 0);
+
+  } catch (mw::TableException& e) {
+	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+		e.what(), intToSQLiteError(e.error()));
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  } catch (...) {
+	WRN("Got exception!");
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (DailyTableTest, DeleteRecordWrongId) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    MoneyValue_t s_balance = 1000;
+	mw::WrappedString s_description = "Тестовая запись в таблице";
+	mw::Status s_status(mw::SV_INCOME);
+	mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+	mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+	mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+	EXPECT_EQ(accessor.getNextID(), 3);
+	EXPECT_TRUE(accessor.checkFinalized());
+
+	int number_of_caught_exceptions = 0;
+	try {
+	  daily_table.deleteRecord(record_3.getID() + 5);
+	} catch (mw::TableException& e) {
+	  ++number_of_caught_exceptions;
+	}
+	EXPECT_EQ(number_of_caught_exceptions, 1);
+	EXPECT_EQ(accessor.getNextID(), 3);
+  } catch (mw::TableException& e) {
+	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+		e.what(), intToSQLiteError(e.error()));
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  } catch (...) {
+	WRN("Got exception!");
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (DailyTableTest, DeleteRecordTwice) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    MoneyValue_t s_balance = 1000;
+	mw::WrappedString s_description = "Тестовая запись в таблице";
+	mw::Status s_status(mw::SV_INCOME);
+	mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+	mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+	mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+	EXPECT_EQ(accessor.getNextID(), 3);
+	EXPECT_TRUE(accessor.checkFinalized());
+
+	daily_table.deleteRecord(record_2.getID());
+	EXPECT_EQ(accessor.getNextID(), 3);
+	int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+	EXPECT_EQ(rows, 2);
+
+	int number_of_caught_exceptions = 0;
+	try {
+	  daily_table.deleteRecord(record_2.getID());
+	} catch (mw::TableException& e) {
+	  ++number_of_caught_exceptions;
+	}
+	EXPECT_EQ(number_of_caught_exceptions, 1);
+	EXPECT_EQ(accessor.getNextID(), 3);
+  } catch (mw::TableException& e) {
+	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+		e.what(), intToSQLiteError(e.error()));
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
+  } catch (...) {
+	WRN("Got exception!");
+	EXPECT_TRUE(false);
+	remove(test_daily_table_db_filename.c_str());
   }
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
