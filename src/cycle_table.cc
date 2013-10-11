@@ -18,7 +18,6 @@ int CycleTable::OPENED_CYCLE_TABLES_COUNT = 0;
 
 CycleTable::CycleTable(const std::string& i_db_name)
   : iDatabase(i_db_name)
-  , m_next_id(0)
   , m_table_name("Cycle_Table") {
   INF("enter CycleTable constructor.");
   this->__init__(this->m_table_name);
@@ -255,24 +254,6 @@ void CycleTable::undo(const ID_t& entry_id) {
 
 /* Private members */
 // ----------------------------------------------------------------------------
-void CycleTable::__init__(const std::string& i_table_name) {
-  DBG("enter CycleTable::__init__().");
-  iDatabase::__init__(i_table_name);
-  DBG("exit CycleTable::__init__().");
-}
-
-void CycleTable::__open_database__() {
-  DBG("enter CycleTable::__open_database__().");
-  iDatabase::__open_database__();
-  DBG("exit CycleTable::__open_database__().");
-}
-
-void CycleTable::__close_database__() {
-  DBG("enter CycleTable::__close_database__().");
-  iDatabase::__close_database__();
-  DBG("exit CycleTable::__close_database__().");
-}
-
 void CycleTable::__create_table__(const std::string& i_table_name) {
   DBG("enter CycleTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
@@ -305,72 +286,6 @@ void CycleTable::__create_table__(const std::string& i_table_name) {
   DBG("Table "%s" has been successfully created.", i_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit CycleTable::__create_table__().");
-}
-
-bool CycleTable::__does_table_exist__(const std::string& i_table_name) {
-  DBG("enter CycleTable::__does_table_exist__().");
-  return (iDatabase::__does_table_exist__(i_table_name));
-}
-
-int CycleTable::__count__(const std::string& i_table_name) {
-  DBG("enter CycleTable::__count__().");
-  return (iDatabase::__count__(i_table_name));
-}
-
-bool CycleTable::__empty__(const std::string& i_table_name) const {
-  DBG("enter CycleTable::__empty__().");
-  return (iDatabase::__empty__(i_table_name));
-}
-
-void CycleTable::__increment_rows__() {
-  DBG("enter CycleTable::__increment_rows__().");
-  iDatabase::__increment_rows__();
-  DBG("exit CycleTable::__increment_rows__().");
-}
-
-void CycleTable::__decrement_rows__() {
-  DBG("enter CycleTable::__decrement_rows__().");
-  iDatabase::__decrement_rows__();
-  DBG("exit CycleTable::__decrement_rows__().");
-}
-
-void CycleTable::__terminate__(const char* i_message) {
-  DBG("enter CycleTable::__terminate__().");
-  iDatabase::__terminate__(i_message);
-  DBG("exit CycleTable::__terminate__().");
-}
-
-void CycleTable::__finalize__(const char* i_statement) {
-  DBG("enter CycleTable::__finalize__().");
-  iDatabase::__finalize__(i_statement);
-  DBG("exit CycleTable::__finalize__().");
-}
-
-void CycleTable::__finalize_and_throw__(const char* i_statement, int i_error_code) {
-  DBG("enter CycleTable::__finalize_and_throw__().");
-  iDatabase::__finalize_and_throw__(i_statement, i_error_code);
-}
-
-void CycleTable::__finalize__(const wchar_t* i_statement) {
-  DBG("enter CycleTable::__finalize__().");
-  iDatabase::__finalize__(i_statement);
-  DBG("exit CycleTable::__finalize__().");
-}
-
-void CycleTable::__finalize_and_throw__(const wchar_t* i_statement, int i_error_code) {
-  DBG("enter CycleTable::__finalize_and_throw__().");
-  iDatabase::__finalize_and_throw__(i_statement, i_error_code);
-}
-
-const char* CycleTable::__get_last_statement__() const {
-  DBG("enter CycleTable::__get_last_statement__().");
-  return (iDatabase::__get_last_statement__());
-}
-
-void CycleTable::__set_last_statement__(const char* i_statement) {
-  DBG("enter CycleTable::__set_last_statement().");
-  iDatabase::__set_last_statement__(i_statement);
-  DBG("exit CycleTable::__set_last_statement().");
 }
 
 }  /* namespace mw */

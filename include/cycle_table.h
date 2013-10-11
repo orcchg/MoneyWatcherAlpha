@@ -73,28 +73,12 @@ public:
   static int OPENED_CYCLE_TABLES_COUNT;
 
 private:
-  ID_t m_next_id;
   std::string m_table_name;
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
 #endif
 
-  void __init__(const std::string& table_name);
-  void __open_database__();
-  void __close_database__();
   void __create_table__(const std::string& table_name);
-  bool __does_table_exist__(const std::string& table_name);
-  int __count__(const std::string& table_name);
-  bool __empty__(const std::string& table_name) const;
-  void __increment_rows__();
-  void __decrement_rows__();
-  void __terminate__(const char* message);
-  void __finalize__(const char* statement);
-  void __finalize_and_throw__(const char* statement, int error_code);
-  void __finalize__(const wchar_t* statement);
-  void __finalize_and_throw__(const wchar_t* statement, int error_code);
-  const char* __get_last_statement__() const;
-  void __set_last_statement__(const char* statement);
 };
 
 }  /* namespace mw */

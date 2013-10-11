@@ -20,7 +20,6 @@ int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
 
 DailyTable::DailyTable(const std::string& i_db_name)
   : iDatabase(i_db_name)
-  , m_next_id(0)
   , m_table_name("Daily_Table") {
   INF("enter DailyTable constructor.");
   this->__init__(this->m_table_name);
@@ -226,24 +225,6 @@ bool DailyTable::load() {
 
 /* Private members */
 // ----------------------------------------------------------------------------
-void DailyTable::__init__(const std::string& i_table_name) {
-  DBG("enter DailyTable::__init__().");
-  iDatabase::__init__(i_table_name);
-  DBG("exit DailyTable::__init__().");
-}
-
-void DailyTable::__open_database__() {
-  DBG("enter DailyTable::__open_database__().");
-  iDatabase::__open_database__();
-  DBG("exit DailyTable::__open_database__().");
-}
-
-void DailyTable::__close_database__() {
-  DBG("enter DailyTable::__close_database__().");
-  iDatabase::__close_database__();
-  DBG("exit DailyTable::__close_database__().");
-}
-
 void DailyTable::__create_table__(const std::string& i_table_name) {
   DBG("enter DailyTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
@@ -274,72 +255,6 @@ void DailyTable::__create_table__(const std::string& i_table_name) {
   DBG("Table "%s" has been successfully created.", i_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit DailyTable::__create_table__().");
-}
-
-bool DailyTable::__does_table_exist__(const std::string& i_table_name) {
-  DBG("enter DailyTable::__does_table_exist__().");
-  return (iDatabase::__does_table_exist__(i_table_name));
-}
-
-int DailyTable::__count__(const std::string& i_table_name) {
-  DBG("enter DailyTable::__count__().");
-  return (iDatabase::__count__(i_table_name));
-}
-
-bool DailyTable::__empty__(const std::string& i_table_name) const {
-  DBG("enter DailyTable::__empty__().");
-  return (iDatabase::__empty__(i_table_name));
-}
-
-void DailyTable::__increment_rows__() {
-  DBG("enter DailyTable::__increment_rows__().");
-  iDatabase::__increment_rows__();
-  DBG("exit DailyTable::__increment_rows__().");
-}
-
-void DailyTable::__decrement_rows__() {
-  DBG("enter DailyTable::__decrement_rows__().");
-  iDatabase::__decrement_rows__();
-  DBG("exit DailyTable::__decrement_rows__().");
-}
-
-void DailyTable::__terminate__(const char* i_message) {
-  DBG("enter DailyTable::__terminate__().");
-  iDatabase::__terminate__(i_message);
-  DBG("exit DailyTable::__terminate__().");
-}
-
-void DailyTable::__finalize__(const char* i_statement) {
-  DBG("enter DailyTable::__finalize__().");
-  iDatabase::__finalize__(i_statement);
-  DBG("exit DailyTable::__finalize__().");
-}
-
-void DailyTable::__finalize_and_throw__(const char* i_statement, int i_error_code) {
-  DBG("enter DailyTable::__finalize_and_throw__().");
-  iDatabase::__finalize_and_throw__(i_statement, i_error_code);
-}
-
-void DailyTable::__finalize__(const wchar_t* i_statement) {
-  DBG("enter DailyTable::__finalize__().");
-  iDatabase::__finalize__(i_statement);
-  DBG("exit DailyTable::__finalize__().");
-}
-
-void DailyTable::__finalize_and_throw__(const wchar_t* i_statement, int i_error_code) {
-  DBG("enter DailyTable::__finalize_and_throw__().");
-  iDatabase::__finalize_and_throw__(i_statement, i_error_code);
-}
-
-const char* DailyTable::__get_last_statement__() const {
-  DBG("enter DailyTable::__get_last_statement__().");
-  return (iDatabase::__get_last_statement__());
-}
-
-void DailyTable::__set_last_statement__(const char* i_statement) {
-  DBG("enter DailyTable::__set_last_statement().");
-  iDatabase::__set_last_statement__(i_statement);
-  DBG("exit DailyTable::__set_last_statement().");
 }
 
 }  /* namespace mw */
