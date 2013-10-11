@@ -94,11 +94,11 @@ static int countRows(const std::string& table_name, const DB_Handler& handler) {
   int nByte = static_cast<int>(count_statement.length());
   DB_Statement statement_handler = nullptr;
   int result = sqlite3_prepare_v2(
-	  handler,
-	  count_statement.c_str(),
-	  nByte,
-	  &statement_handler,
-	  nullptr);
+      handler,
+      count_statement.c_str(),
+      nByte,
+      &statement_handler,
+      nullptr);
   EXPECT_TRUE(statement_handler);
   EXPECT_EQ(result, SQLITE_OK);
   result = sqlite3_step(statement_handler);
@@ -132,14 +132,14 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
     EXPECT_TRUE(accessor.checkFinalized());
     //
   } catch (mw::TableException& e) {
-	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
-		e.what(), intToSQLiteError(e.error()));
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   } catch (...) {
-	WRN("Got exception!");
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   }
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
@@ -795,38 +795,38 @@ TEST (DailyTableTest, DeleteRecord) {
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
-	mw::WrappedString s_description = "Тестовая запись в таблице";
-	mw::Status s_status(mw::SV_INCOME);
-	mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
-	mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
-	mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
-	EXPECT_EQ(accessor.getNextID(), 3);
-	EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    mw::Status s_status(mw::SV_INCOME);
+    mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+    mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+    mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
 
-	daily_table.deleteRecord(record_3.getID());
-	EXPECT_EQ(accessor.getNextID(), 2);
-	int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
-	EXPECT_EQ(rows, 2);
+    daily_table.deleteRecord(record_3.getID());
+    EXPECT_EQ(accessor.getNextID(), 2);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 2);
 
-	daily_table.deleteRecord(record_1.getID());
-	EXPECT_EQ(accessor.getNextID(), 2);
-	rows = countRows(accessor.getTableName(), accessor.getDbHandler());
-	EXPECT_EQ(rows, 1);
+    daily_table.deleteRecord(record_1.getID());
+    EXPECT_EQ(accessor.getNextID(), 2);
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
 
-	daily_table.deleteRecord(record_2.getID());
-//TODO: uncomment, when impl empty()	EXPECT_EQ(accessor.getNextID(), 0);
-	rows = countRows(accessor.getTableName(), accessor.getDbHandler());
-	EXPECT_EQ(rows, 0);
+    daily_table.deleteRecord(record_2.getID());
+    EXPECT_EQ(accessor.getNextID(), 0);
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
 
   } catch (mw::TableException& e) {
-	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
-		e.what(), intToSQLiteError(e.error()));
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   } catch (...) {
-	WRN("Got exception!");
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   }
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
@@ -841,31 +841,31 @@ TEST (DailyTableTest, DeleteRecordWrongId) {
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
-	mw::WrappedString s_description = "Тестовая запись в таблице";
-	mw::Status s_status(mw::SV_INCOME);
-	mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
-	mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
-	mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
-	EXPECT_EQ(accessor.getNextID(), 3);
-	EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    mw::Status s_status(mw::SV_INCOME);
+    mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+    mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+    mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
 
-	int number_of_caught_exceptions = 0;
-	try {
-	  daily_table.deleteRecord(record_3.getID() + 5);
-	} catch (mw::TableException& e) {
-	  ++number_of_caught_exceptions;
-	}
-	EXPECT_EQ(number_of_caught_exceptions, 1);
-	EXPECT_EQ(accessor.getNextID(), 3);
+    int number_of_caught_exceptions = 0;
+    try {
+      daily_table.deleteRecord(record_3.getID() + 5);
+    } catch (mw::TableException& e) {
+      ++number_of_caught_exceptions;
+    }
+    EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of wrong deletion
+    EXPECT_EQ(accessor.getNextID(), 3);
   } catch (mw::TableException& e) {
-	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
-		e.what(), intToSQLiteError(e.error()));
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   } catch (...) {
-	WRN("Got exception!");
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   }
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());
@@ -880,36 +880,36 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
-	mw::WrappedString s_description = "Тестовая запись в таблице";
-	mw::Status s_status(mw::SV_INCOME);
-	mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
-	mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
-	mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
-	EXPECT_EQ(accessor.getNextID(), 3);
-	EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    mw::Status s_status(mw::SV_INCOME);
+    mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+    mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+    mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
 
-	daily_table.deleteRecord(record_2.getID());
-	EXPECT_EQ(accessor.getNextID(), 3);
-	int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
-	EXPECT_EQ(rows, 2);
+    daily_table.deleteRecord(record_2.getID());
+    EXPECT_EQ(accessor.getNextID(), 3);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 2);
 
-	int number_of_caught_exceptions = 0;
-	try {
-	  daily_table.deleteRecord(record_2.getID());
-	} catch (mw::TableException& e) {
-	  ++number_of_caught_exceptions;
-	}
-	EXPECT_EQ(number_of_caught_exceptions, 1);
-	EXPECT_EQ(accessor.getNextID(), 3);
+    int number_of_caught_exceptions = 0;
+    try {
+      daily_table.deleteRecord(record_2.getID());
+    } catch (mw::TableException& e) {
+      ++number_of_caught_exceptions;
+    }
+    EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
+    EXPECT_EQ(accessor.getNextID(), 3);
   } catch (mw::TableException& e) {
-	WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
-		e.what(), intToSQLiteError(e.error()));
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   } catch (...) {
-	WRN("Got exception!");
-	EXPECT_TRUE(false);
-	remove(test_daily_table_db_filename.c_str());
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
   }
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(test_daily_table_db_filename.c_str());

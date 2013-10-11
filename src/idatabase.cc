@@ -14,6 +14,8 @@
 #include "idatabase.h"
 #include "logger.h"
 
+#define ROWS_IN_CASE_OF_NOT_EXISTING_TABLE -1
+
 
 namespace mw {
 
@@ -21,7 +23,8 @@ iDatabase::iDatabase(const std::string& i_db_name)
   : m_db_name(i_db_name)
   , m_db_handler(nullptr)
   , m_db_statement(nullptr)
-  , m_last_statement("") {
+  , m_last_statement("")
+  , m_rows(ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
 }
 
 iDatabase::~iDatabase() {
@@ -31,9 +34,10 @@ void iDatabase::__init__(const std::string& i_table_name) {
   this->__open_database__();
   try {
     this->__create_table__(i_table_name);
+    this->m_rows = this->__count__(i_table_name);
   } catch(TableException& e) {
-    ERR(e.what());
-    this->__terminate__("Error during create table.");
+    ERR("%s", e.what());
+    this->__terminate__("Error during create table or counting rows!");
     // Do not allow invalid object of DailyTable to be instantiated.
     throw e;
   }
@@ -100,8 +104,70 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   return (table_exists);
 }
 
+int iDatabase::__count__(const std::string& table_name) {
+  if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
+    TRC("Rows count initialization has started.");
+    std::string count_statement = "SELECT COUNT(*) FROM \'";
+    count_statement += table_name;
+    count_statement += "\';";
+    int nByte = static_cast<int>(count_statement.length());
+    TRC("Provided string SQL statement: "%s" of length %i.", count_statement.c_str(), nByte);
+    TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+                 this->m_db_handler);
+    int result = sqlite3_prepare_v2(
+        this->m_db_handler,
+        count_statement.c_str(),
+        nByte,
+        &(this->m_db_statement),
+        nullptr);
+    this->__set_last_statement__(count_statement.c_str());
+    if (result != SQLITE_OK) {
+      this->__finalize_and_throw__(count_statement.c_str(), result);
+    }
+    sqlite3_step(this->m_db_statement);
+    this->m_rows = sqlite3_column_int(this->m_db_statement, 0);
+    this->__finalize__(count_statement.c_str());
+  }
+  TRC("Number of rows: %i.", this->m_rows);
+  DBG("exit iDatabase::__count__().");
+  return (this->m_rows);
+}
+
+bool iDatabase::__empty__(const std::string& table_name) const {
+  if (this->m_rows == ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
+    ERR("Wrong initialization of database instance!");
+    throw TableException(
+        "Wrong initialization of database instance!",
+        TABLE_ASSERTION_ERROR_CODE);
+  }
+  TRC("Number of rows: %i.", this->m_rows);
+  DBG("exit iDatabase::__empty__().");
+  return (this->m_rows == 0);
+}
+
+void iDatabase::__increment_rows__() {
+  if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
+    ERR("Wrong initialization of database instance!");
+    throw TableException(
+        "Wrong initialization of database instance!",
+        TABLE_ASSERTION_ERROR_CODE);
+  }
+  ++this->m_rows;
+}
+
+void iDatabase::__decrement_rows__() {
+  if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
+    ERR("Wrong initialization of database instance!");
+    throw TableException(
+        "Wrong initialization of database instance!",
+        TABLE_ASSERTION_ERROR_CODE);
+  } else if (this->m_rows > 0) {
+    --this->m_rows;
+  }
+}
+
 void iDatabase::__terminate__(const char* i_message) {
-  WRN(i_message);
+  WRN("%s", i_message);
   sqlite3_close(this->m_db_handler);
   this->m_db_handler = nullptr;
   this->m_last_statement = "";

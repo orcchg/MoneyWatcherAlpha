@@ -35,19 +35,24 @@ protected:
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;
   const char* m_last_statement;
+  int m_rows;
 
-  virtual void __init__(const std::string& i_table_name) = 0;
+  virtual void __init__(const std::string& table_name) = 0;
   virtual void __open_database__() = 0;
   virtual void __close_database__() = 0;
   virtual void __create_table__(const std::string& table_name) = 0;
   virtual bool __does_table_exist__(const std::string& table_name) = 0;
+  virtual int __count__(const std::string& table_name) = 0;
+  virtual bool __empty__(const std::string& table_name) const = 0;  // soft invocation
+  virtual void __increment_rows__() = 0;  // soft invocation
+  virtual void __decrement_rows__() = 0;  // soft invocation
   virtual void __terminate__(const char* message) = 0;
   virtual void __finalize__(const char* statement) = 0;
   virtual void __finalize_and_throw__(const char* statement, int error_code) = 0;
   virtual void __finalize__(const wchar_t* statement) = 0;
   virtual void __finalize_and_throw__(const wchar_t* statement, int error_code) = 0;
-  virtual const char* __get_last_statement__() const = 0;
-  virtual void __set_last_statement__(const char* statement) = 0;
+  virtual const char* __get_last_statement__() const = 0;  // soft invocation
+  virtual void __set_last_statement__(const char* statement) = 0;  // soft invocation
 };
 
 /// @class TableException

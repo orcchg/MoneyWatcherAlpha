@@ -116,6 +116,7 @@ Record DailyTable::addRecord(
   // TODO: caching the record
 #endif
   this->__finalize__(insert_statement.c_str());
+  this->__increment_rows__();
   Record record(record_id, i_balance, i_description, i_status, current_datetime);
   DBG("Constructed output record.");
   INF("exit DailyTable::addRecord().");
@@ -195,11 +196,12 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
+  this->__decrement_rows__();
   if (i_record_id + 1 == this->m_next_id) {
     --this->m_next_id;
     DBG("Deleted last record. Next id value has been decremented.");
   }
-  if (false) {  // TODO: check, if table empty
+  if (this->__empty__(this->m_table_name)) {
     this->m_next_id = 0;
   }
   INF("exit DailyTable::deleteRecord().");
@@ -277,6 +279,28 @@ void DailyTable::__create_table__(const std::string& i_table_name) {
 bool DailyTable::__does_table_exist__(const std::string& i_table_name) {
   DBG("enter DailyTable::__does_table_exist__().");
   return (iDatabase::__does_table_exist__(i_table_name));
+}
+
+int DailyTable::__count__(const std::string& i_table_name) {
+  DBG("enter DailyTable::__count__().");
+  return (iDatabase::__count__(i_table_name));
+}
+
+bool DailyTable::__empty__(const std::string& i_table_name) const {
+  DBG("enter DailyTable::__empty__().");
+  return (iDatabase::__empty__(i_table_name));
+}
+
+void DailyTable::__increment_rows__() {
+  DBG("enter DailyTable::__increment_rows__().");
+  iDatabase::__increment_rows__();
+  DBG("exit DailyTable::__increment_rows__().");
+}
+
+void DailyTable::__decrement_rows__() {
+  DBG("enter DailyTable::__decrement_rows__().");
+  iDatabase::__decrement_rows__();
+  DBG("exit DailyTable::__decrement_rows__().");
 }
 
 void DailyTable::__terminate__(const char* i_message) {

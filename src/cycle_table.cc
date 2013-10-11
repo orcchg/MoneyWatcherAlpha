@@ -130,6 +130,7 @@ Entry CycleTable::addEntry(
   // TODO: caching the entry
 #endif
   this->__finalize__(insert_statement.c_str());
+  this->__increment_rows__();
   Entry entry(
       entry_id,
       i_name,
@@ -309,6 +310,28 @@ void CycleTable::__create_table__(const std::string& i_table_name) {
 bool CycleTable::__does_table_exist__(const std::string& i_table_name) {
   DBG("enter CycleTable::__does_table_exist__().");
   return (iDatabase::__does_table_exist__(i_table_name));
+}
+
+int CycleTable::__count__(const std::string& i_table_name) {
+  DBG("enter CycleTable::__count__().");
+  return (iDatabase::__count__(i_table_name));
+}
+
+bool CycleTable::__empty__(const std::string& i_table_name) const {
+  DBG("enter CycleTable::__empty__().");
+  return (iDatabase::__empty__(i_table_name));
+}
+
+void CycleTable::__increment_rows__() {
+  DBG("enter CycleTable::__increment_rows__().");
+  iDatabase::__increment_rows__();
+  DBG("exit CycleTable::__increment_rows__().");
+}
+
+void CycleTable::__decrement_rows__() {
+  DBG("enter CycleTable::__decrement_rows__().");
+  iDatabase::__decrement_rows__();
+  DBG("exit CycleTable::__decrement_rows__().");
 }
 
 void CycleTable::__terminate__(const char* i_message) {
