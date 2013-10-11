@@ -53,9 +53,13 @@ protected:
   void __finalize_and_throw__(const char* statement, int error_code);
   const char* __get_last_statement__() const;  // soft invocation
   void __set_last_statement__(const char* statement);  // soft invocation
+  void __write_last_id__(const ID_t& last_id);
 
 private:
+  static const std::string& last_row_id_table_name;
+
   void __create_table_for_last_id__();
+  ID_t __read_last_id__();
 };
 
 /// @class TableException

@@ -1001,6 +1001,96 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
   remove(test_single_db_filename.c_str());
 }
 
+TEST (SQLiteDatabaseTest, TablePersistense) {
+  std::string test_single_db_filename = "Test-SingleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_entry_description = "Тестовое описание слота";
+    mw::WrappedString s_record_description = "Тестовая запись в таблице";
+    MoneyValue_t s_entry_balance = 1000;
+    MoneyValue_t s_record_balance = 500;
+    mw::Status s_record_status(mw::SV_UNKNOWN);
+
+    {  // open single database and fill Cycle_Table
+      mw::CycleTable cycle_table(test_single_db_filename);
+      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::CycleTable> cycle_accessor(&cycle_table);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+      std::string cycle_table_name = cycle_accessor.getTableName();
+      EXPECT_EQ(cycle_accessor.countRows(cycle_table_name), 0);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      EXPECT_EQ(cycle_accessor.countRows(cycle_table_name), 5);
+      EXPECT_EQ(cycle_accessor.getNextID(), 5);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+    {  // open again, check count
+      mw::CycleTable cycle_table(test_single_db_filename);
+      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::CycleTable> cycle_accessor(&cycle_table);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+      std::string cycle_table_name = cycle_accessor.getTableName();
+      EXPECT_EQ(cycle_accessor.countRows(cycle_table_name), 5);
+      EXPECT_EQ(cycle_accessor.getNextID(), 5);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+      EXPECT_EQ(cycle_accessor.countRows(cycle_table_name), 7);
+      EXPECT_EQ(cycle_accessor.getNextID(), 7);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+
+    {  // open single database and fill Daily_Table
+      mw::DailyTable daily_table(test_single_db_filename);
+      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::DailyTable> daily_accessor(&daily_table);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+      std::string daily_table_name = daily_accessor.getTableName();
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 0);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 3);
+      EXPECT_EQ(daily_accessor.getNextID(), 3);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+    {  // open again, check count
+      mw::DailyTable daily_table(test_single_db_filename);
+      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::DailyTable> daily_accessor(&daily_table);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+      std::string daily_table_name = daily_accessor.getTableName();
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 3);
+      EXPECT_EQ(daily_accessor.getNextID(), 3);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 5);
+      EXPECT_EQ(daily_accessor.getNextID(), 5);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_single_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_single_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_single_db_filename.c_str());
+}
+
 
 /* Main */
 // ----------------------------------------------------------------------------
