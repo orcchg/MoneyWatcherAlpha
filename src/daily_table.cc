@@ -54,7 +54,7 @@ Record DailyTable::addRecord(
       &(this->m_db_statement),
       nullptr);
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(insert_statement.c_str());
+    this->__finalize_and_throw__(insert_statement.c_str(), result);
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
@@ -107,7 +107,7 @@ Record DailyTable::addRecord(
   if (!accumulate) {
     ERR("Error during saving data into database "%s" by statement "%s"!",
         this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(insert_statement.c_str());
+    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
     DBG("All insertions have succeeded.");
   }
@@ -139,7 +139,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
       &(this->m_db_statement),
       nullptr);
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(select_statement.c_str());
+    this->__finalize_and_throw__(select_statement.c_str(), result);
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
@@ -230,7 +230,7 @@ void DailyTable::__create_table__(const std::string& i_table_name) {
       &(this->m_db_statement),
       nullptr);
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str());
+    this->__finalize_and_throw__(statement.c_str(), result);
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
@@ -257,9 +257,9 @@ void DailyTable::__finalize__(const char* i_statement) {
   DBG("exit DailyTable::__finalize__().");
 }
 
-void DailyTable::__finalize_and_throw__(const char* i_statement) {
+void DailyTable::__finalize_and_throw__(const char* i_statement, int i_error_code) {
   DBG("enter DailyTable::__finalize_and_throw__().");
-  iDatabase::__finalize_and_throw__(i_statement);
+  iDatabase::__finalize_and_throw__(i_statement, i_error_code);
 }
 
 void DailyTable::__finalize__(const wchar_t* i_statement) {
@@ -268,9 +268,9 @@ void DailyTable::__finalize__(const wchar_t* i_statement) {
   DBG("exit DailyTable::__finalize__().");
 }
 
-void DailyTable::__finalize_and_throw__(const wchar_t* i_statement) {
+void DailyTable::__finalize_and_throw__(const wchar_t* i_statement, int i_error_code) {
   DBG("enter DailyTable::__finalize_and_throw__().");
-  iDatabase::__finalize_and_throw__(i_statement);
+  iDatabase::__finalize_and_throw__(i_statement, i_error_code);
 }
 
 }  /* namespace mw */

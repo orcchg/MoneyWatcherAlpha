@@ -87,9 +87,9 @@ private:
   bool __does_table_exist__(const std::string& table_name);
   void __terminate__(const char* message);
   void __finalize__(const char* statement);
-  void __finalize_and_throw__(const char* statement);
+  void __finalize_and_throw__(const char* statement, int error_code);
   void __finalize__(const wchar_t* statement);
-  void __finalize_and_throw__(const wchar_t* statement);
+  void __finalize_and_throw__(const wchar_t* statement, int error_code);
 };
 
 }  /* namespace mw */

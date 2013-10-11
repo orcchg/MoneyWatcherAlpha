@@ -43,7 +43,7 @@ void iDatabase::__open_database__() {
   if (result != SQLITE_OK) {
     ERR("Unable to open database "%s"!", this->m_db_name.c_str());
     this->__terminate__("Error during open database.");
-    throw TableException("Unable to open database!");
+    throw TableException("Unable to open database!", result);
   }
   DBG("SQLite database "%s" has been successfully opened and placed into %p.",
       this->m_db_name.c_str(), this->m_db_handler);
@@ -98,7 +98,7 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   return (table_exists);
 }
 
-void iDatabase::__terminate__(const char* message) {
+void iDatabase::__terminate__(const char* i_message) {
   WRN(i_message);
   sqlite3_close(this->m_db_handler);
   this->m_db_handler = nullptr;
@@ -106,41 +106,42 @@ void iDatabase::__terminate__(const char* message) {
   sqlite3_free(nullptr);
 }
 
-void iDatabase::__finalize__(const char* statement) {
+void iDatabase::__finalize__(const char* i_statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
   TRC("Statement "%s" (%i bytes) has been finalized.",
-      statement, static_cast<int>(strlen(statement)) * sizeof(char));
+      i_statement, static_cast<int>(strlen(i_statement)) * sizeof(char));
 }
 
-void iDatabase::__finalize_and_throw__(const char* statement) {
+void iDatabase::__finalize_and_throw__(const char* i_statement, int i_error_code) {
   ERR("Unable to prepare statement "%s" (%i bytes)!",
-      statement, static_cast<int>(strlen(statement)) * sizeof(char));
-  this->__finalize__(statement);
+      i_statement, static_cast<int>(strlen(i_statement)) * sizeof(char));
+  this->__finalize__(i_statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
-  throw TableException("Unable to prepare statement!");
+  throw TableException("Unable to prepare statement!", i_error_code);
 }
 
-void iDatabase::__finalize__(const wchar_t* statement) {
+void iDatabase::__finalize__(const wchar_t* i_statement) {
   sqlite3_finalize(this->m_db_statement);
   this->m_db_statement = nullptr;
   TRC("Statement "%ls" (%i bytes) has been finalized.",
-      statement, static_cast<int>(wcslen(statement)) * sizeof(wchar_t));
+      i_statement, static_cast<int>(wcslen(i_statement)) * sizeof(wchar_t));
 }
 
-void iDatabase::__finalize_and_throw__(const wchar_t* statement) {
+void iDatabase::__finalize_and_throw__(const wchar_t* i_statement, int i_error_code) {
   ERR("Unable to prepare statement "%ls" (%i bytes)!",
-      statement, static_cast<int>(wcslen(statement)) * sizeof(wchar_t));
-  this->__finalize__(statement);
+      i_statement, static_cast<int>(wcslen(i_statement)) * sizeof(wchar_t));
+  this->__finalize__(i_statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
-  throw TableException("Unable to prepare statement!");
+  throw TableException("Unable to prepare statement!", i_error_code);
 }
 
 
 /* Table exception */
 // ----------------------------------------------------------------------------
-TableException::TableException(const char* i_message)
-  : m_message(i_message) {
+TableException::TableException(const char* i_message, int i_error_code)
+  : m_message(i_message)
+  , m_error_code(i_error_code) {
 }
 
 TableException::~TableException() throw() {
@@ -148,6 +149,10 @@ TableException::~TableException() throw() {
 
 const char* TableException::what() const throw() {
   return (this->m_message);
+}
+
+int TableException::error() const throw() {
+  return (this->m_error_code);
 }
 
 }  /* namespace mw */

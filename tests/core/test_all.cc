@@ -18,6 +18,77 @@
 #include "test_include_all.h"
 
 
+static const char* intToSQLiteError(int i_error_code) {
+  switch (i_error_code) {
+  case SQLITE_OK:             /* 0  Successful result */
+    return "SQLITE_OK";
+  case SQLITE_ERROR:          /* 1  SQL error or missing database */
+    return "SQLITE_ERROR";
+  case SQLITE_INTERNAL:       /* 2  Internal logic error in SQLite */
+    return "SQLITE_INTERNAL";
+  case SQLITE_PERM:           /* 3  Access permission denied */
+    return "SQLITE_PERM";
+  case SQLITE_ABORT:          /* 4  Callback routine requested an abort */
+    return "SQLITE_ABORT";
+  case SQLITE_BUSY:           /* 5  The database file is locked */
+    return "SQLITE_BUSY";
+  case SQLITE_LOCKED:         /* 6  A table in the database is locked */
+    return "SQLITE_LOCKED";
+  case SQLITE_NOMEM:          /* 7  A malloc() failed */
+    return "SQLITE_NOMEM";
+  case SQLITE_READONLY:       /* 8  Attempt to write a readonly database */
+    return "SQLITE_READONLY";
+  case SQLITE_INTERRUPT:      /* 9  Operation terminated by sqlite3_interrupt()*/
+    return "SQLITE_INTERRUPT";
+  case SQLITE_IOERR:          /* 10  Some kind of disk I/O error occurred */
+    return "SQLITE_IOERR";
+  case SQLITE_CORRUPT:        /* 11  The database disk image is malformed */
+    return "SQLITE_CORRUPT";
+  case SQLITE_NOTFOUND:       /* 12  Unknown opcode in sqlite3_file_control() */
+    return "SQLITE_NOTFOUND";
+  case SQLITE_FULL:           /* 13  Insertion failed because database is full */
+    return "SQLITE_FULL";
+  case SQLITE_CANTOPEN:       /* 14  Unable to open the database file */
+    return "SQLITE_CANTOPEN";
+  case SQLITE_PROTOCOL:       /* 15  Database lock protocol error */
+    return "SQLITE_PROTOCOL";
+  case SQLITE_EMPTY:          /* 16  Database is empty */
+    return "SQLITE_EMPTY";
+  case SQLITE_SCHEMA:         /* 17  The database schema changed */
+    return "SQLITE_SCHEMA";
+  case SQLITE_TOOBIG:         /* 18  String or BLOB exceeds size limit */
+    return "SQLITE_TOOBIG";
+  case SQLITE_CONSTRAINT:     /* 19  Abort due to constraint violation */
+    return "SQLITE_CONSTRAINT";
+  case SQLITE_MISMATCH:       /* 20  Data type mismatch */
+    return "SQLITE_MISMATCH";
+  case SQLITE_MISUSE:         /* 21  Library used incorrectly */
+    return "SQLITE_MISUSE";
+  case SQLITE_NOLFS:          /* 22  Uses OS features not supported on host */
+    return "SQLITE_NOLFS";
+  case SQLITE_AUTH:           /* 23  Authorization denied */
+    return "SQLITE_AUTH";
+  case SQLITE_FORMAT:         /* 24  Auxiliary database format error */
+    return "SQLITE_FORMAT";
+  case SQLITE_RANGE:          /* 25  2nd parameter to sqlite3_bind out of range */
+    return "SQLITE_RANGE";
+  case SQLITE_NOTADB:         /* 26  File opened that is not a database file */
+    return "SQLITE_NOTADB";
+  case SQLITE_NOTICE:         /* 27  Notifications from sqlite3_log() */
+    return "SQLITE_NOTICE";
+  case SQLITE_WARNING:        /* 28  Warnings from sqlite3_log() */
+    return "SQLITE_WARNING";
+  case SQLITE_ROW:            /* 100  sqlite3_step() has another row ready */
+    return "SQLITE_ROW";
+  case SQLITE_DONE:           /* 101  sqlite3_step() has finished executing */
+    return "SQLITE_DONE";
+  default:
+    return "UNKNOWN_ERROR_CODE";
+  }
+}
+
+
+// ----------------------------------------------
 TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
   /*std::thread simple_test([&] () {
     EXPECT_EQ(1.0, 1.0);
@@ -55,11 +126,12 @@ TEST (CycleTableTest, CreateCycleTable) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
@@ -153,11 +225,12 @@ TEST (CycleTableTest, AddEntry) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
@@ -200,11 +273,12 @@ TEST (CycleTableTest, ReadEntry) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
@@ -223,7 +297,6 @@ TEST (CycleTableTest, AddManyentries) {
     mw::WrappedString s_name = "Имя слота";
     mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
-    MoneyValue_t s_transaction = 0;
     mw::Status s_status(mw::SV_UNKNOWN);
     std::vector<mw::Entry> entries;
     entries.reserve(10);
@@ -318,11 +391,12 @@ TEST (CycleTableTest, AddManyentries) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
@@ -375,11 +449,60 @@ TEST (CycleTableTest, UpdateEntry) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (CycleTableTest, ReadEntryWrongId) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  try {
+    mw::CycleTable cycle_table(test_cycle_table_db_filename);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
+    MoneyValue_t s_balance = 1000;
+    MoneyValue_t s_transaction = 0;
+    mw::Status s_status(mw::SV_UNKNOWN);
+    mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(entry.getID(), accessor.getNextID() - 1);
+    EXPECT_STREQ(entry.getName().c_str(), s_name.c_str());
+    EXPECT_STREQ(entry.getDescription().c_str(), s_description.c_str());
+    EXPECT_EQ(entry.getBalance(), s_balance);
+    EXPECT_EQ(entry.getLastTransaction(), s_transaction);
+    EXPECT_EQ(entry.getStatus(), s_status);
+
+    mw::Entry read_entry = cycle_table.readEntry(entry.getID());
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(read_entry.getID(), entry.getID());
+    EXPECT_STREQ(read_entry.getName().c_str(), entry.getName().c_str());
+    EXPECT_STREQ(read_entry.getDescription().c_str(), entry.getDescription().c_str());
+    EXPECT_EQ(read_entry.getBalance(), entry.getBalance());
+    EXPECT_EQ(read_entry.getLastTransaction(), entry.getLastTransaction());
+    EXPECT_STREQ(read_entry.getDateTime().getDate().c_str(), entry.getDateTime().getDate().c_str());
+    EXPECT_STREQ(read_entry.getDateTime().getTime().c_str(), entry.getDateTime().getTime().c_str());
+    EXPECT_EQ(read_entry.getStatus(), entry.getStatus());
+
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch(mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch(...) {
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_cycle_table_db_filename.c_str());
   }
@@ -418,11 +541,12 @@ TEST (DailyTableTest, CreateDailyTable) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
@@ -507,11 +631,12 @@ TEST (DailyTableTest, AddRecord) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
@@ -544,11 +669,12 @@ TEST (DailyTableTest, ReadRecord) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
@@ -655,11 +781,12 @@ TEST (DailyTableTest, AddManyRecords) {
 
     EXPECT_TRUE(accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_daily_table_db_filename.c_str());
   }
@@ -739,11 +866,12 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
     EXPECT_TRUE(cycle_accessor.checkFinalized());
     EXPECT_TRUE(daily_accessor.checkFinalized());
   } catch(mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]!", e.what());
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
     EXPECT_TRUE(false);
     remove(test_single_db_filename.c_str());
   } catch(...) {
-    ERR("Got exception!");
+    WRN("Got exception!");
     EXPECT_TRUE(false);
     remove(test_single_db_filename.c_str());
   }

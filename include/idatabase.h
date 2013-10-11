@@ -13,6 +13,8 @@
 #include <string>
 #include "types.h"
 
+#define SQLITE_ACCUMULATED_PREPARE_ERROR -1
+
 
 namespace mw {
 
@@ -33,22 +35,24 @@ protected:
   virtual bool __does_table_exist__(const std::string& table_name) = 0;
   virtual void __terminate__(const char* message) = 0;
   virtual void __finalize__(const char* statement) = 0;
-  virtual void __finalize_and_throw__(const char* statement) = 0;
+  virtual void __finalize_and_throw__(const char* statement, int error_code) = 0;
   virtual void __finalize__(const wchar_t* statement) = 0;
-  virtual void __finalize_and_throw__(const wchar_t* statement) = 0;
+  virtual void __finalize_and_throw__(const wchar_t* statement, int error_code) = 0;
 };
 
 /// @class TableException
 /// @brief Represents a common exception raised by Table class methods.
 class TableException : public std::exception {
 public:
-  TableException(const char* message);
+  TableException(const char* message, int error_code);
   virtual ~TableException() throw();
 
   const char* what() const throw();
+  int error() const throw();
 
 private:
   const char* m_message;
+  int m_error_code;
 };
 
 }  /* namespace mw */
