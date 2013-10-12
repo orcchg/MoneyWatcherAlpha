@@ -30,4 +30,12 @@ TableManager::~TableManager() {
   INF("exit TableManager destructor.");
 }
 
+CycleTable& TableManager::getCycleTable() {
+  return (this->m_cycle_table);
+}
+
+DailyTable& TableManager::getDailyTable() {
+  return (this->m_daily_table);
+}
+
 }  /* namespace mw */

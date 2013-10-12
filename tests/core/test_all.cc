@@ -1098,6 +1098,7 @@ TEST (TableManagerTest, TableManagerInit) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
+
 /* Main */
 // ----------------------------------------------------------------------------
 int main(int argc, char** argv) {

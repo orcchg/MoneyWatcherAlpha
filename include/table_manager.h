@@ -25,6 +25,14 @@ public:
   TableManager();
   virtual ~TableManager();
 
+  /// -------------------------------------------------------------------------
+  /// @defgroup GET Access methods for tables.
+  /// @{
+  CycleTable& getCycleTable();
+  DailyTable& getDailyTable();
+  /// @}
+  /// -------------------------------------------------------------------------
+
   static int OPENED_DATABASES_COUNT;
   static const std::string single_database_name;
 
