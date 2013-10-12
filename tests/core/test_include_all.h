@@ -21,6 +21,7 @@
 #include "serializable.h"
 #include "status.h"
 #include "types.h"
+#include "table_manager.h"
 #include "unistring.h"
 
 
