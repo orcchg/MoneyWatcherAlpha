@@ -61,13 +61,6 @@ public:
       const MoneyValue_t& value,
       const WrappedString& description);
   /// @}
-
-  /// @brief Undoes last operation with existing entry, rolling its state
-  /// back to last transaction.
-  /// @param entry_id - Primary key of entry of interest in SQLite database.
-  /// @note If there is no last transaction provided with entry, the entry
-  /// becomes empty.
-  void undo(const ID_t& entry_id);
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------
