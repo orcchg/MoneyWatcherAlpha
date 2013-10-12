@@ -7,6 +7,7 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
+#include <utility>
 #include "cycle_table.h"
 #include "logger.h"
 #include "service.h"
@@ -24,6 +25,14 @@ CycleTable::CycleTable(const std::string& i_db_name)
   this->__init__(this->m_table_name);
   ++CycleTable::OPENED_CYCLE_TABLES_COUNT;
   INF("exit CycleTable constructor.");
+}
+
+CycleTable::CycleTable(CycleTable&& rval_obj)
+  : iDatabase(std::move(static_cast<iDatabase&>(rval_obj)))
+  , m_table_name(rval_obj.m_table_name) {
+  INF("enter CycleTable move constructor.");
+  rval_obj.m_table_name = "";
+  INF("exit CycleTable move constructor.");
 }
 
 CycleTable::~CycleTable() {
@@ -131,7 +140,7 @@ Entry CycleTable::addEntry(
 #endif
   this->__finalize__(insert_statement.c_str());
   this->__increment_rows__();
-  this->__write_last_id__(last_row_id_table_name, entry_id);
+  this->__write_last_id__(CycleTable::last_row_id_table_name, entry_id);
   Entry entry(
       entry_id,
       i_name,
@@ -262,8 +271,8 @@ const std::string& CycleTable::getName() const {
 void CycleTable::__init__(const std::string& i_table_name) {
   DBG("enter CycleTable::__init__().");
   iDatabase::__init__(i_table_name);
-  iDatabase::__create_table_for_last_id__(last_row_id_table_name);
-  ID_t last_row_id = this->__read_last_id__(last_row_id_table_name);
+  iDatabase::__create_table_for_last_id__(CycleTable::last_row_id_table_name);
+  ID_t last_row_id = this->__read_last_id__(CycleTable::last_row_id_table_name);
   this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
   TRC("Initialization has completed: total rows [%i], last row id [%lli], next_id [%lli].",
       this->m_rows, last_row_id, this->m_next_id);

@@ -122,29 +122,6 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
   EXPECT_EQ(1.0, 1.0);
 }
 
-/*TEST (SampleTableTest, Sample) {
-  std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  try {
-    mw::DailyTable daily_table(test_daily_table_db_filename);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
-    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
-    EXPECT_TRUE(accessor.checkFinalized());
-    //
-  } catch (mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
-        e.what(), intToSQLiteError(e.error()));
-    EXPECT_TRUE(false);
-    remove(test_daily_table_db_filename.c_str());
-  } catch (...) {
-    WRN("Got exception!");
-    EXPECT_TRUE(false);
-    remove(test_daily_table_db_filename.c_str());
-  }
-  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  remove(test_daily_table_db_filename.c_str());
-}*/
-
 
 /* CylceTable testing */
 // ----------------------------------------------------------------------------
@@ -1095,6 +1072,31 @@ TEST (SQLiteDatabaseTest, TablePersistense) {
   remove(test_single_db_filename.c_str());
 }
 
+
+/* TableManager testing */
+// ----------------------------------------------------------------------------
+TEST (TableManagerTest, TableManagerInit) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+     mw::TableManager& table_manager = mw::TableManager::instance();
+     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  // static instance deletion time is undefined.
+  remove(mw::TableManager::single_database_name.c_str());
+}
 
 /* Main */
 // ----------------------------------------------------------------------------

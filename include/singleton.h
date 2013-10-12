@@ -11,14 +11,15 @@
 #define SINGLETON_H_
 
 
-template<class InstanceClass>
+template <class InstanceClass>
 class Singleton {
 public:
   Singleton(const Singleton&) = delete;
   Singleton(Singleton&&) = delete;
   Singleton& operator = (const Singleton&) = delete;
   Singleton&& operator = (Singleton&&) = delete;
-  static InstanceClass &instance() {
+
+  static InstanceClass& instance() {
     static InstanceClass inst;
     return (inst);
   }

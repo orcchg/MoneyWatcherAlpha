@@ -29,6 +29,7 @@ class DailyTable : private iDatabase {
   friend class TestAccessTable;
 public:
   DailyTable(const std::string& db_name = "MW_DailyTable.db");
+  DailyTable(DailyTable&& rval_obj);
   virtual ~DailyTable();
 
   /// -------------------------------------------------------------------------
@@ -82,6 +83,10 @@ private:
 
   void __init__(const std::string& table_name);
   void __create_table__(const std::string& table_name);
+
+  DailyTable(const DailyTable& obj) = delete;
+  DailyTable& operator = (const DailyTable& rhs) = delete;
+  DailyTable& operator = (DailyTable&& rval_rhs) = delete;
 };
 
 }  /* namespace mw */

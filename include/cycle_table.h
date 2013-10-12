@@ -28,6 +28,7 @@ class CycleTable : private iDatabase {
   friend class TestAccessTable;
 public:
   CycleTable(const std::string& db_name = "MW_CycleTable.db");
+  CycleTable(CycleTable&& rval_obj);
   virtual ~CycleTable();
 
   /// -------------------------------------------------------------------------
@@ -83,6 +84,10 @@ private:
 
   void __init__(const std::string& table_name);
   void __create_table__(const std::string& table_name);
+
+  CycleTable(const CycleTable& obj) = delete;
+  CycleTable& operator = (const CycleTable& rhs) = delete;
+  CycleTable& operator = (CycleTable&& rval_rhs) = delete;
 };
 
 }  /* namespace mw */

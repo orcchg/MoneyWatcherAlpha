@@ -26,8 +26,9 @@
 namespace mw {
 
 class iDatabase {
-public:
+protected:
   iDatabase(const std::string& db_name = "Default-abstract.db");
+  iDatabase(iDatabase&& rval_obj);
   virtual ~iDatabase();
 
 protected:
@@ -58,6 +59,11 @@ protected:
       const std::string& table_name,
       const ID_t& last_id);
   ID_t __read_last_id__(const std::string& table_name);
+
+private:
+  iDatabase(const iDatabase& obj) = delete;
+  iDatabase& operator = (const iDatabase& rhs) = delete;
+  iDatabase& operator = (iDatabase&& rval_rhs) = delete;
 };
 
 /// @class TableException

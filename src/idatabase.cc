@@ -29,7 +29,28 @@ iDatabase::iDatabase(const std::string& i_db_name)
   , m_next_id(ID_IN_CASE_OF_NOT_EXISTING_TABLE) {
 }
 
+iDatabase::iDatabase(iDatabase&& rval_obj)
+  : m_db_name(rval_obj.m_db_name)
+  , m_db_handler(rval_obj.m_db_handler)
+  , m_db_statement(rval_obj.m_db_statement)
+  , m_last_statement(rval_obj.m_last_statement)
+  , m_rows(rval_obj.m_rows)
+  , m_next_id(rval_obj.m_next_id) {
+  rval_obj.m_db_name = "";
+  rval_obj.m_db_handler = nullptr;
+  rval_obj.m_db_statement = nullptr;
+  rval_obj.m_last_statement = "";
+  rval_obj.m_rows = ROWS_IN_CASE_OF_NOT_EXISTING_TABLE;
+  rval_obj.m_next_id = ID_IN_CASE_OF_NOT_EXISTING_TABLE;
+}
+
 iDatabase::~iDatabase() {
+  this->m_db_name = "";
+  this->m_db_handler = nullptr;
+  this->m_db_statement = nullptr;
+  this->m_last_statement = "";
+  this->m_rows = ROWS_IN_CASE_OF_NOT_EXISTING_TABLE;
+  this->m_next_id = ID_IN_CASE_OF_NOT_EXISTING_TABLE;
 }
 
 void iDatabase::__init__(const std::string& i_table_name) {
