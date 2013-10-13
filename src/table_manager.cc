@@ -40,10 +40,6 @@ TableManager::~TableManager() {
   INF("exit TableManager destructor.");
 }
 
-/*CycleTable& TableManager::getCycleTable() {
-  return (this->m_cycle_table);
-}*/ // TODO:
-
 ID_t TableManager::add(
     const WrappedString& i_name,
     const WrappedString& i_description,

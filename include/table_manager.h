@@ -31,13 +31,6 @@ public:
   virtual ~TableManager();
 
   /// -------------------------------------------------------------------------
-  /// @defgroup GET Access methods for tables.
-  /// @{
-  // TODO: CycleTable& getCycleTable();
-  /// @}
-  /// -------------------------------------------------------------------------
-
-  /// -------------------------------------------------------------------------
   /// @defgroup SERVICE Methods to manipulate with tables' content.
   /// @{
   /// @brief Adds new entry to CycleTable.
