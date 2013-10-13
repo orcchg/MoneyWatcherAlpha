@@ -57,6 +57,7 @@ public:
   /// value.
   /// @param description - Description of provided transaction.
   /// @return Updated entry.
+  /// @details Entry will also be updated in SQLite database.
   Entry updateEntry(
       const ID_t& entry_id,
       const MoneyValue_t& value,

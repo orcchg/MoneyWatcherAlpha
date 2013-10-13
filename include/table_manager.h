@@ -28,13 +28,24 @@ public:
   /// -------------------------------------------------------------------------
   /// @defgroup GET Access methods for tables.
   /// @{
-  CycleTable& getCycleTable();
+  // TODO: CycleTable& getCycleTable();
   /// @}
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------
   /// @defgroup SERVICE Methods to manipulate with tables' content.
   /// @{
+  /// @brief Adds new entry to CycleTable.
+  /// @param name - Name of entry.
+  /// @param description - Text description of last transaction.
+  /// @param current_balace - Value of current money balance of entry.
+  /// @return Newly created entry's ID.
+  /// @details Entry will also be stored into SQLite database.
+  ID_t add(
+      const WrappedString& name,
+      const WrappedString& description,
+      const MoneyValue_t& current_balance);
+
   /// @brief Updates current balance of existing entry by its ID. Also,
   /// provides corresponding record in daily_table.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
@@ -42,6 +53,7 @@ public:
   /// be updated - it could be both positive (income) or negative (expense)
   /// value.
   /// @param description - Description of provided transaction.
+  /// @details Entry will also be updated in SQLite database.
   void update(
 	    const ID_t& entry_id,
 	    const MoneyValue_t& value,

@@ -35,8 +35,49 @@ TableManager::~TableManager() {
   INF("exit TableManager destructor.");
 }
 
-CycleTable& TableManager::getCycleTable() {
+/*CycleTable& TableManager::getCycleTable() {
   return (this->m_cycle_table);
+}*/ // TODO:
+
+ID_t TableManager::add(
+    const WrappedString& i_name,
+    const WrappedString& i_description,
+    const MoneyValue_t& i_current_balance) {
+  INF("enter TableManager::add().");
+  Entry entry = this->m_cycle_table.addEntry(i_name, i_description, i_current_balance);
+  ID_t entry_id = entry.getID();
+  DBG("Added entry into Cycle_Table, got ID: %lli.", entry_id);
+  std::string insert_statement = "INSERT INTO '";
+  insert_statement += this->m_entry_ids_table_name;
+  insert_statement += "' VALUES(?1);";
+  int nByte = static_cast<int>(insert_statement.length());
+  TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      insert_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(insert_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(insert_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, entry_id);
+  sqlite3_step(this->m_db_statement);
+  if (accumulate != SQLITE_OK) {
+    ERR("Error during saving data into database "%s" by statement "%s"!",
+        this->m_db_name.c_str(), insert_statement.c_str());
+    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+  } else {
+    DBG("All insertions have succeeded.");
+  }
+  this->__finalize__(insert_statement.c_str());
+  INF("exit TableManager::add().");
+  return (entry_id);
 }
 
 void TableManager::update(
@@ -52,13 +93,13 @@ void TableManager::update(
 
 void TableManager::redo(const ID_t& entry_id) {
   INF("enter TableManager::redo().");
-  //
+  // TODO: impl
   INF("exit TableManager::redo().");
 }
 
 void TableManager::undo(const ID_t& entry_id) {
   INF("enter TableManager::undo().");
-  //
+  // TODO: impl
   INF("exit TableManager::undo().");
 }
 

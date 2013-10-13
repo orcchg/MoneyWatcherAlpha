@@ -1100,6 +1100,9 @@ TEST (TableManagerTest, TableManagerInit) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
+// TODO: test add()
+// TODO: test update()
+
 
 /* Main */
 // ----------------------------------------------------------------------------
