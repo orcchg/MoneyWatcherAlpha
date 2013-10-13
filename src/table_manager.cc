@@ -18,10 +18,9 @@ int TableManager::OPENED_DATABASES_COUNT = 0;
 const std::string TableManager::single_database_name = "MW-Database.db";
 
 TableManager::TableManager()
-  : iDatabase(TableManager::single_database_name)
+  : iDatabase(TableManager::single_database_name, "Entry_IDs_Table")
   , m_cycle_table(TableManager::single_database_name)
-  , m_daily_table(TableManager::single_database_name)
-  , m_table_name("Entry_IDs_Table") {
+  , m_daily_table(TableManager::single_database_name) {
   INF("enter TableManager constructor.");
   this->__init__(this->m_table_name);
   ++TableManager::OPENED_DATABASES_COUNT;
