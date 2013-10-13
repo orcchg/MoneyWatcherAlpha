@@ -24,6 +24,7 @@ class TableManager : private iDatabase {
   friend class TestAccessTable;
 public:
   TableManager();
+  TableManager(TableManager&& rval_obj);
   virtual ~TableManager();
 
   /// -------------------------------------------------------------------------
@@ -81,6 +82,10 @@ private:
 
   void __init__();
   void __create_table__();
+
+  TableManager(const TableManager& obj) = delete;
+  TableManager& operator = (const TableManager& rhs) = delete;
+  TableManager& operator = (TableManager&& rval_rhs) = delete;
 };
 
 }  /* namespace mw */

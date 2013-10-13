@@ -8,6 +8,7 @@
  */
 
 #include <string>
+#include <utility>
 #include "logger.h"
 #include "table_manager.h"
 
@@ -25,6 +26,10 @@ TableManager::TableManager()
   this->__init__();
   ++TableManager::OPENED_DATABASES_COUNT;
   INF("exit TableManager constructor.");
+}
+
+TableManager::TableManager(TableManager&& rval_obj)
+  : iDatabase(std::move(static_cast<iDatabase&>(rval_obj))) {
 }
 
 TableManager::~TableManager() {

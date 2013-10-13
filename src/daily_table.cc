@@ -30,9 +30,6 @@ DailyTable::DailyTable(const std::string& i_db_name)
 
 DailyTable::DailyTable(DailyTable&& rval_obj)
   : iDatabase(std::move(static_cast<iDatabase&>(rval_obj))) {
-  INF("enter DailyTable move constructor.");
-  rval_obj.m_table_name = "";
-  INF("exit DailyTable move constructor.");
 }
 
 DailyTable::~DailyTable() {
