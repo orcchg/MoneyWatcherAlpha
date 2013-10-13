@@ -21,9 +21,9 @@ TableManager::TableManager()
   : iDatabase(TableManager::single_database_name)
   , m_cycle_table(TableManager::single_database_name)
   , m_daily_table(TableManager::single_database_name)
-  , m_entry_ids_table_name("Entry_IDs_Table") {
+  , m_table_name("Entry_IDs_Table") {
   INF("enter TableManager constructor.");
-  this->__init__(this->m_entry_ids_table_name);
+  this->__init__(this->m_table_name);
   ++TableManager::OPENED_DATABASES_COUNT;
   INF("exit TableManager constructor.");
 }
@@ -48,7 +48,7 @@ ID_t TableManager::add(
   ID_t entry_id = entry.getID();
   DBG("Added entry into Cycle_Table, got ID: %lli.", entry_id);
   std::string insert_statement = "INSERT INTO '";
-  insert_statement += this->m_entry_ids_table_name;
+  insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1);";
   int nByte = static_cast<int>(insert_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);

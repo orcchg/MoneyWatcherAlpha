@@ -20,8 +20,11 @@
 
 namespace mw {
 
-iDatabase::iDatabase(const std::string& i_db_name)
+iDatabase::iDatabase(
+    const std::string& i_db_name,
+    const std::string& i_table_name)
   : m_db_name(i_db_name)
+  , m_table_name(i_table_name)
   , m_db_handler(nullptr)
   , m_db_statement(nullptr)
   , m_next_id(ID_IN_CASE_OF_NOT_EXISTING_TABLE)
@@ -31,12 +34,14 @@ iDatabase::iDatabase(const std::string& i_db_name)
 
 iDatabase::iDatabase(iDatabase&& rval_obj)
   : m_db_name(rval_obj.m_db_name)
+  , m_table_name(rval_obj.m_table_name)
   , m_db_handler(rval_obj.m_db_handler)
   , m_db_statement(rval_obj.m_db_statement)
   , m_next_id(rval_obj.m_next_id)
   , m_rows(rval_obj.m_rows)
   , m_last_statement(rval_obj.m_last_statement) {
   rval_obj.m_db_name = "";
+  rval_obj.m_table_name = "";
   rval_obj.m_db_handler = nullptr;
   rval_obj.m_db_statement = nullptr;
   rval_obj.m_next_id = ID_IN_CASE_OF_NOT_EXISTING_TABLE;
@@ -46,6 +51,7 @@ iDatabase::iDatabase(iDatabase&& rval_obj)
 
 iDatabase::~iDatabase() {
   this->m_db_name = "";
+  this->m_table_name = "";
   this->m_db_handler = nullptr;
   this->m_db_statement = nullptr;
   this->m_next_id = ID_IN_CASE_OF_NOT_EXISTING_TABLE;
@@ -234,6 +240,13 @@ void iDatabase::__finalize_and_throw__(const char* i_statement, int i_error_code
   this->__finalize__(i_statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!", i_error_code);
+}
+
+const std::string& iDatabase::__get_table_name__() const {
+  DBG("enter iDatabase::__get_table_name__().");
+  TRC("Table name is "%s".", this->m_table_name.c_str());
+  DBG("exit iDatabase::__get_table_name__().");
+  return (this->m_table_name);
 }
 
 const char* iDatabase::__get_last_statement__() const {

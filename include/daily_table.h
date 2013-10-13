@@ -16,6 +16,7 @@
 #include "hash.h"
 #include "idatabase.h"
 #include "record.h"
+#include "tests/core/test_access_class.h"
 #include "types.h"
 #include "unistring.h"
 
@@ -74,7 +75,6 @@ public:
   static int OPENED_DAILY_TABLES_COUNT;
 
 private:
-  std::string m_table_name;
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 #endif

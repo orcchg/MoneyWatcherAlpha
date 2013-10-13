@@ -27,12 +27,15 @@ namespace mw {
 
 class iDatabase {
 protected:
-  iDatabase(const std::string& db_name = "Default-abstract.db");
+  iDatabase(
+      const std::string& db_name = "Default-abstract.db",
+      const std::string& table_name = "Default_Table");
   iDatabase(iDatabase&& rval_obj);
   virtual ~iDatabase();
 
 protected:
   std::string m_db_name;
+  std::string m_table_name;
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;
   ID_t m_next_id;
@@ -51,6 +54,7 @@ protected:
   void __terminate__(const char* message);
   void __finalize__(const char* statement);
   void __finalize_and_throw__(const char* statement, int error_code);
+  const std::string& __get_table_name__() const;  // soft invocation
   const char* __get_last_statement__() const;  // soft invocation
   void __set_last_statement__(const char* statement);  // soft invocation
   void __create_table_for_last_id__(const std::string& table_name);

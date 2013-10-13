@@ -16,6 +16,7 @@
 #include "entry.h"
 #include "hash.h"
 #include "idatabase.h"
+#include "tests/core/test_access_class.h"
 #include "unistring.h"
 
 
@@ -76,7 +77,6 @@ public:
   static int OPENED_CYCLE_TABLES_COUNT;
 
 private:
-  std::string m_table_name;
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
 #endif

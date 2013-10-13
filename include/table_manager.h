@@ -21,6 +21,8 @@ namespace mw {
 /// @class TableManager
 /// @brief Contains tables and manages its content, applies policies.
 class TableManager : public Singleton<TableManager>, private iDatabase {
+  template <typename Table>
+  friend class TestAccessTable;
 public:
   TableManager();
   virtual ~TableManager();
@@ -77,7 +79,7 @@ public:
 private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
-  std::string m_entry_ids_table_name;
+  std::string m_table_name;
 
   void __init__(const std::string& table_name);
   void __create_table__(const std::string& table_name);

@@ -17,6 +17,9 @@
 
 namespace mw {
 
+/// @class TestAccessTable
+/// @brief Friend-class providing access to private Table class-members.
+/// @note Template parameter 'Table' must inherits iDatabase interface.
 template <typename Table>
 class TestAccessTable {
 public:

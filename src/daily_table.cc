@@ -21,8 +21,7 @@ int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
 const std::string DailyTable::last_row_id_table_name = "Last_Record_ID";
 
 DailyTable::DailyTable(const std::string& i_db_name)
-  : iDatabase(i_db_name)
-  , m_table_name("Daily_Table") {
+  : iDatabase(i_db_name, "Daily_Table") {
   INF("enter DailyTable constructor.");
   this->__init__(this->m_table_name);
   ++DailyTable::OPENED_DAILY_TABLES_COUNT;
@@ -30,8 +29,7 @@ DailyTable::DailyTable(const std::string& i_db_name)
 }
 
 DailyTable::DailyTable(DailyTable&& rval_obj)
-  : iDatabase(std::move(static_cast<iDatabase&>(rval_obj)))
-  , m_table_name(rval_obj.m_table_name) {
+  : iDatabase(std::move(static_cast<iDatabase&>(rval_obj))) {
   INF("enter DailyTable move constructor.");
   rval_obj.m_table_name = "";
   INF("exit DailyTable move constructor.");
