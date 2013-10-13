@@ -80,6 +80,10 @@ ID_t TableManager::add(
     DBG("All insertions have succeeded.");
   }
   this->__finalize__(insert_statement.c_str());
+  std::string records_table_name = "Records_for_Entry_" + std::to_string(entry_id);
+  this->__create_table_entry_records__(records_table_name);
+  DBG("Created table with name "%s" for records of entry with ID: %lli.",
+      records_table_name.c_str(), entry_id);
   INF("exit TableManager::add().");
   return (entry_id);
 }
@@ -141,6 +145,33 @@ void TableManager::__create_table__() {
   DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit TableManager::__create_table__().");
+}
+
+void TableManager::__create_table_entry_records__(const std::string& i_table_name) {
+  DBG("enter TableManager::__create_table_entry_records__().");
+  std::string statement = "CREATE TABLE IF NOT EXISTS ";
+  statement += i_table_name;
+  statement += "('RecordID' INTEGER PRIMARY KEY);";  // TODO: foreign key?
+  int nByte = static_cast<int>(statement.length());
+  TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
+  this->__finalize__(statement.c_str());
+  DBG("exit TableManager::__create_table_entry_records__().");
 }
 
 }  /* namespace mw */

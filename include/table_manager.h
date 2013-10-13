@@ -90,6 +90,7 @@ private:
 
   void __init__();
   void __create_table__();
+  void __create_table_entry_records__(const std::string& table_name);
 
   TableManager(const TableManager& obj) = delete;
   TableManager& operator = (const TableManager& rhs) = delete;
