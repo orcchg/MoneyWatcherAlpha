@@ -55,7 +55,7 @@ ID_t TableManager::add(
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2);";
   int nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.", insert_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -74,7 +74,7 @@ ID_t TableManager::add(
   bool accumulate = true;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
-  DBG("ID [%lli] has been stored in SQLite database "%s".",
+  DBG("ID [%lli] has been stored in SQLite database ["%s"].",
       entry_id, this->m_db_name.c_str());
 
   std::string records_table_name = "Records_for_Entry_" + std::to_string(entry_id);
@@ -85,12 +85,12 @@ ID_t TableManager::add(
           records_table_name.c_str(),
           records_table_name.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Records table name ["%s"] has been stored in SQLite database "%s".",
+  DBG("Records table name ["%s"] has been stored in SQLite database ["%s"].",
       records_table_name.c_str(), this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
-    ERR("Error during saving data into database "%s" by statement "%s"!",
+    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
         this->m_db_name.c_str(), insert_statement.c_str());
     this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
@@ -103,7 +103,7 @@ ID_t TableManager::add(
 
   this->__finalize__(insert_statement.c_str());
   this->__create_table_entry_records__(records_table_name);
-  DBG("Created table with name "%s" for records of entry with ID: %lli.",
+  DBG("Created table with name ["%s"] for records of entry with ID: %lli.",
       records_table_name.c_str(), entry_id);
   INF("exit TableManager::add().");
   return (entry_id);
@@ -118,14 +118,14 @@ void TableManager::update(
   Record record = this->m_daily_table.addRecord(i_value, i_description, entry.getStatus());
   ID_t record_id = record.getID();
 
-  DBG("Reading table name of entry records from SQLite database "%s"...", this->m_db_name.c_str());
+  DBG("Reading table name of entry records from SQLite database ["%s"]...", this->m_db_name.c_str());
   std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
   select_statement += "' WHERE ID == '";
   select_statement += std::to_string(i_entry_id);
   select_statement += "';";
   int nByte = static_cast<int>(select_statement.length());
-  TRC("Provided string SQL statement: "%s" of length %i.", select_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.", select_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -143,14 +143,14 @@ void TableManager::update(
   sqlite3_step(this->m_db_statement);
   this->__finalize__(select_statement.c_str());
   std::string records_table_name(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
-  DBG("Got record [ID: %lli], inserting into table "%s" of entry [ID: %lli].",
+  DBG("Got record [ID: %lli], inserting into table ["%s"] of entry [ID: %lli].",
       record_id, records_table_name.c_str(), entry.getID());
 
   std::string insert_statement = "INSERT INTO '";
   insert_statement += records_table_name;
   insert_statement += "' VALUES(?1);";
   nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: "%s" of length %i.", insert_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.", insert_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   result = sqlite3_prepare_v2(
@@ -168,7 +168,7 @@ void TableManager::update(
   int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
   sqlite3_step(this->m_db_statement);
   if (accumulate != SQLITE_OK) {
-    ERR("Error during saving data into database "%s" by statement "%s"!",
+    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
         this->m_db_name.c_str(), insert_statement.c_str());
     this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
@@ -205,7 +205,7 @@ void TableManager::__create_table__() {
   statement += this->m_table_name;
   statement += "('EntryID' INTEGER PRIMARY KEY, 'RecordsTableName' TEXT);";
   int nByte = static_cast<int>(statement.length());
-  TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.", statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -221,7 +221,7 @@ void TableManager::__create_table__() {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
+  DBG("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit TableManager::__create_table__().");
 }
@@ -234,7 +234,7 @@ void TableManager::__create_table_entry_records__(const std::string& i_table_nam
   statement += this->m_table_name;
   statement += "(EntryID));";
   int nByte = static_cast<int>(statement.length());
-  TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.", statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -250,7 +250,7 @@ void TableManager::__create_table_entry_records__(const std::string& i_table_nam
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
+  DBG("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit TableManager::__create_table_entry_records__().");
 }
