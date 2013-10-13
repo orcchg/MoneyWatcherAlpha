@@ -229,14 +229,14 @@ void iDatabase::__finalize__(const char* i_statement) {
   this->m_db_statement = nullptr;
   this->m_last_statement = "";
   TRC("Statement "%s" (%i bytes) has been finalized.",
-      i_statement, static_cast<int>(strlen(i_statement)) * sizeof(char));
+      i_statement, static_cast<int>(strlen(i_statement) * sizeof(char)));
   DBG("exit iDatabase::__finalize__().");
 }
 
 void iDatabase::__finalize_and_throw__(const char* i_statement, int i_error_code) {
   DBG("enter iDatabase::__finalize_and_throw__().");
   ERR("Unable to prepare statement "%s" (%i bytes)!",
-      i_statement, static_cast<int>(strlen(i_statement)) * sizeof(char));
+      i_statement, static_cast<int>(strlen(i_statement) * sizeof(char)));
   this->__finalize__(i_statement);
   DBG("exit iDatabase::__finalize_and_throw__().");
   throw TableException("Unable to prepare statement!", i_error_code);

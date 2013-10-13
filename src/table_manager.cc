@@ -85,9 +85,9 @@ ID_t TableManager::add(
 }
 
 void TableManager::update(
-      const ID_t& i_entry_id,
-      const MoneyValue_t& i_value,
-      const WrappedString& i_description){
+    const ID_t& i_entry_id,
+    const MoneyValue_t& i_value,
+    const WrappedString& i_description){
   INF("enter TableManager::update().");
   Entry entry = this->m_cycle_table.updateEntry(i_entry_id, i_value, i_description);
   Record record = this->m_daily_table.addRecord(i_value, i_description, entry.getStatus());
