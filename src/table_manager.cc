@@ -17,6 +17,7 @@ namespace mw {
 
 int TableManager::OPENED_DATABASES_COUNT = 0;
 const std::string TableManager::single_database_name = "MW-Database.db";
+const std::string TableManager::records_table_name_prefix = "Records_for_Entry_";
 
 TableManager::TableManager()
   : iDatabase(TableManager::single_database_name, "Entry_IDs_Table")
@@ -77,7 +78,8 @@ ID_t TableManager::add(
   DBG("ID [%lli] has been stored in SQLite database ["%s"].",
       entry_id, this->m_db_name.c_str());
 
-  std::string records_table_name = "Records_for_Entry_" + std::to_string(entry_id);
+  std::string records_table_name =
+      TableManager::records_table_name_prefix + std::to_string(entry_id);
   accumulate = accumulate &&
       (sqlite3_bind_text(
           this->m_db_statement,

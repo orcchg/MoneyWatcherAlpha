@@ -1144,6 +1144,9 @@ TEST (TableManagerTest, TableManagerAdd) {
     EXPECT_EQ(result, SQLITE_ROW);
     ID_t id = sqlite3_column_int64(statement_handler, 0);
     EXPECT_EQ(entry_id, id);
+    std::string records_table_name(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1)));
+    std::string check_string = mw::TableManager::records_table_name_prefix + std::to_string(entry_id);
+    EXPECT_STREQ(records_table_name.c_str(), check_string.c_str());
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);

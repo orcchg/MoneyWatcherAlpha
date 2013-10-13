@@ -80,6 +80,7 @@ public:
 
   static int OPENED_DATABASES_COUNT;
   static const std::string single_database_name;
+  static const std::string records_table_name_prefix;
 
 private:
   CycleTable m_cycle_table;
