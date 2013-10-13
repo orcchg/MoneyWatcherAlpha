@@ -68,8 +68,8 @@ Record DailyTable::addRecord(
   ID_t record_id = this->m_next_id++;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, record_id) == SQLITE_OK);
-  DBG("ID [%lli] has been stored in SQLite database ["%s"].",
-      record_id, this->m_db_name.c_str());
+  DBG("ID [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+      record_id, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   DateTime current_datetime;
   std::string date = current_datetime.getDate();
@@ -80,8 +80,8 @@ Record DailyTable::addRecord(
           date.c_str(),
           date.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Date ["%s"] has been stored in SQLite database ["%s"].",
-      date.c_str(), this->m_db_name.c_str());
+  DBG("Date ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+      date.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   std::string time = current_datetime.getTime();
   accumulate = accumulate &&
@@ -91,13 +91,13 @@ Record DailyTable::addRecord(
           time.c_str(),
           time.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Time ["%s"] has been stored in SQLite database ["%s"].",
-      time.c_str(), this->m_db_name.c_str());
+  DBG("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+      time.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 4, i_balance) == SQLITE_OK);
-  DBG("Balance [%lli] has been stored in SQLite database ["%s"].",
-      i_balance, this->m_db_name.c_str());
+  DBG("Balance [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+      i_balance, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
@@ -107,18 +107,18 @@ Record DailyTable::addRecord(
           i_description.c_str(),
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Description ["%s"] has been stored in SQLite database ["%s"].",
-      i_description.c_str(), this->m_db_name.c_str());
+  DBG("Description ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+      i_description.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
-  DBG("Status [%lli] has been stored in SQLite database ["%s"].",
-        static_cast<sqlite3_int64>(i_status), this->m_db_name.c_str());
+  DBG("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+        static_cast<sqlite3_int64>(i_status), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
-    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
-        this->m_db_name.c_str(), insert_statement.c_str());
+    ERR("Error during saving data into table ["%s"] of database ["%s"] by statement ["%s"]!",
+        this->m_table_name.c_str(), this->m_db_name.c_str(), insert_statement.c_str());
     this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
     DBG("All insertions have succeeded.");
@@ -162,7 +162,8 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Read id [%lli] from database, input id was [%lli].", id, i_record_id);
+  DBG("Read id [%lli] from  table ["%s"] of database ["%s"], input id was [%lli].",
+      id, this->m_table_name.c_str(), this->m_db_name.c_str(), i_record_id);
   TABLE_ASSERT("Input record id does not equal to primary key value from database!" &&
                id == i_record_id);
 

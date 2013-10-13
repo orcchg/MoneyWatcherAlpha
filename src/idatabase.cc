@@ -396,7 +396,7 @@ ID_t iDatabase::__read_last_id__(const std::string& i_table_name) {
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
   ID_t last_row_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Read last row id: %lli.", last_row_id);
+  DBG("Read last row id: [%lli].", last_row_id);
   this->__finalize__(count_statement.c_str());
   DBG("exit iDatabase::__read_last_id__().");
   return (last_row_id);

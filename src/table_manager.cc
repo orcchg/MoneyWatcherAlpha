@@ -50,7 +50,7 @@ ID_t TableManager::add(
   INF("enter TableManager::add().");
   Entry entry = this->m_cycle_table.addEntry(i_name, i_description, i_current_balance);
   ID_t entry_id = entry.getID();
-  DBG("Added entry into Cycle_Table, got ID: %lli.", entry_id);
+  DBG("Added entry into Cycle_Table, got ID: [%lli].", entry_id);
   std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2);";
@@ -103,7 +103,7 @@ ID_t TableManager::add(
 
   this->__finalize__(insert_statement.c_str());
   this->__create_table_entry_records__(records_table_name);
-  DBG("Created table with name ["%s"] for records of entry with ID: %lli.",
+  DBG("Created table with name ["%s"] for records of entry [ID: %lli].",
       records_table_name.c_str(), entry_id);
   INF("exit TableManager::add().");
   return (entry_id);
