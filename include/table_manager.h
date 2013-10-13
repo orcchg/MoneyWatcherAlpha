@@ -13,14 +13,13 @@
 #include <string>
 #include "cycle_table.h"
 #include "daily_table.h"
-#include "singleton.h"
 
 
 namespace mw {
 
 /// @class TableManager
 /// @brief Contains tables and manages its content, applies policies.
-class TableManager : public Singleton<TableManager>, private iDatabase {
+class TableManager : private iDatabase {
   template <typename Table>
   friend class TestAccessTable;
 public:
@@ -79,7 +78,6 @@ public:
 private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
-  std::string m_table_name;
 
   void __init__();
   void __create_table__();

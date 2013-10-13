@@ -426,6 +426,7 @@ TEST (CycleTableTest, ReadEntryWrongId) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
+
 TEST (CycleTableTest, UpdateEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -1082,10 +1083,15 @@ TEST (TableManagerTest, TableManagerInit) {
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   try {
-     mw::TableManager& table_manager = mw::TableManager::instance();
+     mw::TableManager table_manager;
      EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+
+     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+     EXPECT_TRUE(accessor.checkFinalized());
+     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+     EXPECT_EQ(rows, 0);
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1096,12 +1102,94 @@ TEST (TableManagerTest, TableManagerInit) {
     EXPECT_TRUE(false);
     remove(mw::TableManager::single_database_name.c_str());
   }
-  // static instance deletion time is undefined.
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-// TODO: test add()
-// TODO: test update()
+TEST (TableManagerTest, TableManagerAdd) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  MoneyValue_t s_entry_balance = 1000;
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
+
+    DB_Statement statement_handler = nullptr;
+    std::string value_statement = "SELECT * FROM \'";
+    value_statement += accessor.getTableName();
+    value_statement += "\';";
+    int nByte = static_cast<int>(value_statement.length());
+    int result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        value_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t id = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(entry_id, id);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+TEST (TableManagerTest, TableManagerUpdate) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    // TODO: implement update()
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
+}
 
 
 /* Main */

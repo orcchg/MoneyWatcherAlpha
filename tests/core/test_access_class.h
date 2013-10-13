@@ -12,6 +12,7 @@
 
 #include <string>
 #include "daily_table.h"
+#include "logger.h"
 #include "types.h"
 
 
@@ -60,6 +61,7 @@ ID_t TestAccessTable<Table>::getNextID() const {
 
 template <typename Table>
 const std::string& TestAccessTable<Table>::getTableName() const {
+  TRC("Table name: "%s".", this->m_ptr_table->m_table_name.c_str());
   return (this->m_ptr_table->m_table_name);
 }
 
