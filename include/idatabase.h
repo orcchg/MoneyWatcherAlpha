@@ -35,9 +35,8 @@ protected:
   std::string m_db_name;
   DB_Handler m_db_handler;
   DB_Statement m_db_statement;
-  const char* m_last_statement;
-  int m_rows;
   ID_t m_next_id;
+  int m_rows;
 
   virtual void __init__(const std::string& table_name) = 0;
   virtual void __create_table__(const std::string& table_name) = 0;
@@ -61,6 +60,8 @@ protected:
   ID_t __read_last_id__(const std::string& table_name);
 
 private:
+  const char* m_last_statement;
+
   iDatabase(const iDatabase& obj) = delete;
   iDatabase& operator = (const iDatabase& rhs) = delete;
   iDatabase& operator = (iDatabase&& rval_rhs) = delete;
