@@ -7,6 +7,7 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
+#include <string>
 #include "logger.h"
 #include "table_manager.h"
 
@@ -17,15 +18,19 @@ int TableManager::OPENED_DATABASES_COUNT = 0;
 const std::string TableManager::single_database_name = "MW-Database.db";
 
 TableManager::TableManager()
-  : m_cycle_table(TableManager::single_database_name)
-  , m_daily_table(TableManager::single_database_name) {
+  : iDatabase(TableManager::single_database_name)
+  , m_cycle_table(TableManager::single_database_name)
+  , m_daily_table(TableManager::single_database_name)
+  , m_entry_ids_table_name("Entry_IDs_Table") {
   INF("enter TableManager constructor.");
+  this->__init__(this->m_entry_ids_table_name);
   ++TableManager::OPENED_DATABASES_COUNT;
   INF("exit TableManager constructor.");
 }
 
 TableManager::~TableManager() {
   INF("enter TableManager destructor.");
+  this->__close_database__();
   --TableManager::OPENED_DATABASES_COUNT;
   INF("exit TableManager destructor.");
 }
@@ -34,8 +39,63 @@ CycleTable& TableManager::getCycleTable() {
   return (this->m_cycle_table);
 }
 
-DailyTable& TableManager::getDailyTable() {
-  return (this->m_daily_table);
+void TableManager::update(
+      const ID_t& i_entry_id,
+      const MoneyValue_t& i_value,
+      const WrappedString& i_description){
+  INF("enter TableManager::update().");
+  Entry entry = this->m_cycle_table.updateEntry(i_entry_id, i_value, i_description);
+  Record record = this->m_daily_table.addRecord(i_value, i_description, entry.getStatus());
+  // TODO: create or update table for records, add foreign key.
+  INF("exit TableManager::update().");
+}
+
+void TableManager::redo(const ID_t& entry_id) {
+  INF("enter TableManager::redo().");
+  //
+  INF("exit TableManager::redo().");
+}
+
+void TableManager::undo(const ID_t& entry_id) {
+  INF("enter TableManager::undo().");
+  //
+  INF("exit TableManager::undo().");
+}
+
+
+/* Private members */
+// ----------------------------------------------------------------------------
+void TableManager::__init__(const std::string& i_table_name) {
+  DBG("enter TableManager::__init__().");
+  iDatabase::__init__(i_table_name);
+  DBG("exit TableManager::__init__().");
+}
+
+void TableManager::__create_table__(const std::string& i_table_name) {
+  DBG("enter TableManager::__create_table__().");
+  std::string statement = "CREATE TABLE IF NOT EXISTS ";
+  statement += i_table_name;
+  statement += "('EntryID' INTEGER PRIMARY KEY);";
+  int nByte = static_cast<int>(statement.length());
+  TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  DBG("Table "%s" has been successfully created.", i_table_name.c_str());
+  this->__finalize__(statement.c_str());
+  DBG("exit TableManager::__create_table__().");
 }
 
 }  /* namespace mw */

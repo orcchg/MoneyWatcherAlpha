@@ -484,6 +484,8 @@ TEST (CycleTableTest, UpdateEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
+// TODO: Update invalid entry.
+
 
 /* DailyTable testing */
 // ----------------------------------------------------------------------------

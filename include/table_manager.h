@@ -20,7 +20,7 @@ namespace mw {
 
 /// @class TableManager
 /// @brief Contains tables and manages its content, applies policies.
-class TableManager : public Singleton<TableManager> {
+class TableManager : public Singleton<TableManager>, private iDatabase {
 public:
   TableManager();
   virtual ~TableManager();
@@ -29,7 +29,33 @@ public:
   /// @defgroup GET Access methods for tables.
   /// @{
   CycleTable& getCycleTable();
-  DailyTable& getDailyTable();
+  /// @}
+  /// -------------------------------------------------------------------------
+
+  /// -------------------------------------------------------------------------
+  /// @defgroup SERVICE Methods to manipulate with tables' content.
+  /// @{
+  /// @brief Updates current balance of existing entry by its ID. Also,
+  /// provides corresponding record in daily_table.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @param value - Amount to which the actual money balance should
+  /// be updated - it could be both positive (income) or negative (expense)
+  /// value.
+  /// @param description - Description of provided transaction.
+  void update(
+	    const ID_t& entry_id,
+	    const MoneyValue_t& value,
+	    const WrappedString& description);
+
+  /// @brief
+  void redo(const ID_t& entry_id);
+
+  /// @brief Undoes last operation with existing entry, rolling its state
+  /// back to last transaction.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @note If there is no last transaction provided with entry, the entry
+  /// becomes empty. Also deletes associated record from daily_table.
+  void undo(const ID_t& entry_id);
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -39,6 +65,10 @@ public:
 private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
+  std::string m_entry_ids_table_name;
+
+  void __init__(const std::string& table_name);
+  void __create_table__(const std::string& table_name);
 };
 
 }  /* namespace mw */
