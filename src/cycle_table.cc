@@ -61,12 +61,14 @@ Entry CycleTable::addEntry(
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+
   bool accumulate = true;
   ID_t entry_id = this->m_next_id++;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database "%s".",
       entry_id, this->m_db_name.c_str());
+
   int name_n_bytes = i_name.n_bytes();
   accumulate = accumulate &&
       (sqlite3_bind_text(
@@ -77,6 +79,7 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Name ["%s"] has been stored in SQLite database "%s".",
       i_name.c_str(), this->m_db_name.c_str());
+
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
       (sqlite3_bind_text(
@@ -87,15 +90,18 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Description ["%s"] has been stored in SQLite database "%s".",
       i_description.c_str(), this->m_db_name.c_str());
+
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 4, i_current_balance) == SQLITE_OK);
   DBG("Current balance [%lli] has been stored in SQLite database "%s".",
       i_current_balance, this->m_db_name.c_str());
+
   MoneyValue_t last_transaction = 0;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 5, last_transaction) == SQLITE_OK);
   DBG("Last transaction balance [%lli] has been stored in SQLite database "%s".",
       last_transaction, this->m_db_name.c_str());
+
   DateTime current_datetime;
   std::string date = current_datetime.getDate();
   accumulate = accumulate &&
@@ -107,6 +113,7 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Date ["%s"] has been stored in SQLite database "%s".",
       date.c_str(), this->m_db_name.c_str());
+
   std::string time = current_datetime.getTime();
   accumulate = accumulate &&
       (sqlite3_bind_text(
@@ -117,11 +124,13 @@ Entry CycleTable::addEntry(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Time ["%s"] has been stored in SQLite database "%s".",
       time.c_str(), this->m_db_name.c_str());
+
   Status status = SV_UNKNOWN;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 8, static_cast<sqlite3_int64>(status)) == SQLITE_OK);
   DBG("Status [%lli] has been stored in SQLite database "%s".",
       static_cast<sqlite3_int64>(status), this->m_db_name.c_str());
+
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
     ERR("Error during saving data into database "%s" by statement "%s"!",
@@ -130,9 +139,11 @@ Entry CycleTable::addEntry(
   } else {
     DBG("All insertions have succeeded.");
   }
+
 #if ENABLED_DB_CACHING
   // TODO: caching the entry
 #endif
+
   this->__finalize__(insert_statement.c_str());
   this->__increment_rows__();
   this->__write_last_id__(CycleTable::last_row_id_table_name, entry_id);
@@ -193,9 +204,11 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
       name.c_str(), description.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
   Entry entry(id, name, description, balance, transaction, status, datetime);
   DBG("Proper entry instance has been constructed.");
+
 #if ENABLED_DB_CACHING
   // TODO: caching the entry
 #endif
+
   this->__finalize__(select_statement.c_str());
   INF("exit CycleTable::readEntry().");
   return (entry);
@@ -245,9 +258,11 @@ Entry CycleTable::updateEntry(
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
+
 #if ENABLED_DB_CACHING
   // TODO: caching the entry
 #endif
+
   this->__finalize__(update_statement.c_str());
   INF("exit CycleTable::updateEntry().");
   return (entry);

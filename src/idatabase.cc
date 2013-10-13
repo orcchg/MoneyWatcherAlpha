@@ -343,6 +343,7 @@ void iDatabase::__write_last_id__(const std::string& i_table_name, const ID_t& i
       DBG("All insertions have succeeded.");
     }
     this->__finalize__(insert_statement.c_str());
+
   } else {
     DBG("Table "%s" is filled. Updating first value...", i_table_name.c_str());
     std::string update_statement = "UPDATE '";

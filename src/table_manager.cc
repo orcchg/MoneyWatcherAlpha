@@ -70,11 +70,13 @@ ID_t TableManager::add(
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+
   bool accumulate = true;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database "%s".",
       entry_id, this->m_db_name.c_str());
+
   std::string records_table_name = "Records_for_Entry_" + std::to_string(entry_id);
   accumulate = accumulate &&
       (sqlite3_bind_text(
@@ -85,6 +87,7 @@ ID_t TableManager::add(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Records table name ["%s"] has been stored in SQLite database "%s".",
       records_table_name.c_str(), this->m_db_name.c_str());
+
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
     ERR("Error during saving data into database "%s" by statement "%s"!",
@@ -93,6 +96,11 @@ ID_t TableManager::add(
   } else {
     DBG("All insertions have succeeded.");
   }
+
+#if ENABLED_DB_CACHING
+  // TODO: caching the entry's records
+#endif
+
   this->__finalize__(insert_statement.c_str());
   this->__create_table_entry_records__(records_table_name);
   DBG("Created table with name "%s" for records of entry with ID: %lli.",

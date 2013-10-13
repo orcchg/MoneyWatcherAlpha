@@ -63,12 +63,14 @@ Record DailyTable::addRecord(
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+
   bool accumulate = true;
   ID_t record_id = this->m_next_id++;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, record_id) == SQLITE_OK);
   DBG("ID [%lli] has been stored in SQLite database "%s".",
       record_id, this->m_db_name.c_str());
+
   DateTime current_datetime;
   std::string date = current_datetime.getDate();
   accumulate = accumulate &&
@@ -80,6 +82,7 @@ Record DailyTable::addRecord(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Date ["%s"] has been stored in SQLite database "%s".",
       date.c_str(), this->m_db_name.c_str());
+
   std::string time = current_datetime.getTime();
   accumulate = accumulate &&
       (sqlite3_bind_text(
@@ -90,10 +93,12 @@ Record DailyTable::addRecord(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Time ["%s"] has been stored in SQLite database "%s".",
       time.c_str(), this->m_db_name.c_str());
+
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 4, i_balance) == SQLITE_OK);
   DBG("Balance [%lli] has been stored in SQLite database "%s".",
       i_balance, this->m_db_name.c_str());
+
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
       (sqlite3_bind_text(
@@ -104,10 +109,12 @@ Record DailyTable::addRecord(
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG("Description ["%s"] has been stored in SQLite database "%s".",
       i_description.c_str(), this->m_db_name.c_str());
+
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
   DBG("Status [%lli] has been stored in SQLite database "%s".",
         static_cast<sqlite3_int64>(i_status), this->m_db_name.c_str());
+
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
     ERR("Error during saving data into database "%s" by statement "%s"!",
@@ -116,9 +123,11 @@ Record DailyTable::addRecord(
   } else {
     DBG("All insertions have succeeded.");
   }
+
 #if ENABLED_DB_CACHING
   // TODO: caching the record
 #endif
+
   this->__finalize__(insert_statement.c_str());
   this->__increment_rows__();
   this->__write_last_id__(DailyTable::last_row_id_table_name, record_id);
@@ -156,6 +165,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   DBG("Read id [%lli] from database, input id was [%lli].", id, i_record_id);
   TABLE_ASSERT("Input record id does not equal to primary key value from database!" &&
                id == i_record_id);
+
   std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
   std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2)));
   DateTime datetime(date, time);
@@ -168,9 +178,11 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
         datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
   Record record(id, balance, description, status, datetime);
   DBG("Proper record instance has been constructed.");
+
 #if ENABLED_DB_CACHING
   // TODO: caching the record
 #endif
+
   this->__finalize__(select_statement.c_str());
   INF("exit DailyTable::readRecord().");
   return (record);
@@ -221,9 +233,11 @@ const std::string& DailyTable::getName() const {
 
 bool DailyTable::load() {
   INF("enter DailyTable::load().");
+
 #if ENABLED_DB_CACHING
   // TODO: caching the records
 #endif
+
   INF("exit DailyTable::load().");
   return (false);
 }
