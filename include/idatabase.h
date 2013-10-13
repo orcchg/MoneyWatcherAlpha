@@ -41,14 +41,14 @@ protected:
   ID_t m_next_id;
   int m_rows;
 
-  virtual void __init__(const std::string& table_name) = 0;
-  virtual void __create_table__(const std::string& table_name) = 0;
+  virtual void __init__() = 0;
+  virtual void __create_table__() = 0;
 
   void __open_database__();
   void __close_database__();
-  bool __does_table_exist__(const std::string& table_name);
-  int __count__(const std::string& table_name);
-  bool __empty__(const std::string& table_name) const;  // soft invocation
+  bool __does_table_exist__();
+  int __count__(const std::string& i_table_name);
+  bool __empty__() const;  // soft invocation
   void __increment_rows__();  // soft invocation
   void __decrement_rows__();  // soft invocation
   void __terminate__(const char* message);
@@ -58,9 +58,7 @@ protected:
   const char* __get_last_statement__() const;  // soft invocation
   void __set_last_statement__(const char* statement);  // soft invocation
   void __create_table_for_last_id__(const std::string& table_name);
-  void __write_last_id__(
-      const std::string& table_name,
-      const ID_t& last_id);
+  void __write_last_id__(const std::string& table_name, const ID_t& last_id);
   ID_t __read_last_id__(const std::string& table_name);
 
 private:

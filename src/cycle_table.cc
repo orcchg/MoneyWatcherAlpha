@@ -21,7 +21,7 @@ const std::string CycleTable::last_row_id_table_name = "Last_Entry_ID";
 CycleTable::CycleTable(const std::string& i_db_name)
   : iDatabase(i_db_name, "Cycle_Table") {
   INF("enter CycleTable constructor.");
-  this->__init__(this->m_table_name);
+  this->__init__();
   ++CycleTable::OPENED_CYCLE_TABLES_COUNT;
   INF("exit CycleTable constructor.");
 }
@@ -266,9 +266,9 @@ const std::string& CycleTable::getName() const {
 
 /* Private members */
 // ----------------------------------------------------------------------------
-void CycleTable::__init__(const std::string& i_table_name) {
+void CycleTable::__init__() {
   DBG("enter CycleTable::__init__().");
-  iDatabase::__init__(i_table_name);
+  iDatabase::__init__();
   iDatabase::__create_table_for_last_id__(CycleTable::last_row_id_table_name);
   ID_t last_row_id = this->__read_last_id__(CycleTable::last_row_id_table_name);
   this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
@@ -277,10 +277,10 @@ void CycleTable::__init__(const std::string& i_table_name) {
   DBG("exit CycleTable::__init__().");
 }
 
-void CycleTable::__create_table__(const std::string& i_table_name) {
+void CycleTable::__create_table__() {
   DBG("enter CycleTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
-  statement += i_table_name;
+  statement += this->m_table_name;
   statement += "('ID' INTEGER PRIMARY KEY, "
       "'Name' TEXT, "
       "'Description' TEXT, "
@@ -306,7 +306,7 @@ void CycleTable::__create_table__(const std::string& i_table_name) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table "%s" has been successfully created.", i_table_name.c_str());
+  DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit CycleTable::__create_table__().");
 }

@@ -22,7 +22,7 @@ TableManager::TableManager()
   , m_cycle_table(TableManager::single_database_name)
   , m_daily_table(TableManager::single_database_name) {
   INF("enter TableManager constructor.");
-  this->__init__(this->m_table_name);
+  this->__init__();
   ++TableManager::OPENED_DATABASES_COUNT;
   INF("exit TableManager constructor.");
 }
@@ -105,16 +105,16 @@ void TableManager::undo(const ID_t& entry_id) {
 
 /* Private members */
 // ----------------------------------------------------------------------------
-void TableManager::__init__(const std::string& i_table_name) {
+void TableManager::__init__() {
   DBG("enter TableManager::__init__().");
-  iDatabase::__init__(i_table_name);
+  iDatabase::__init__();
   DBG("exit TableManager::__init__().");
 }
 
-void TableManager::__create_table__(const std::string& i_table_name) {
+void TableManager::__create_table__() {
   DBG("enter TableManager::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
-  statement += i_table_name;
+  statement += this->m_table_name;
   statement += "('EntryID' INTEGER PRIMARY KEY);";
   int nByte = static_cast<int>(statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", statement.c_str(), nByte);
@@ -133,7 +133,7 @@ void TableManager::__create_table__(const std::string& i_table_name) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table "%s" has been successfully created.", i_table_name.c_str());
+  DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit TableManager::__create_table__().");
 }

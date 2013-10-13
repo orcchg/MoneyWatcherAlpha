@@ -81,8 +81,8 @@ private:
 
   static const std::string last_row_id_table_name;
 
-  void __init__(const std::string& table_name);
-  void __create_table__(const std::string& table_name);
+  void __init__();
+  void __create_table__();
 
   DailyTable(const DailyTable& obj) = delete;
   DailyTable& operator = (const DailyTable& rhs) = delete;

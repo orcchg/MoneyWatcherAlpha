@@ -83,8 +83,8 @@ private:
 
   static const std::string last_row_id_table_name;
 
-  void __init__(const std::string& table_name);
-  void __create_table__(const std::string& table_name);
+  void __init__();
+  void __create_table__();
 
   CycleTable(const CycleTable& obj) = delete;
   CycleTable& operator = (const CycleTable& rhs) = delete;

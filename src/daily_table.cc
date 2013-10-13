@@ -23,7 +23,7 @@ const std::string DailyTable::last_row_id_table_name = "Last_Record_ID";
 DailyTable::DailyTable(const std::string& i_db_name)
   : iDatabase(i_db_name, "Daily_Table") {
   INF("enter DailyTable constructor.");
-  this->__init__(this->m_table_name);
+  this->__init__();
   ++DailyTable::OPENED_DAILY_TABLES_COUNT;
   INF("exit DailyTable constructor.");
 }
@@ -209,7 +209,7 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
     --this->m_next_id;
     DBG("Deleted last record. Next id value has been decremented.");
   }
-  if (this->__empty__(this->m_table_name)) {
+  if (this->__empty__()) {
     this->m_next_id = 0;
   }
   INF("exit DailyTable::deleteRecord().");
@@ -234,9 +234,9 @@ bool DailyTable::load() {
 
 /* Private members */
 // ----------------------------------------------------------------------------
-void DailyTable::__init__(const std::string& i_table_name) {
+void DailyTable::__init__() {
   DBG("enter DailyTable::__init__().");
-  iDatabase::__init__(i_table_name);
+  iDatabase::__init__();
   iDatabase::__create_table_for_last_id__(DailyTable::last_row_id_table_name);
   ID_t last_row_id = this->__read_last_id__(DailyTable::last_row_id_table_name);
   this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
@@ -245,10 +245,10 @@ void DailyTable::__init__(const std::string& i_table_name) {
   DBG("exit DailyTable::__init__().");
 }
 
-void DailyTable::__create_table__(const std::string& i_table_name) {
+void DailyTable::__create_table__() {
   DBG("enter DailyTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
-  statement += i_table_name;
+  statement += this->m_table_name;
   statement += "('ID' INTEGER PRIMARY KEY, "
       "'Date' TEXT, "
       "'Time' TEXT, "
@@ -272,7 +272,7 @@ void DailyTable::__create_table__(const std::string& i_table_name) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table "%s" has been successfully created.", i_table_name.c_str());
+  DBG("Table "%s" has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit DailyTable::__create_table__().");
 }

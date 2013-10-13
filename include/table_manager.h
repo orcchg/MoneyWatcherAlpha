@@ -81,8 +81,8 @@ private:
   DailyTable m_daily_table;
   std::string m_table_name;
 
-  void __init__(const std::string& table_name);
-  void __create_table__(const std::string& table_name);
+  void __init__();
+  void __create_table__();
 };
 
 }  /* namespace mw */

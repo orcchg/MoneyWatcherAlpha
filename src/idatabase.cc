@@ -59,12 +59,12 @@ iDatabase::~iDatabase() {
   this->m_last_statement = "";
 }
 
-void iDatabase::__init__(const std::string& i_table_name) {
+void iDatabase::__init__() {
   DBG("enter iDatabase::__init__().");
   this->__open_database__();
   try {
-    this->__create_table__(i_table_name);
-    this->m_rows = this->__count__(i_table_name);
+    this->__create_table__();
+    this->m_rows = this->__count__(this->m_table_name);
   } catch(TableException& e) {
     ERR("%s", e.what());
     this->__terminate__("Error during create table or counting rows!");
@@ -110,10 +110,10 @@ void iDatabase::__close_database__() {
   DBG("exit iDatabase::__close_database__().");
 }
 
-bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
+bool iDatabase::__does_table_exist__() {
   DBG("enter iDatabase::__does_table_exist__().");
   std::string check_statement = "SELECT * FROM '";
-  check_statement += i_table_name;
+  check_statement += this->m_table_name;
   check_statement += "';";
   int nByte = static_cast<int>(check_statement.length());
   TRC("Provided string SQL statement: "%s" of length %i.", check_statement.c_str(), nByte);
@@ -131,23 +131,23 @@ bool iDatabase::__does_table_exist__(const std::string& i_table_name) {
   bool table_exists = false;
   switch (result) {
     case SQLITE_OK:
-      DBG("SQLite table "%s" already exists.", i_table_name.c_str());
+      DBG("SQLite table "%s" already exists.", this->m_table_name.c_str());
       table_exists = true;
       break;
     default:
-      DBG("SQLite table "%s" does not exist.", i_table_name.c_str());
+      DBG("SQLite table "%s" does not exist.", this->m_table_name.c_str());
       break;
   }
   DBG("exit iDatabase::__does_table_exist__().");
   return (table_exists);
 }
 
-int iDatabase::__count__(const std::string& table_name) {
+int iDatabase::__count__(const std::string& i_table_name) {
   DBG("enter iDatabase::__count__().");
   if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
     TRC("Rows count initialization has started.");
     std::string count_statement = "SELECT COUNT(*) FROM '";
-    count_statement += table_name;
+    count_statement += i_table_name;
     count_statement += "';";
     int nByte = static_cast<int>(count_statement.length());
     TRC("Provided string SQL statement: "%s" of length %i.", count_statement.c_str(), nByte);
@@ -172,7 +172,7 @@ int iDatabase::__count__(const std::string& table_name) {
   return (this->m_rows);
 }
 
-bool iDatabase::__empty__(const std::string& table_name) const {
+bool iDatabase::__empty__() const {
   DBG("enter iDatabase::__empty__().");
   if (this->m_rows == ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
     ERR("Wrong initialization of database instance!");
@@ -290,9 +290,7 @@ void iDatabase::__create_table_for_last_id__(const std::string& i_table_name) {
   DBG("exit iDatabase::__create_table_for_last_id__().");
 }
 
-void iDatabase::__write_last_id__(
-    const std::string& i_table_name,
-    const ID_t& i_last_id) {
+void iDatabase::__write_last_id__(const std::string& i_table_name, const ID_t& i_last_id) {
   DBG("enter iDatabase::__write_last_id__().");
   std::string count_statement = "SELECT COUNT(*) FROM '";
   count_statement += i_table_name;
