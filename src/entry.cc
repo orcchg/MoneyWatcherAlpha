@@ -85,6 +85,7 @@ Status Entry::updateBalance(const MoneyValue_t& i_value, const WrappedString& i_
 }
 
 
+/* Private members */
 // ----------------------------------------------------------------------------
 Record Entry::__make_record__() const {
   Record record(

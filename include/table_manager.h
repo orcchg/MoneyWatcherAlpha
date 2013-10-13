@@ -10,9 +10,12 @@
 #ifndef TABLE_MANAGER_H_
 #define TABLE_MANAGER_H_
 
+#include <list>
 #include <string>
+#include <unordered_map>
 #include "cycle_table.h"
 #include "daily_table.h"
+#include "hash.h"
 
 
 namespace mw {
@@ -61,7 +64,9 @@ public:
 	    const MoneyValue_t& value,
 	    const WrappedString& description);
 
-  /// @brief
+  /// @brief Restores state of existing entry being just undone.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @note This function provides no effect in case undo action has not performed.
   void redo(const ID_t& entry_id);
 
   /// @brief Undoes last operation with existing entry, rolling its state
@@ -79,6 +84,9 @@ public:
 private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
+#if ENABLED_DB_CACHING
+  __MW_DB_CACHED__ std::unordered_map<ID_t, std::list<ID_t>, Hasher<ID_t> > m_entry_records;
+#endif
 
   void __init__();
   void __create_table__();
