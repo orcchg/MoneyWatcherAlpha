@@ -410,6 +410,7 @@ TEST (CycleTableTest, ReadEntryWrongId) {
       mw::Entry read_entry = cycle_table.readEntry(entry.getID() + 5);
     } catch (mw::TableException& e) {
       ++number_of_caught_exceptions;
+      EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
     }
     EXPECT_EQ(number_of_caught_exceptions, 1);
   } catch (mw::TableException& e) {
@@ -485,7 +486,58 @@ TEST (CycleTableTest, UpdateEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
-// TODO: Update invalid entry.
+TEST (CycleTableTest, UpdateEntryWrongId) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  try {
+    mw::CycleTable cycle_table(test_cycle_table_db_filename);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
+    MoneyValue_t s_balance = 1000;
+    mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    MoneyValue_t s_expense = -700;
+    mw::WrappedString s_transaction_comment = "Расход на 700 единиц";
+    entry.updateBalance(s_expense, s_transaction_comment);
+    EXPECT_EQ(entry.getBalance(), s_balance + s_expense);
+    EXPECT_EQ(entry.getLastTransaction(), s_expense);
+    mw::Status s_status(mw::SV_EXPENSE);
+    EXPECT_EQ(entry.getStatus(), s_status);
+
+    int number_of_caught_exceptions = 0;
+    try {
+      mw::Entry updated_entry =
+          cycle_table.updateEntry(entry.getID() + 5, s_expense, s_transaction_comment);
+    } catch (mw::TableException& e) {
+      ++number_of_caught_exceptions;
+      EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
+    }
+    EXPECT_EQ(number_of_caught_exceptions, 1);
+
+    try {
+      mw::Entry read_entry = cycle_table.readEntry(entry.getID() + 5);
+    } catch (mw::TableException& e) {
+      ++number_of_caught_exceptions;
+      EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
+    }
+    EXPECT_EQ(number_of_caught_exceptions, 2);
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  remove(test_cycle_table_db_filename.c_str());
+}
 
 
 /* DailyTable testing */
@@ -750,6 +802,7 @@ TEST (DailyTableTest, ReadRecordWrongId) {
       mw::Record read_record = daily_table.readRecord(record.getID() + 5);
     } catch (mw::TableException& e) {
       ++number_of_caught_exceptions;
+      EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
     }
     EXPECT_EQ(number_of_caught_exceptions, 1);
   } catch (mw::TableException& e) {
@@ -837,6 +890,7 @@ TEST (DailyTableTest, DeleteRecordWrongId) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of wrong deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -881,6 +935,7 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
