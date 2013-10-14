@@ -38,6 +38,7 @@ namespace mw {
 #define DBG1_COLOR "00;34m"   // Blue
 #define DBG2_COLOR "00;35m"   // Magenta
 #define TRC_COLOR "00;37m"    // Grey
+#define MSG_COLOR "01;37m"    // White
 
 #define CRT_STRING "  CRT  in ["
 #define ERR_STRING "  ERR  in ["
@@ -45,6 +46,7 @@ namespace mw {
 #define INF_STRING "  INF  in ["
 #define DBG_STRING "  DBG  in ["
 #define TRC_STRING "  TRC  in ["
+#define MSG_STRING "  MSG  in ["
 
 #define CRT_SUGGEST COLOR_OPEN CRT_COLOR CRT_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define ERR_SUGGEST COLOR_OPEN ERR_COLOR ERR_STRING __FILE__ COLON LINE PROMPT_SUGGEST
@@ -54,6 +56,7 @@ namespace mw {
 #define DBG1_SUGGEST COLOR_OPEN DBG1_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define DBG2_SUGGEST COLOR_OPEN DBG2_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define TRC_SUGGEST COLOR_OPEN TRC_COLOR TRC_STRING __FILE__ COLON LINE PROMPT_SUGGEST
+#define MSG_SUGGEST COLOR_OPEN MSG_COLOR MSG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 
 #define CRT(fmt, ...)
 #define ERR(fmt, ...)
@@ -63,6 +66,7 @@ namespace mw {
 #define DBG1(fmt, ...)
 #define DBG2(fmt, ...)
 #define TRC(fmt, ...)
+#define MSG(fmt, ...) printf((MSG_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
 
 #define LOG_LEVEL __MW_LOG_LEVEL__
 
@@ -106,6 +110,7 @@ namespace mw {
 #define DBG1(fmt, ...)
 #define DBG2(fmt, ...)
 #define TRC(fmt, ...)
+#define MSG(fmt, ...)
 
 #endif
 
