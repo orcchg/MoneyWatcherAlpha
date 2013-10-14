@@ -1227,12 +1227,45 @@ TEST (TableManagerTest, TableManagerUpdate) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_expense = -700;
   try {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
-    // TODO: implement update()
+    ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    ID_t record_id = table_manager.update(entry_id, s_expense, s_update_description);
+    std::string records_table_name = mw::TableManager::records_table_name_prefix + std::to_string(entry_id);
+
+    DB_Statement statement_handler = nullptr;
+    std::string check_statement = "SELECT * FROM '";
+    check_statement += records_table_name;
+    check_statement += "';";
+    int nByte = static_cast<int>(check_statement.length());
+    int result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        check_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t id = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(id, record_id);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+
+    EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));

@@ -107,7 +107,7 @@ ID_t TableManager::add(
   return (entry_id);
 }
 
-void TableManager::update(
+ID_t TableManager::update(
     const ID_t& i_entry_id,
     const MoneyValue_t& i_value,
     const WrappedString& i_description){
@@ -119,7 +119,7 @@ void TableManager::update(
   DBG("Reading table name of entry records from SQLite database ["%s"]...", this->m_db_name.c_str());
   std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
-  select_statement += "' WHERE ID == '";
+  select_statement += "' WHERE EntryID == '";
   select_statement += std::to_string(i_entry_id);
   select_statement += "';";
   int nByte = static_cast<int>(select_statement.length());
@@ -139,10 +139,10 @@ void TableManager::update(
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  this->__finalize__(select_statement.c_str());
   std::string records_table_name(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
   DBG1("Got record [ID: %lli], inserting into table ["%s"] of entry [ID: %lli].",
       record_id, records_table_name.c_str(), entry.getID());
+  this->__finalize__(select_statement.c_str());
 
   std::string insert_statement = "INSERT INTO '";
   insert_statement += records_table_name;
@@ -174,6 +174,7 @@ void TableManager::update(
   }
   this->__finalize__(insert_statement.c_str());
   INF("exit TableManager::update().");
+  return (record_id);
 }
 
 void TableManager::redo(const ID_t& entry_id) {

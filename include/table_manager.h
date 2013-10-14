@@ -51,8 +51,9 @@ public:
   /// be updated - it could be both positive (income) or negative (expense)
   /// value.
   /// @param description - Description of provided transaction.
+  /// @return ID of corresponding record.
   /// @details Entry will also be updated in SQLite database.
-  void update(
+  ID_t update(
 	    const ID_t& entry_id,
 	    const MoneyValue_t& value,
 	    const WrappedString& description);
