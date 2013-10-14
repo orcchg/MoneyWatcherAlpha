@@ -232,6 +232,7 @@ void TableManager::__create_table_entry_records__(const std::string& i_table_nam
   statement += "('RecordID' INTEGER, FOREIGN KEY (RecordID) REFERENCES ";
   statement += this->m_table_name;
   statement += "(EntryID));";
+  // TODO: Implement cascade table deletion
   int nByte = static_cast<int>(statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.", statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
