@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+
+namespace mw {
+
 /* Basic logging */
 // ----------------------------------------------
 #define PROMPT_SUGGEST "] >>> "
@@ -27,12 +30,14 @@
 #define LINE "%i"
 #define PROMPT_CLOSE COLOR_ENCLOSING NEWLINE
 
-#define CRT_COLOR "01;31m"
-#define ERR_COLOR "00;31m"
-#define WRN_COLOR "00;33m"
-#define INF_COLOR "00;32m"
-#define DBG_COLOR "00;36m"
-#define TRC_COLOR "00;37m"
+#define CRT_COLOR "01;31m"    // Bold Red
+#define ERR_COLOR "00;31m"    // Red
+#define WRN_COLOR "00;33m"    // Yellow
+#define INF_COLOR "00;32m"    // Green
+#define DBG_COLOR "00;36m"    // Cyan
+#define DBG1_COLOR "00;34m"   // Blue
+#define DBG2_COLOR "00;35m"   // Magenta
+#define TRC_COLOR "00;37m"    // Grey
 
 #define CRT_STRING "  CRT  in ["
 #define ERR_STRING "  ERR  in ["
@@ -46,6 +51,8 @@
 #define WRN_SUGGEST COLOR_OPEN WRN_COLOR WRN_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define INF_SUGGEST COLOR_OPEN INF_COLOR INF_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define DBG_SUGGEST COLOR_OPEN DBG_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
+#define DBG1_SUGGEST COLOR_OPEN DBG1_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
+#define DBG2_SUGGEST COLOR_OPEN DBG2_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define TRC_SUGGEST COLOR_OPEN TRC_COLOR TRC_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 
 #define CRT(fmt, ...)
@@ -53,6 +60,8 @@
 #define WRN(fmt, ...)
 #define INF(fmt, ...)
 #define DBG(fmt, ...)
+#define DBG1(fmt, ...)
+#define DBG2(fmt, ...)
 #define TRC(fmt, ...)
 
 #define LOG_LEVEL __MW_LOG_LEVEL__
@@ -77,6 +86,10 @@
 #if (LOG_LEVEL >= 4)
 #undef DBG
 #define DBG(fmt, ...) printf((DBG_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
+#undef DBG1
+#define DBG1(fmt, ...) printf((DBG1_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
+#undef DBG2
+#define DBG2(fmt, ...) printf((DBG2_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
 #endif
 #if (LOG_LEVEL >= 5)
 #undef TRC
@@ -90,12 +103,13 @@
 #define WRN(fmt, ...)
 #define INF(fmt, ...)
 #define DBG(fmt, ...)
+#define DBG1(fmt, ...)
+#define DBG2(fmt, ...)
 #define TRC(fmt, ...)
 
 #endif
 
-namespace mw {
-
 }  /* namespace mw */
+
 
 #endif /* LOGGER_H_ */

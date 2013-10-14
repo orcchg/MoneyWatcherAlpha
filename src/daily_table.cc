@@ -80,7 +80,7 @@ Record DailyTable::addRecord(
           date.c_str(),
           date.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Date ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+  DBG1("Date ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
       date.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   std::string time = current_datetime.getTime();
@@ -91,7 +91,7 @@ Record DailyTable::addRecord(
           time.c_str(),
           time.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+  DBG2("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
       time.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   accumulate = accumulate &&
@@ -107,12 +107,12 @@ Record DailyTable::addRecord(
           i_description.c_str(),
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Description ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+  DBG1("Description ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
       i_description.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
-  DBG("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+  DBG2("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
         static_cast<sqlite3_int64>(i_status), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
@@ -132,7 +132,7 @@ Record DailyTable::addRecord(
   this->__increment_rows__();
   this->__write_last_id__(DailyTable::last_row_id_table_name, record_id);
   Record record(record_id, i_balance, i_description, i_status, current_datetime);
-  DBG("Constructed output record.");
+  DBG1("Constructed output record.");
   INF("exit DailyTable::addRecord().");
   return (record);
 }
@@ -175,10 +175,10 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   WrappedString description(raw_description);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
   Status status(raw_status);
-  DBG("Loaded column data: Date ["%s"]; Time ["%s"]; Balance [%lli]; Description ["%s"]; Status [%lli].",
+  DBG1("Loaded column data: Date ["%s"]; Time ["%s"]; Balance [%lli]; Description ["%s"]; Status [%lli].",
         datetime.getDate().c_str(), datetime.getTime().c_str(), balance, description.c_str(), raw_status);
   Record record(id, balance, description, status, datetime);
-  DBG("Proper record instance has been constructed.");
+  DBG2("Proper record instance has been constructed.");
 
 #if ENABLED_DB_CACHING
   // TODO: caching the record
@@ -284,7 +284,7 @@ void DailyTable::__create_table__() {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
+  DBG1("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit DailyTable::__create_table__().");
 }

@@ -84,7 +84,7 @@ void iDatabase::__open_database__() {
     WRN("throw from iDatabase::__open_database__().");
     throw TableException("Unable to open database!", result);
   }
-  DBG("SQLite database ["%s"] has been successfully opened and placed into %p.",
+  DBG1("SQLite database ["%s"] has been successfully opened and placed into %p.",
       this->m_db_name.c_str(), this->m_db_handler);
   DBG("exit iDatabase::__open_database__().");
 }
@@ -92,10 +92,10 @@ void iDatabase::__open_database__() {
 void iDatabase::__close_database__() {
   DBG("enter iDatabase::__close_database__().");
   if (this->m_db_statement) {
-    DBG("Found prepared SQL statement at %p.", this->m_db_statement);
+    DBG1("Found prepared SQL statement at %p.", this->m_db_statement);
     this->__finalize__(this->m_last_statement);
   } else {
-    DBG("Statement has been already finalized.");
+    DBG2("Statement has been already finalized.");
   }
   if (this->m_db_handler) {
     DBG("Found valid database handler at %p.", this->m_db_handler);
@@ -104,7 +104,7 @@ void iDatabase::__close_database__() {
     DBG("Database ["%s"] has been successfully closed.",
         this->m_db_name.c_str());
   } else {
-    DBG("Database ["%s"] has been already shut down.", this->m_db_name.c_str());
+    DBG1("Database ["%s"] has been already shut down.", this->m_db_name.c_str());
   }
   sqlite3_free(nullptr);
   DBG("exit iDatabase::__close_database__().");
@@ -285,7 +285,7 @@ void iDatabase::__create_table_for_last_id__(const std::string& i_table_name) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table ["%s"] has been successfully created.", i_table_name.c_str());
+  DBG1("Table ["%s"] has been successfully created.", i_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit iDatabase::__create_table_for_last_id__().");
 }
@@ -313,7 +313,7 @@ void iDatabase::__write_last_id__(const std::string& i_table_name, const ID_t& i
   this->__finalize__(count_statement.c_str());
 
   if (rows == 0) {
-    DBG("Table ["%s"] is empty. Inserting first value...", i_table_name.c_str());
+    DBG1("Table ["%s"] is empty. Inserting first value...", i_table_name.c_str());
     std::string insert_statement = "INSERT INTO '";
     insert_statement += i_table_name;
     insert_statement += "' VALUES(?1);";
@@ -340,7 +340,7 @@ void iDatabase::__write_last_id__(const std::string& i_table_name, const ID_t& i
           this->m_db_name.c_str(), insert_statement.c_str());
       this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
     } else {
-      DBG("All insertions have succeeded.");
+      DBG2("All insertions have succeeded.");
     }
     this->__finalize__(insert_statement.c_str());
 
@@ -396,7 +396,7 @@ ID_t iDatabase::__read_last_id__(const std::string& i_table_name) {
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
   ID_t last_row_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Read last row id: [%lli].", last_row_id);
+  DBG1("Read last row id: [%lli].", last_row_id);
   this->__finalize__(count_statement.c_str());
   DBG("exit iDatabase::__read_last_id__().");
   return (last_row_id);
