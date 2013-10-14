@@ -112,7 +112,7 @@ Record DailyTable::addRecord(
 
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 6, static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
-  DBG2("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+  DBG("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
         static_cast<sqlite3_int64>(i_status), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
@@ -121,7 +121,7 @@ Record DailyTable::addRecord(
         this->m_table_name.c_str(), this->m_db_name.c_str(), insert_statement.c_str());
     this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG("All insertions have succeeded.");
+    DBG2("All insertions have succeeded.");
   }
 
 #if ENABLED_DB_CACHING

@@ -71,7 +71,7 @@ ID_t TableManager::add(
   bool accumulate = true;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
-  DBG("ID [%lli] has been stored in SQLite database ["%s"].",
+  DBG1("ID [%lli] has been stored in SQLite database ["%s"].",
       entry_id, this->m_db_name.c_str());
 
   std::string records_table_name =
@@ -92,7 +92,7 @@ ID_t TableManager::add(
         this->m_db_name.c_str(), insert_statement.c_str());
     this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG("All insertions have succeeded.");
+    DBG2("All insertions have succeeded.");
   }
 
 #if ENABLED_DB_CACHING
@@ -101,7 +101,7 @@ ID_t TableManager::add(
 
   this->__finalize__(insert_statement.c_str());
   this->__create_table_entry_records__(records_table_name);
-  DBG("Created table with name ["%s"] for records of entry [ID: %lli].",
+  DBG1("Created table with name ["%s"] for records of entry [ID: %lli].",
       records_table_name.c_str(), entry_id);
   INF("exit TableManager::add().");
   return (entry_id);
@@ -141,7 +141,7 @@ void TableManager::update(
   sqlite3_step(this->m_db_statement);
   this->__finalize__(select_statement.c_str());
   std::string records_table_name(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
-  DBG("Got record [ID: %lli], inserting into table ["%s"] of entry [ID: %lli].",
+  DBG1("Got record [ID: %lli], inserting into table ["%s"] of entry [ID: %lli].",
       record_id, records_table_name.c_str(), entry.getID());
 
   std::string insert_statement = "INSERT INTO '";
@@ -170,7 +170,7 @@ void TableManager::update(
         this->m_db_name.c_str(), insert_statement.c_str());
     this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG("All insertions have succeeded.");
+    DBG2("All insertions have succeeded.");
   }
   this->__finalize__(insert_statement.c_str());
   INF("exit TableManager::update().");
@@ -219,7 +219,7 @@ void TableManager::__create_table__() {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
+  DBG1("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit TableManager::__create_table__().");
 }
@@ -248,7 +248,7 @@ void TableManager::__create_table_entry_records__(const std::string& i_table_nam
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
+  DBG1("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit TableManager::__create_table_entry_records__().");
 }
