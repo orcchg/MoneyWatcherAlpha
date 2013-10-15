@@ -11,7 +11,6 @@
 #define TEST_ACCESS_CLASS_H_
 
 #include <string>
-#include "daily_table.h"
 #include "logger.h"
 #include "types.h"
 
@@ -24,7 +23,7 @@ namespace mw {
 template <typename Table>
 class TestAccessTable {
 public:
-  TestAccessTable(Table* ptr_daily_table);
+  TestAccessTable(Table* ptr_table);
   virtual ~TestAccessTable();
 
   const DB_Handler& getDbHandler() const;
@@ -47,6 +46,7 @@ TestAccessTable<Table>::TestAccessTable(Table* i_ptr_table)
 
 template <typename Table>
 TestAccessTable<Table>::~TestAccessTable() {
+  m_ptr_table = nullptr;
 }
 
 template <typename Table>

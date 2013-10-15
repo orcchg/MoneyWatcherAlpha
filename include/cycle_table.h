@@ -81,13 +81,12 @@ public:
   /// -------------------------------------------------------------------------
 
   static int OPENED_CYCLE_TABLES_COUNT;
+  static const std::string last_row_id_table_name;
 
 private:
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Entry, Hasher<ID_t> > m_entries;
 #endif
-
-  static const std::string last_row_id_table_name;
 
   void __init__();
   void __create_table__();

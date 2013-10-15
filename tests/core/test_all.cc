@@ -1435,10 +1435,19 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
     EXPECT_TRUE(accessor.checkFinalized());
 
+    int rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 5);
+    rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
     std::string count_statement = "SELECT COUNT(*) FROM "
         "sqlite_master WHERE type == 'table' "
         "AND name != '";
     count_statement += accessor.getTableName();
+    count_statement += "' AND name != '" + table_manager.getCycleTableName();
+    count_statement += "' AND name != '" + table_manager.getDailyTableName();
+    count_statement += "' AND name != '" + mw::CycleTable::last_row_id_table_name;
+    count_statement += "' AND name != '" + mw::DailyTable::last_row_id_table_name;
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -1456,13 +1465,13 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     int type = sqlite3_column_type(statement_handler, 0);
     EXPECT_EQ(type, SQLITE_INTEGER);
     int value = sqlite3_column_int(statement_handler, 0);
-    // Daily_Table, Last_Record_ID, Cycle_Table, Last_Entry_ID, 5 Records tables
-    EXPECT_EQ(value, 9);
+    // 5 Records tables
+    EXPECT_EQ(value, 5);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
 
-    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 5);
 
     table_manager.update(entry_id_2, s_expense, s_update_description);
@@ -1480,6 +1489,9 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     EXPECT_EQ(rows, 3);
     rows = countRows(records_table_name_5, accessor.getDbHandler());
     EXPECT_EQ(rows, 1);
+
+    rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 5);
 
     statement_handler = nullptr;
     std::string check_statement = "SELECT * FROM '";
@@ -1562,14 +1574,28 @@ TEST (TableManagerTest, TableManagerRemove) {
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 4);
 
+    rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 4);
+    rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 2);
+
     table_manager.remove(entry_id_5);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 3);
+
+    rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 3);
+    rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
 
     std::string count_statement = "SELECT COUNT(*) FROM "
         "sqlite_master WHERE type == 'table' "
         "AND name != '";
     count_statement += accessor.getTableName();
+    count_statement += "' AND name != '" + table_manager.getCycleTableName();
+    count_statement += "' AND name != '" + table_manager.getDailyTableName();
+    count_statement += "' AND name != '" + mw::CycleTable::last_row_id_table_name;
+    count_statement += "' AND name != '" + mw::DailyTable::last_row_id_table_name;
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -1587,8 +1613,8 @@ TEST (TableManagerTest, TableManagerRemove) {
     int type = sqlite3_column_type(statement_handler, 0);
     EXPECT_EQ(type, SQLITE_INTEGER);
     int value = sqlite3_column_int(statement_handler, 0);
-    // Daily_Table, Last_Record_ID, Cycle_Table, Last_Entry_ID, 3 Records tables
-    EXPECT_EQ(value, 7);
+    // 3 Records tables
+    EXPECT_EQ(value, 3);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);

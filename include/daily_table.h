@@ -73,13 +73,12 @@ public:
   bool load();
 
   static int OPENED_DAILY_TABLES_COUNT;
+  static const std::string last_row_id_table_name;
 
 private:
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, Record, Hasher<ID_t> > m_records;
 #endif
-
-  static const std::string last_row_id_table_name;
 
   void __init__();
   void __create_table__();

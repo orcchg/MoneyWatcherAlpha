@@ -208,13 +208,14 @@ void TableManager::remove(const ID_t& i_entry_id) {
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
-  do {
-    result = sqlite3_step(this->m_db_statement);
+  result = sqlite3_step(this->m_db_statement);
+  while (result == SQLITE_ROW) {
     ID_t record_id = sqlite3_column_int64(this->m_db_statement, 0);
     this->m_daily_table.deleteRecord(record_id);
     DBG1("Deleted record [ID: %lli] from table ["%s"].",
          record_id, records_table_name.c_str());
-  } while (result == SQLITE_ROW);
+    result = sqlite3_step(this->m_db_statement);
+  }
   this->__finalize__(select_statement.c_str());
   DBG2("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
@@ -244,7 +245,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
 
   std::string delete_statement = "DELETE FROM '";
   delete_statement += this->m_table_name;
-  delete_statement += "' WHERE ID == '";
+  delete_statement += "' WHERE EntryID == '";
   delete_statement += std::to_string(i_entry_id);
   delete_statement += "';";
   nByte = static_cast<int>(delete_statement.length());
@@ -281,6 +282,22 @@ void TableManager::undo(const ID_t& entry_id) {
   INF("enter TableManager::undo().");
   // TODO: impl
   INF("exit TableManager::undo().");
+}
+
+const std::string& TableManager::getCycleTableName() const {
+  INF("enter TableManager::getCycleTableName().");
+  DBG("Cycle Table name is ["%s"].",
+      this->m_cycle_table.getName().c_str());
+  INF("exit TableManager::getCycleTableName().");
+  return (this->m_cycle_table.getName());
+}
+
+const std::string& TableManager::getDailyTableName() const {
+  INF("enter TableManager::getDailyTableName().");
+  DBG("Daily Table name is ["%s"].",
+      this->m_daily_table.getName().c_str());
+  INF("exit TableManager::getDailyTableName().");
+  return (this->m_daily_table.getName());
 }
 
 

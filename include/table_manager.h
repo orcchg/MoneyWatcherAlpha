@@ -25,6 +25,7 @@ namespace mw {
 class TableManager : private iDatabase {
   template <typename Table>
   friend class TestAccessTable;
+  friend class TestAccessTableManager;
 public:
   TableManager();
   TableManager(TableManager&& rval_obj);
@@ -75,6 +76,14 @@ public:
   /// @note If there is no last transaction provided with entry, the entry
   /// becomes empty. Also deletes associated record from daily_table.
   void undo(const ID_t& entry_id);
+  /// @}
+  /// -------------------------------------------------------------------------
+
+  /// -------------------------------------------------------------------------
+  /// @defgroup NAME Getters for underlying tables' names.
+  /// @{
+  const std::string& getCycleTableName() const;
+  const std::string& getDailyTableName() const;
   /// @}
   /// -------------------------------------------------------------------------
 
