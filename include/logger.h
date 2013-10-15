@@ -33,7 +33,9 @@ namespace mw {
 #define CRT_COLOR "01;31m"    // Bold Red
 #define ERR_COLOR "00;31m"    // Red
 #define WRN_COLOR "00;33m"    // Yellow
+#define WRN1_COLOR "01;33m"    // Bold Yellow
 #define INF_COLOR "00;32m"    // Green
+#define INF1_COLOR "01;32m"    // Bold Green
 #define DBG_COLOR "00;36m"    // Cyan
 #define DBG1_COLOR "00;34m"   // Blue
 #define DBG2_COLOR "00;35m"   // Magenta
@@ -51,7 +53,9 @@ namespace mw {
 #define CRT_SUGGEST COLOR_OPEN CRT_COLOR CRT_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define ERR_SUGGEST COLOR_OPEN ERR_COLOR ERR_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define WRN_SUGGEST COLOR_OPEN WRN_COLOR WRN_STRING __FILE__ COLON LINE PROMPT_SUGGEST
+#define WRN1_SUGGEST COLOR_OPEN WRN1_COLOR WRN_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define INF_SUGGEST COLOR_OPEN INF_COLOR INF_STRING __FILE__ COLON LINE PROMPT_SUGGEST
+#define INF1_SUGGEST COLOR_OPEN INF1_COLOR INF_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define DBG_SUGGEST COLOR_OPEN DBG_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define DBG1_SUGGEST COLOR_OPEN DBG1_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
 #define DBG2_SUGGEST COLOR_OPEN DBG2_COLOR DBG_STRING __FILE__ COLON LINE PROMPT_SUGGEST
@@ -61,7 +65,9 @@ namespace mw {
 #define CRT(fmt, ...)
 #define ERR(fmt, ...)
 #define WRN(fmt, ...)
+#define WRN1(fmt, ...)
 #define INF(fmt, ...)
+#define INF1(fmt, ...)
 #define DBG(fmt, ...)
 #define DBG1(fmt, ...)
 #define DBG2(fmt, ...)
@@ -82,10 +88,14 @@ namespace mw {
 #if (LOG_LEVEL >= 2)
 #undef WRN
 #define WRN(fmt, ...) printf((WRN_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
+#undef WRN1
+#define WRN1(fmt, ...) printf((WRN1_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
 #endif
 #if (LOG_LEVEL >= 3)
 #undef INF
 #define INF(fmt, ...) printf((INF_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
+#undef INF1
+#define INF1(fmt, ...) printf((INF1_SUGGEST #fmt PROMPT_CLOSE), __LINE__, ##__VA_ARGS__)
 #endif
 #if (LOG_LEVEL >= 4)
 #undef DBG
@@ -105,7 +115,9 @@ namespace mw {
 #define CRT(fmt, ...)
 #define ERR(fmt, ...)
 #define WRN(fmt, ...)
+#define WRN1(fmt, ...)
 #define INF(fmt, ...)
+#define INF1(fmt, ...)
 #define DBG(fmt, ...)
 #define DBG1(fmt, ...)
 #define DBG2(fmt, ...)

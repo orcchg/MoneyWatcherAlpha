@@ -13,6 +13,7 @@
 #include <exception>
 #include <string>
 #include <unordered_map>
+#include "common.h"
 #include "hash.h"
 #include "idatabase.h"
 #include "record.h"

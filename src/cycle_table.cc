@@ -163,6 +163,44 @@ Entry CycleTable::addEntry(
 
 Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   INF("enter CycleTable::readEntry().");
+
+#if ENABLED_ADVANCED_DEBUG
+  MSG("Entrance into advanced debug source branch.");
+  std::string where_statement = "SELECT EXISTS(SELECT * FROM '";
+  where_statement += this->m_table_name;
+  where_statement += "' WHERE ID == '";
+  where_statement += std::to_string(i_entry_id);
+  where_statement += "');";
+  int n_bytes = static_cast<int>(where_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      where_statement.c_str(), n_bytes);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int ad_result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      where_statement.c_str(),
+      n_bytes,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(where_statement.c_str());
+  if (ad_result != SQLITE_OK) {
+    this->__finalize_and_throw__(where_statement.c_str(), ad_result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  sqlite3_int64 answer = sqlite3_column_int64(this->m_db_statement, 0);
+  if (answer) {
+    INF1("ID [%lli] does exist in table ["%s"] of database %p.",
+         i_entry_id, this->m_table_name.c_str(), this->m_db_handler);
+  } else {
+    WRN1("ID [%lli] is MISSED in table ["%s"] of database %p!",
+         i_entry_id, this->m_table_name.c_str(), this->m_db_handler);
+  }
+  this->__finalize__(where_statement.c_str());
+  MSG("Leave from advanced debug source branch.");
+#endif
+
   std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
   select_statement += "' WHERE ID == '";
@@ -222,6 +260,44 @@ Entry CycleTable::updateEntry(
     const MoneyValue_t& i_value,
     const WrappedString& i_description) {
   INF("enter CycleTable::updateEntry().");
+
+#if ENABLED_ADVANCED_DEBUG
+  MSG("Entrance into advanced debug source branch.");
+  std::string where_statement = "SELECT EXISTS(SELECT * FROM '";
+  where_statement += this->m_table_name;
+  where_statement += "' WHERE ID == '";
+  where_statement += std::to_string(i_entry_id);
+  where_statement += "');";
+  int n_bytes = static_cast<int>(where_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      where_statement.c_str(), n_bytes);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int ad_result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      where_statement.c_str(),
+      n_bytes,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(where_statement.c_str());
+  if (ad_result != SQLITE_OK) {
+    this->__finalize_and_throw__(where_statement.c_str(), ad_result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  sqlite3_int64 answer = sqlite3_column_int64(this->m_db_statement, 0);
+  if (answer) {
+    INF1("ID [%lli] does exist in table ["%s"] of database %p.",
+         i_entry_id, this->m_table_name.c_str(), this->m_db_handler);
+  } else {
+    WRN1("ID [%lli] is MISSED in table ["%s"] of database %p!",
+         i_entry_id, this->m_table_name.c_str(), this->m_db_handler);
+  }
+  this->__finalize__(where_statement.c_str());
+  MSG("Leave from advanced debug source branch.");
+#endif
+
   Entry entry = this->readEntry(i_entry_id);
   DBG("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
@@ -267,12 +343,52 @@ Entry CycleTable::updateEntry(
 #endif
 
   this->__finalize__(update_statement.c_str());
+  DBG2("Updated database row for entry [ID: %lli] in table ["%s"].",
+       i_entry_id, this->m_table_name.c_str());
   INF("exit CycleTable::updateEntry().");
   return (entry);
 }
 
 void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   INF("enter CycleTable::deleteEntry().");
+
+#if ENABLED_ADVANCED_DEBUG
+  MSG("Entrance into advanced debug source branch.");
+  std::string where_statement = "SELECT EXISTS(SELECT * FROM '";
+  where_statement += this->m_table_name;
+  where_statement += "' WHERE ID == '";
+  where_statement += std::to_string(i_entry_id);
+  where_statement += "');";
+  int n_bytes = static_cast<int>(where_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      where_statement.c_str(), n_bytes);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int ad_result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      where_statement.c_str(),
+      n_bytes,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(where_statement.c_str());
+  if (ad_result != SQLITE_OK) {
+    this->__finalize_and_throw__(where_statement.c_str(), ad_result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  sqlite3_int64 answer = sqlite3_column_int64(this->m_db_statement, 0);
+  if (answer) {
+    INF1("ID [%lli] does exist in table ["%s"] of database %p.",
+         i_entry_id, this->m_table_name.c_str(), this->m_db_handler);
+  } else {
+    WRN1("ID [%lli] is MISSED in table ["%s"] of database %p!",
+         i_entry_id, this->m_table_name.c_str(), this->m_db_handler);
+  }
+  this->__finalize__(where_statement.c_str());
+  MSG("Leave from advanced debug source branch.");
+#endif
+
   std::string delete_statement = "DELETE FROM '";
   delete_statement += this->m_table_name;
   delete_statement += "' WHERE ID == '";
@@ -300,11 +416,13 @@ void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   this->__decrement_rows__();
   if (i_entry_id + 1 == this->m_next_id) {
     --this->m_next_id;
-    DBG("Deleted last entry. Next id value has been decremented.");
+    DBG2("Deleted last entry. Next id value has been decremented.");
   }
   if (this->__empty__()) {
     this->m_next_id = 0;
   }
+  DBG1("Deleted entry [ID: %lli] in table ["%s"].",
+       i_entry_id, this->m_table_name.c_str());
   INF("exit CycleTable::deleteEntry().");
 }
 

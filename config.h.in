@@ -109,14 +109,14 @@
 /* Define for large files, on AIX-style hosts. */
 #undef _LARGE_FILES
 
+/* Disabled advanced debug */
+#undef __MW_ENABLE_ADVANCED_DEBUG__
+
 /* Disabled caching from database */
 #undef __MW_ENABLE_CACHING__
 
 /* Disabled logging in source code */
 #undef __MW_ENABLE_LOGGING__
-
-/* Disabled advanced debug */
-#undef __MW_ENABLE_ADVANCED_DEBUG__
 
 /* Logging level */
 #undef __MW_LOG_LEVEL__
