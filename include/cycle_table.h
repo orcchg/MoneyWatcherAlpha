@@ -63,6 +63,12 @@ public:
       const ID_t& entry_id,
       const MoneyValue_t& value,
       const WrappedString& description);
+
+  /// @brief Removes entry from SQLite database.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @note Value of next_id remains incremented in case the entry
+  /// to be deleted is not the last one, otherwise next_id will be decreased.
+  void deleteEntry(const ID_t& entry_id);
   /// @}
   /// -------------------------------------------------------------------------
 

@@ -269,6 +269,42 @@ Entry CycleTable::updateEntry(
   return (entry);
 }
 
+void CycleTable::deleteEntry(const ID_t& i_entry_id) {
+  INF("enter CycleTable::deleteEntry().");
+  std::string delete_statement = "DELETE FROM '";
+  delete_statement += this->m_table_name;
+  delete_statement += "' WHERE ID == '";
+  delete_statement += std::to_string(i_entry_id);
+  delete_statement += "';";
+  int nByte = static_cast<int>(delete_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.", delete_statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      delete_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(delete_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(delete_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(delete_statement.c_str());
+  this->__decrement_rows__();
+  if (i_entry_id + 1 == this->m_next_id) {
+    --this->m_next_id;
+    DBG("Deleted last entry. Next id value has been decremented.");
+  }
+  if (this->__empty__()) {
+    this->m_next_id = 0;
+  }
+  INF("exit CycleTable::deleteEntry().");
+}
+
 const std::string& CycleTable::getName() const {
   INF("enter CycleTable::getName().");
   DBG("Return the name ["%s"] of CycleTable at %p.", this->m_table_name.c_str(), this);
