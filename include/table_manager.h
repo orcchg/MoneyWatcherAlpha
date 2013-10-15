@@ -58,6 +58,8 @@ public:
 	    const MoneyValue_t& value,
 	    const WrappedString& description);
 
+  //
+
   /// @brief Restores state of existing entry being just undone.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
   /// @note This function provides no effect in case undo action has not performed.

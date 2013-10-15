@@ -229,10 +229,7 @@ void TableManager::__create_table_entry_records__(const std::string& i_table_nam
   DBG("enter TableManager::__create_table_entry_records__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += i_table_name;
-  statement += "('RecordID' INTEGER, FOREIGN KEY (RecordID) REFERENCES ";
-  statement += this->m_table_name;
-  statement += "(EntryID));";
-  // TODO: Implement cascade table deletion
+  statement += "('RecordID' INTEGER);";
   int nByte = static_cast<int>(statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.", statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
