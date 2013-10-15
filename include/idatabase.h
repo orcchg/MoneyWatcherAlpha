@@ -11,6 +11,7 @@
 #define IDATABASE_H_
 
 #include <string>
+#include "common.h"
 #include "types.h"
 
 #define SQLITE_ACCUMULATED_PREPARE_ERROR -1
@@ -60,6 +61,11 @@ protected:
   void __create_table_for_last_id__(const std::string& table_name);
   void __write_last_id__(const std::string& table_name, const ID_t& last_id);
   ID_t __read_last_id__(const std::string& table_name);
+
+#if ENABLED_ADVANCED_DEBUG
+  void __where_check__(const ID_t& id);
+  void __count_check__();
+#endif
 
 private:
   const char* m_last_statement;

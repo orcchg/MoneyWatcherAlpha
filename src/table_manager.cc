@@ -213,7 +213,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
     ID_t record_id = sqlite3_column_int64(this->m_db_statement, 0);
     this->m_daily_table.deleteRecord(record_id);
     DBG1("Deleted record [ID: %lli] from table ["%s"].",
-         record_id, records_table_name.c_str());
+         record_id, this->m_daily_table.getName().c_str());
     result = sqlite3_step(this->m_db_statement);
   }
   this->__finalize__(select_statement.c_str());

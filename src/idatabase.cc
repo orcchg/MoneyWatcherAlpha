@@ -426,6 +426,75 @@ ID_t iDatabase::__read_last_id__(const std::string& i_table_name) {
   return (last_row_id);
 }
 
+#if ENABLED_ADVANCED_DEBUG
+void iDatabase::__where_check__(const ID_t& i_id) {
+  MSG("Entrance into advanced debug source branch.");
+  std::string where_statement = "SELECT EXISTS(SELECT * FROM '";
+  where_statement += this->m_table_name;
+  where_statement += "' WHERE ID == '";
+  where_statement += std::to_string(i_id);
+  where_statement += "');";
+  int n_bytes = static_cast<int>(where_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      where_statement.c_str(), n_bytes);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int ad_result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      where_statement.c_str(),
+      n_bytes,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(where_statement.c_str());
+  if (ad_result != SQLITE_OK) {
+    this->__finalize_and_throw__(where_statement.c_str(), ad_result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  sqlite3_int64 answer = sqlite3_column_int64(this->m_db_statement, 0);
+  if (answer) {
+    INF1("ID [%lli] does exist in table ["%s"] of database %p.",
+         i_id, this->m_table_name.c_str(), this->m_db_handler);
+  } else {
+    WRN1("ID [%lli] is MISSED in table ["%s"] of database %p!",
+         i_id, this->m_table_name.c_str(), this->m_db_handler);
+  }
+  this->__finalize__(where_statement.c_str());
+  MSG("Leave from advanced debug source branch.");
+}
+
+void iDatabase::__count_check__() {
+  MSG("Entrance into advanced debug source branch.");
+  std::string count_statement = "SELECT COUNT(*) FROM \'";
+  count_statement += this->m_table_name;
+  count_statement += "\';";
+  int n_bytes = static_cast<int>(count_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      count_statement.c_str(), n_bytes);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int ad_result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      count_statement.c_str(),
+      n_bytes,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(count_statement.c_str());
+  if (ad_result != SQLITE_OK) {
+    this->__finalize_and_throw__(count_statement.c_str(), ad_result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  sqlite3_int64 answer = sqlite3_column_int64(this->m_db_statement, 0);
+  INF1("Count of rows in table ["%s"] is equal to %lli.",
+       this->m_table_name.c_str(), answer);
+  this->__finalize__(count_statement.c_str());
+  MSG("Leave from advanced debug source branch.");
+}
+#endif
+
 
 /* Table exception */
 // ----------------------------------------------------------------------------
