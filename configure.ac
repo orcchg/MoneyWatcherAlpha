@@ -112,6 +112,33 @@ AC_SUBST([MW_VAR_ENABLE_LOGGING])
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
+#   --enable-advanced_debug
+#
+AC_ARG_ENABLE(advanced_debug, [AS_HELP_STRING(
+  [--enable-advanced_debug],
+  [enable advanced checks being performed (yes, no) [default=no]])],
+  [case "${enableval}" in
+    yes) advanced_debug=true ;;
+    no) advanced_debug=false ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-advanced_debug]) ;;
+   esac], [enable_advanced_debug=no])
+if  test x"$enable_advanced_debug" != xno ; then
+  # Enable advanced check being performed for better debugging
+  AC_DEFINE([__MW_ENABLE_ADVANCED_DEBUG__], [true], [Enabled advanced debug])
+  CFLAGS="$CFLAGS -DENABLE_ADVANCED_DEBUG"
+  CXXFLAGS="$CXXFLAGS -DENABLE_ADVANCED_DEBUG"
+  MW_VAR_ENABLE_ADVANCED_DEBUG=true
+  AC_MSG_NOTICE([Enabled advanced debug])
+else
+  AC_DEFINE([__MW_ENABLE_ADVANCED_DEBUG__], [false], [Disabled advanced debug])
+  MW_VAR_ENABLE_ADVANCED_DEBUG=false
+  AC_MSG_NOTICE([Disabled advanced debug])
+fi
+AM_CONDITIONAL([ENABLE_ADVANCED_DEBUG], [test x$enable_advanced_debug != xno])
+AC_SUBST([MW_VAR_ENABLE_ADVANCED_DEBUG])
+#-----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------
 #
 #   --disable-tests
 #
