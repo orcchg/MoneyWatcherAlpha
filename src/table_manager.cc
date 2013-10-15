@@ -177,6 +177,12 @@ ID_t TableManager::update(
   return (record_id);
 }
 
+void TableManager::remove(const ID_t& entry_id) {
+  INF("enter TableManager::remove().");
+  // TODO: implement cascade deletion
+  INF("exit TableManager::remove().");
+}
+
 void TableManager::redo(const ID_t& entry_id) {
   INF("enter TableManager::redo().");
   // TODO: impl

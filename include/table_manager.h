@@ -58,7 +58,11 @@ public:
 	    const MoneyValue_t& value,
 	    const WrappedString& description);
 
-  //
+  /// @brief Removes existing entry by its ID. Also removes all related records
+  /// from daily_table through cascade deletion.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @note Result of this invocation cannot be undone.
+  void remove(const ID_t& entry_id);
 
   /// @brief Restores state of existing entry being just undone.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
