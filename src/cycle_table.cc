@@ -46,7 +46,8 @@ Entry CycleTable::addEntry(
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);";
   int nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.", insert_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      insert_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -78,7 +79,7 @@ Entry CycleTable::addEntry(
           name_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG1("Name ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
-      i_name.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
+       i_name.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
@@ -89,7 +90,7 @@ Entry CycleTable::addEntry(
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG2("Description ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
-      i_description.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
+       i_description.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 4, i_current_balance) == SQLITE_OK);
@@ -100,7 +101,7 @@ Entry CycleTable::addEntry(
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 5, last_transaction) == SQLITE_OK);
   DBG1("Last transaction balance [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
-      last_transaction, this->m_table_name.c_str(), this->m_db_name.c_str());
+       last_transaction, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   DateTime current_datetime;
   std::string date = current_datetime.getDate();
@@ -112,7 +113,7 @@ Entry CycleTable::addEntry(
           date.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG2("Date ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
-      date.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
+       date.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   std::string time = current_datetime.getTime();
   accumulate = accumulate &&
@@ -129,7 +130,7 @@ Entry CycleTable::addEntry(
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 8, static_cast<sqlite3_int64>(status)) == SQLITE_OK);
   DBG1("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
-      static_cast<sqlite3_int64>(status), this->m_table_name.c_str(), this->m_db_name.c_str());
+       static_cast<sqlite3_int64>(status), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
@@ -168,7 +169,8 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   select_statement += std::to_string(i_entry_id);
   select_statement += "';";
   int nByte = static_cast<int>(select_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.", select_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      select_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -202,7 +204,7 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 7);
   Status status(raw_status);
   DBG1("Loaded column data: Name ["%s"]; Description ["%s"]; Balance [%lli]; Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
-      name.c_str(), description.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
+       name.c_str(), description.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
   Entry entry(id, name, description, balance, transaction, status, datetime);
   DBG2("Proper entry instance has been constructed.");
 
@@ -223,7 +225,7 @@ Entry CycleTable::updateEntry(
   Entry entry = this->readEntry(i_entry_id);
   DBG("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
-  DBG1("Updated entry.");
+  DBG1("Updated entry [ID: %lli].", i_entry_id);
   WrappedString update_statement = "UPDATE '";
   update_statement += WrappedString(this->m_table_name);
   update_statement += "' SET Description = '";
@@ -277,7 +279,8 @@ void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   delete_statement += std::to_string(i_entry_id);
   delete_statement += "';";
   int nByte = static_cast<int>(delete_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.", delete_statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      delete_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -339,7 +342,8 @@ void CycleTable::__create_table__() {
       "'Time' TEXT, "
       "'Status' INTEGER);";
   int nByte = static_cast<int>(statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.", statement.c_str(), nByte);
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
