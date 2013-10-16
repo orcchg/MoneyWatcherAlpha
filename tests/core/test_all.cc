@@ -164,7 +164,11 @@ TEST_F (TableManagerTimeMeasureFixture, TableManagerMultipleUpdate) {
 }
 
 TEST_F (TableManagerTimeMeasureFixture, TableManagerRemove) {
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_expense = -700;
   ID_t id = rand() % TableManagerTimeMeasureFixture::total_rows;
+  this->getTableManager().update(id, s_expense, s_update_description);
+  this->getTableManager().update(id, s_expense, s_update_description);
   this->getTableManager().remove(id);
 }
 

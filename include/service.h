@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include "logger.h"
 
 
 std::wstring widenString(const std::string& src);
@@ -19,6 +20,9 @@ std::wstring widenString(const std::string& src);
 template <typename T>
 std::string vectorToString(const std::vector<T>& array, const std::string& delim = ", ") {
   std::string result = "";
+  if (array.empty()) {
+    return (result);
+  }
   for (const T& item : array) {
     result += std::to_string(item);
     result += delim;
@@ -27,6 +31,7 @@ std::string vectorToString(const std::vector<T>& array, const std::string& delim
   for (size_t index = 0; index < length; ++index) {
     result.pop_back();
   }
+  MSG("String: ["%s"].", result.c_str());
   return result;
 }
 
