@@ -31,13 +31,15 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
 /* Time consumption measurements */
 // TODO(navigation): Time measurements
 // ----------------------------------------------------------------------------
-TEST (TimeMeasure, CreateCycleTable) {
+const std::string TimeMeasureFixture::test_db_filename = "Test-TimeMeasureFixture.db";
+
+TEST_F (TimeMeasureFixture, CreateCycleTable) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   remove(test_cycle_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, AddEntry) {
+TEST_F (TimeMeasureFixture, AddEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
@@ -47,7 +49,7 @@ TEST (TimeMeasure, AddEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, AddManyEntries) {
+TEST_F (TimeMeasureFixture, AddManyEntries) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
@@ -61,7 +63,7 @@ TEST (TimeMeasure, AddManyEntries) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, ReadEntry) {
+TEST_F (TimeMeasureFixture, ReadEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
@@ -72,7 +74,7 @@ TEST (TimeMeasure, ReadEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, UpdateEntry) {
+TEST_F (TimeMeasureFixture, UpdateEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
@@ -85,7 +87,7 @@ TEST (TimeMeasure, UpdateEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, DeleteEntry) {
+TEST_F (TimeMeasureFixture, DeleteEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
@@ -96,14 +98,31 @@ TEST (TimeMeasure, DeleteEntry) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
+TEST_F (TimeMeasureFixture, DeleteManyEntriesByOneSQLstatement) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_description = "Тестовое описание слота";
+  MoneyValue_t s_balance = 1000;
+  std::vector<ID_t> entry_ids;
+  int total_entries = 10;
+  entry_ids.reserve(total_entries);
+  for (int index = 0; index < total_entries; ++index) {
+    mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+    entry_ids.push_back(entry.getID());
+  }
+  cycle_table.deleteEntries(entry_ids);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
 // ----------------------------------------------
-TEST (TimeMeasure, CreateDailyTable) {
+TEST_F (TimeMeasureFixture, CreateDailyTable) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   mw::DailyTable daily_table(test_daily_table_db_filename);
   remove(test_daily_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, AddRecord) {
+TEST_F (TimeMeasureFixture, AddRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   mw::DailyTable daily_table(test_daily_table_db_filename);
   MoneyValue_t s_balance = 1000;
@@ -113,7 +132,7 @@ TEST (TimeMeasure, AddRecord) {
   remove(test_daily_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, AddManyRecord) {
+TEST_F (TimeMeasureFixture, AddManyRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   mw::DailyTable daily_table(test_daily_table_db_filename);
   MoneyValue_t s_balance = 1000;
@@ -127,7 +146,7 @@ TEST (TimeMeasure, AddManyRecord) {
   remove(test_daily_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, ReadRecord) {
+TEST_F (TimeMeasureFixture, ReadRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   mw::DailyTable daily_table(test_daily_table_db_filename);
   MoneyValue_t s_balance = 1000;
@@ -138,7 +157,7 @@ TEST (TimeMeasure, ReadRecord) {
   remove(test_daily_table_db_filename.c_str());
 }
 
-TEST (TimeMeasure, DeleteRecord) {
+TEST_F (TimeMeasureFixture, DeleteRecord) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   mw::DailyTable daily_table(test_daily_table_db_filename);
   MoneyValue_t s_balance = 1000;
@@ -149,8 +168,25 @@ TEST (TimeMeasure, DeleteRecord) {
   remove(test_daily_table_db_filename.c_str());
 }
 
+TEST_F (TimeMeasureFixture, DeleteManyRecordsByOneSQLstatement) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  mw::DailyTable daily_table(test_daily_table_db_filename);
+  MoneyValue_t s_balance = 1000;
+  mw::WrappedString s_description = "Тестовая запись в таблице";
+  mw::Status s_status(mw::SV_INCOME);
+  std::vector<ID_t> record_ids;
+  int total_records = 10;
+  record_ids.reserve(total_records);
+  for (int index = 0; index < total_records; ++index) {
+    mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+    record_ids.push_back(record.getID());
+  }
+  daily_table.deleteRecords(record_ids);
+  remove(test_daily_table_db_filename.c_str());
+}
+
 // ----------------------------------------------
-TEST (TimeMeasure, SingleTableOpenFromTwoHandlers) {
+TEST_F (TimeMeasureFixture, SingleTableOpenFromTwoHandlers) {
   std::string test_single_db_filename = "Test-SingleTable.db";
   mw::CycleTable cycle_table(test_single_db_filename);
   mw::DailyTable daily_table(test_single_db_filename);
@@ -166,12 +202,12 @@ TEST (TimeMeasure, SingleTableOpenFromTwoHandlers) {
 }
 
 // ----------------------------------------------
-TEST (TimeMeasure, TableManagerInit) {
+TEST_F (TimeMeasureFixture, TableManagerInit) {
   mw::TableManager table_manager;
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TimeMeasure, TableManagerAdd) {
+TEST_F (TimeMeasureFixture, TableManagerAdd) {
   mw::TableManager table_manager;
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
@@ -180,7 +216,7 @@ TEST (TimeMeasure, TableManagerAdd) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TimeMeasure, TableManagerUpdate) {
+TEST_F (TimeMeasureFixture, TableManagerUpdate) {
   mw::TableManager table_manager;
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
@@ -192,7 +228,7 @@ TEST (TimeMeasure, TableManagerUpdate) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TimeMeasure, TableManagerMultipleUpdate) {
+TEST_F (TimeMeasureFixture, TableManagerMultipleUpdate) {
   mw::TableManager table_manager;
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
@@ -210,7 +246,7 @@ TEST (TimeMeasure, TableManagerMultipleUpdate) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TimeMeasure, TableManagerRemove) {
+TEST_F (TimeMeasureFixture, TableManagerRemove) {
   mw::TableManager table_manager;
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
