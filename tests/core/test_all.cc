@@ -18,6 +18,212 @@
 #include "test_include_all.h"
 
 
+// ----------------------------------------------
+TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
+  /*std::thread simple_test([&] () {
+    EXPECT_EQ(1.0, 1.0);
+  });*/
+  EXPECT_EQ(1.0, 1.0);
+}
+
+
+#if ENABLED_TIME_MEASURE_ONLY
+/* Time consumption measurements */
+// TODO(navigation): Time measurements
+// ----------------------------------------------------------------------------
+TEST (TimeMeasure, CreateCycleTable) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, AddEntry) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_description = "Тестовое описание слота";
+  MoneyValue_t s_balance = 1000;
+  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, AddManyEntries) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_description = "Тестовое описание слота";
+  MoneyValue_t s_balance = 1000;
+  mw::Entry entry_1 = cycle_table.addEntry(s_name, s_description, s_balance);
+  mw::Entry entry_2 = cycle_table.addEntry(s_name, s_description, s_balance);
+  mw::Entry entry_3 = cycle_table.addEntry(s_name, s_description, s_balance);
+  mw::Entry entry_4 = cycle_table.addEntry(s_name, s_description, s_balance);
+  mw::Entry entry_5 = cycle_table.addEntry(s_name, s_description, s_balance);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, ReadEntry) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_description = "Тестовое описание слота";
+  MoneyValue_t s_balance = 1000;
+  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+  mw::Entry read_entry = cycle_table.readEntry(entry.getID());
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, UpdateEntry) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_description = "Тестовое описание слота";
+  MoneyValue_t s_balance = 1000;
+  MoneyValue_t s_expense = -700;
+  mw::WrappedString s_transaction_comment = "Расход на 700 единиц";
+  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+  cycle_table.updateEntry(entry.getID(), s_expense, s_transaction_comment);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, DeleteEntry) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  mw::CycleTable cycle_table(test_cycle_table_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_description = "Тестовое описание слота";
+  MoneyValue_t s_balance = 1000;
+  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+  cycle_table.deleteEntry(entry.getID());
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+// ----------------------------------------------
+TEST (TimeMeasure, CreateDailyTable) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  mw::DailyTable daily_table(test_daily_table_db_filename);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, AddRecord) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  mw::DailyTable daily_table(test_daily_table_db_filename);
+  MoneyValue_t s_balance = 1000;
+  mw::WrappedString s_description = "Тестовая запись в таблице";
+  mw::Status s_status(mw::SV_INCOME);
+  mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, AddManyRecord) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  mw::DailyTable daily_table(test_daily_table_db_filename);
+  MoneyValue_t s_balance = 1000;
+  mw::WrappedString s_description = "Тестовая запись в таблице";
+  mw::Status s_status(mw::SV_INCOME);
+  mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
+  mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
+  mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
+  mw::Record record_4 = daily_table.addRecord(s_balance, s_description, s_status);
+  mw::Record record_5 = daily_table.addRecord(s_balance, s_description, s_status);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, ReadRecord) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  mw::DailyTable daily_table(test_daily_table_db_filename);
+  MoneyValue_t s_balance = 1000;
+  mw::WrappedString s_description = "Тестовая запись в таблице";
+  mw::Status s_status(mw::SV_INCOME);
+  mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+  mw::Record read_record = daily_table.readRecord(record.getID());
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (TimeMeasure, DeleteRecord) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  mw::DailyTable daily_table(test_daily_table_db_filename);
+  MoneyValue_t s_balance = 1000;
+  mw::WrappedString s_description = "Тестовая запись в таблице";
+  mw::Status s_status(mw::SV_INCOME);
+  mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+  daily_table.deleteRecord(record.getID());
+  remove(test_daily_table_db_filename.c_str());
+}
+
+// ----------------------------------------------
+TEST (TimeMeasure, SingleTableOpenFromTwoHandlers) {
+  std::string test_single_db_filename = "Test-SingleTable.db";
+  mw::CycleTable cycle_table(test_single_db_filename);
+  mw::DailyTable daily_table(test_single_db_filename);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_record_description = "Тестовая запись в таблице";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_record_balance = 500;
+  mw::Status s_record_status(mw::SV_INCOME);
+  mw::Entry entry = cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
+  mw::Record record = daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+  remove(test_single_db_filename.c_str());
+}
+
+// ----------------------------------------------
+TEST (TimeMeasure, TableManagerInit) {
+  mw::TableManager table_manager;
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+TEST (TimeMeasure, TableManagerAdd) {
+  mw::TableManager table_manager;
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  MoneyValue_t s_entry_balance = 1000;
+  table_manager.add(s_name, s_entry_description, s_entry_balance);
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+TEST (TimeMeasure, TableManagerUpdate) {
+  mw::TableManager table_manager;
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_expense = -700;
+  ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
+  table_manager.update(entry_id, s_expense, s_update_description);
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+TEST (TimeMeasure, TableManagerMultipleUpdate) {
+  mw::TableManager table_manager;
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_expense = -700;
+  ID_t entry_id_1 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+  table_manager.add(s_name, s_entry_description, s_entry_balance);
+  ID_t entry_id_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+  table_manager.add(s_name, s_entry_description, s_entry_balance);
+  ID_t entry_id_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+  table_manager.update(entry_id_1, s_expense, s_update_description);
+  table_manager.update(entry_id_3, s_expense, s_update_description);
+  table_manager.update(entry_id_5, s_expense, s_update_description);
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+TEST (TimeMeasure, TableManagerRemove) {
+  mw::TableManager table_manager;
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  MoneyValue_t s_entry_balance = 1000;
+  ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
+  table_manager.remove(entry_id);
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+
+#else  // ENABLED_TIME_MEASURE_ONLY
+
+
 static const char* intToSQLiteError(int i_error_code) {
   switch (i_error_code) {
   case SQLITE_OK:             /* 0  Successful result */
@@ -114,16 +320,8 @@ static int countRows(const std::string& table_name, const DB_Handler& handler) {
 }
 
 
-// ----------------------------------------------
-TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
-  /*std::thread simple_test([&] () {
-    EXPECT_EQ(1.0, 1.0);
-  });*/
-  EXPECT_EQ(1.0, 1.0);
-}
-
-
-/* CylceTable testing */
+/* CycleTable testing */
+// TODO(navigation): CycleTable testing
 // ----------------------------------------------------------------------------
 TEST (CycleTableTest, CreateCycleTable) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
@@ -672,6 +870,7 @@ TEST (CycleTableTest, DeleteEntryTwice) {
 
 
 /* DailyTable testing */
+// TODO(navigation): DailyTable testing
 // ----------------------------------------------------------------------------
 TEST (DailyTableTest, CreateDailyTable) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
@@ -1083,6 +1282,7 @@ TEST (DailyTableTest, DeleteRecordTwice) {
 
 
 /* SQLite database testing */
+// TODO(navigation): SQLite database testing
 // ----------------------------------------------------------------------------
 TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
   std::string test_single_db_filename = "Test-SingleTable.db";
@@ -1263,6 +1463,7 @@ TEST (SQLiteDatabaseTest, TablePersistense) {
 
 
 /* TableManager testing */
+// TODO(navigation): TableManager testing
 // ----------------------------------------------------------------------------
 TEST (TableManagerTest, TableManagerInit) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
@@ -1639,6 +1840,8 @@ TEST (TableManagerTest, TableManagerRemove) {
 TEST (TableManagerTest, TableManagerRemoveWrongId) {
   // TODO: impl
 }
+
+#endif  // ENABLED_TIME_MEASURE_ONLY
 
 
 /* Main */
