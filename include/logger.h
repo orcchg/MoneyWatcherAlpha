@@ -12,12 +12,13 @@
 
 #include "common.h"
 
+
+namespace mw {
+
 #if ENABLED_LOGGING
 #include <stdio.h>
 #include <stdarg.h>
 
-
-namespace mw {
 
 /* Basic logging */
 // ----------------------------------------------
