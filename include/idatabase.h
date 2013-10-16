@@ -42,6 +42,8 @@ protected:
   ID_t m_next_id;
   int m_rows;
 
+  static const int sql_statement_limit_length = 10000000;  // ten millions
+
   virtual void __init__() = 0;
   virtual void __create_table__() = 0;
 

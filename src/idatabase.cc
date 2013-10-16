@@ -13,6 +13,7 @@
 #include "common.h"
 #include "idatabase.h"
 #include "logger.h"
+#include "sqlite3.h"
 
 #define ROWS_IN_CASE_OF_NOT_EXISTING_TABLE -1
 #define ID_IN_CASE_OF_NOT_EXISTING_TABLE 0
@@ -87,6 +88,9 @@ void iDatabase::__open_database__() {
   }
   DBG1("SQLite database ["%s"] has been successfully opened and placed into %p.",
        this->m_db_name.c_str(), this->m_db_handler);
+  sqlite3_limit(m_db_handler, SQLITE_LIMIT_SQL_LENGTH, iDatabase::sql_statement_limit_length);
+  DBG2("SQL-statement max limit was set to %i in bytes.",
+       iDatabase::sql_statement_limit_length);
   DBG("exit iDatabase::__open_database__().");
 }
 

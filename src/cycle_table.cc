@@ -357,7 +357,8 @@ void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
   delete_statement += vectorToString(i_entry_ids, ", ");
   delete_statement += ");";
   int nByte = static_cast<int>(delete_statement.length());
-  // TODO: check length of statement
+  TABLE_ASSERT("SQL-statement number of bytes exceeds the limitations!" &&
+               nByte < iDatabase::sql_statement_limit_length);
   TRC("Provided string SQL statement: ["%s"] of length %i.",
       delete_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
