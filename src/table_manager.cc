@@ -221,6 +221,10 @@ void TableManager::remove(const ID_t& i_entry_id) {
     result = sqlite3_step(this->m_db_statement);
   }
   this->__finalize__(select_statement.c_str());
+  // Unable to perform record deletion in-place with record ID reading
+  // from another table, because when certain sqlite_step() is in progress,
+  // other tables become READ ONLY, so 'INSERT', 'UPDATE' and 'DELETE'
+  // are prohibited.
   for (ID_t& record_id : record_ids) {
     this->m_daily_table.deleteRecord(record_id);
     DBG1("Deleted record [ID: %lli] from table ["%s"].",
