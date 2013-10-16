@@ -118,5 +118,8 @@
 /* Disabled logging in source code */
 #undef __MW_ENABLE_LOGGING__
 
+/* Disabled time measurements only */
+#undef __MW_ENABLE_TIME_MEASURE_ONLY__
+
 /* Logging level */
 #undef __MW_LOG_LEVEL__

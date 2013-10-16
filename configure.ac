@@ -168,6 +168,35 @@ AC_SUBST([MW_VAR_ENABLE_TESTS])
 AC_SUBST([MW_VAR_SUBDIR_TESTS])
 #-----------------------------------------------------------------------
 
+#-----------------------------------------------------------------------
+#
+#   --enable-time_measurements_only
+#
+AC_ARG_ENABLE(time_measurements_only, [AS_HELP_STRING(
+  [--enable-time_measurements_only],
+  [enables only time measurements in unit-tests (yes, no) [default=no]])],
+  [case "${enableval}" in
+    yes) time_measurements_only=true ;;
+    no) time_measurements_only=false ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-time_measurements_only]) ;;
+  esac], [enable_time_measurements_only=no])
+AS_IF([test "x$enable_time_measurements_only" != "xno"],
+  [dnl Enable only time measurements in unit-tests
+  AC_DEFINE([__MW_ENABLE_TIME_MEASURE_ONLY__], [true], [Enabled time measurements only])
+  CFLAGS="$CFLAGS -DENABLE_TIME_MEASURE_ONLY"
+  CXXFLAGS="$CXXFLAGS -DENABLE_TIME_MEASURE_ONLY"
+  MW_VAR_ENABLE_TIME_MEASURE_ONLY=true
+  AC_MSG_NOTICE([Enabled time measurements only])
+])
+AS_IF([test "x$enable_time_measurements_only" != "xyes"],
+  AC_DEFINE([__MW_ENABLE_TIME_MEASURE_ONLY__], [false], [Disabled time measurements only])
+  MW_VAR_ENABLE_TIME_MEASURE_ONLY=false
+  AC_MSG_NOTICE([Disabled time measurements only])
+])
+AM_CONDITIONAL([ENABLE_TIME_MEASURE_ONLY], [test "x$enable_time_measurements_only" != "xno"])
+AC_SUBST([MW_VAR_ENABLE_TIME_MEASURE_ONLY])
+#-----------------------------------------------------------------------
+
 dnl SQLite-specific options
 #-----------------------------------------------------------------------
 #   --enable-readline
