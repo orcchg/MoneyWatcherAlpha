@@ -175,7 +175,8 @@ int iDatabase::__count__(const std::string& i_table_name) {
     this->m_rows = sqlite3_column_int(this->m_db_statement, 0);
     this->__finalize__(count_statement.c_str());
   }
-  TRC("Number of rows: %i.", this->m_rows);
+  TRC("Number of rows in table ["%s"]: %i.",
+      i_table_name.c_str(), this->m_rows);
   DBG("exit iDatabase::__count__().");
   return (this->m_rows);
 }
@@ -188,7 +189,8 @@ bool iDatabase::__empty__() const {
         "Wrong initialization of database instance!",
         TABLE_ASSERTION_ERROR_CODE);
   }
-  TRC("Number of rows: %i.", this->m_rows);
+  TRC("Number of rows in table ["%s"]: %i.",
+      this->m_table_name.c_str(), this->m_rows);
   DBG("exit iDatabase::__empty__().");
   return (this->m_rows == 0);
 }

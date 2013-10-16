@@ -235,9 +235,11 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
   this->__decrement_rows__();
   if (i_record_id + 1 == this->m_next_id) {
     --this->m_next_id;
-    DBG2("Deleted last record. Next id value has been decremented.");
+    DBG2("Deleted record with largest ID. Next id value has been decremented.");
   }
   if (this->__empty__()) {
+    DBG("Table ["%s"] has become empty. Next id value is set to zero.",
+        this->m_table_name.c_str());
     this->m_next_id = 0;
   }
   DBG1("Deleted record [ID: %lli] in table ["%s"].",

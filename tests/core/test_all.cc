@@ -1573,7 +1573,7 @@ TEST (TableManagerTest, TableManagerRemove) {
     table_manager.remove(entry_id_3);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 4);
-ASSERT_TRUE(false);
+
     rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 4);
     rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());

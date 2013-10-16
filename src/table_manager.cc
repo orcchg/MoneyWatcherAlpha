@@ -208,7 +208,10 @@ void TableManager::remove(const ID_t& i_entry_id) {
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+  DBG2("Loop deletion of records by its ID...");
+  //this->m_daily_table.deleteRecord(3);
   result = sqlite3_step(this->m_db_statement);
+  //this->m_daily_table.deleteRecord(3); wrong
   while (result == SQLITE_ROW) {
     ID_t record_id = sqlite3_column_int64(this->m_db_statement, 0);
     this->m_daily_table.deleteRecord(record_id);
@@ -216,10 +219,11 @@ void TableManager::remove(const ID_t& i_entry_id) {
          record_id, this->m_daily_table.getName().c_str());
     result = sqlite3_step(this->m_db_statement);
   }
+  //this->m_daily_table.deleteRecord(3);
   this->__finalize__(select_statement.c_str());
   DBG2("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
-
+  //this->m_daily_table.deleteRecord(3);
   std::string drop_statement = "DROP TABLE IF EXISTS '";
   drop_statement += records_table_name;
   drop_statement += "';";
