@@ -8,6 +8,7 @@
  */
 
 #include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <thread>
 #include <locale.h>
@@ -33,227 +34,138 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
 // ----------------------------------------------------------------------------
 const std::string TimeMeasureFixture::test_db_filename = "Test-TimeMeasureFixture.db";
 
-TEST_F (TimeMeasureFixture, CreateCycleTable) {
+TEST (TimeMeasure, CreateCycleTable) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   mw::CycleTable cycle_table(test_cycle_table_db_filename);
   remove(test_cycle_table_db_filename.c_str());
 }
 
 TEST_F (TimeMeasureFixture, AddEntry) {
-  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_description = "Тестовое описание слота";
   MoneyValue_t s_balance = 1000;
-  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
-  remove(test_cycle_table_db_filename.c_str());
+  this->getCycleTable().addEntry(s_name, s_description, s_balance);
 }
 
 TEST_F (TimeMeasureFixture, AddManyEntries) {
-  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  mw::CycleTable cycle_table(test_cycle_table_db_filename);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_description = "Тестовое описание слота";
   MoneyValue_t s_balance = 1000;
-  mw::Entry entry_1 = cycle_table.addEntry(s_name, s_description, s_balance);
-  mw::Entry entry_2 = cycle_table.addEntry(s_name, s_description, s_balance);
-  mw::Entry entry_3 = cycle_table.addEntry(s_name, s_description, s_balance);
-  mw::Entry entry_4 = cycle_table.addEntry(s_name, s_description, s_balance);
-  mw::Entry entry_5 = cycle_table.addEntry(s_name, s_description, s_balance);
-  remove(test_cycle_table_db_filename.c_str());
+  this->getCycleTable().addEntry(s_name, s_description, s_balance);
+  this->getCycleTable().addEntry(s_name, s_description, s_balance);
+  this->getCycleTable().addEntry(s_name, s_description, s_balance);
+  this->getCycleTable().addEntry(s_name, s_description, s_balance);
+  this->getCycleTable().addEntry(s_name, s_description, s_balance);
 }
 
 TEST_F (TimeMeasureFixture, ReadEntry) {
-  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  mw::CycleTable cycle_table(test_cycle_table_db_filename);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_description = "Тестовое описание слота";
-  MoneyValue_t s_balance = 1000;
-  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
-  mw::Entry read_entry = cycle_table.readEntry(entry.getID());
-  remove(test_cycle_table_db_filename.c_str());
+  ID_t id = rand() % TimeMeasureFixture::total_rows;
+  this->getCycleTable().readEntry(id);
 }
 
 TEST_F (TimeMeasureFixture, UpdateEntry) {
-  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  mw::CycleTable cycle_table(test_cycle_table_db_filename);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_description = "Тестовое описание слота";
-  MoneyValue_t s_balance = 1000;
   MoneyValue_t s_expense = -700;
   mw::WrappedString s_transaction_comment = "Расход на 700 единиц";
-  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
-  cycle_table.updateEntry(entry.getID(), s_expense, s_transaction_comment);
-  remove(test_cycle_table_db_filename.c_str());
+  ID_t id = rand() % TimeMeasureFixture::total_rows;
+  this->getCycleTable().updateEntry(id, s_expense, s_transaction_comment);
 }
 
 TEST_F (TimeMeasureFixture, DeleteEntry) {
-  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  mw::CycleTable cycle_table(test_cycle_table_db_filename);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_description = "Тестовое описание слота";
-  MoneyValue_t s_balance = 1000;
-  mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
-  cycle_table.deleteEntry(entry.getID());
-  remove(test_cycle_table_db_filename.c_str());
+  ID_t id = rand() % TimeMeasureFixture::total_rows;
+  this->getCycleTable().deleteEntry(id);
+}
+
+TEST_F (TimeMeasureFixture, DeleteManyEntries) {
+  std::vector<ID_t> ids = this->getEntryIDs();
+  for (ID_t& id : ids) {
+    this->getCycleTable().deleteEntry(id);
+  }
 }
 
 TEST_F (TimeMeasureFixture, DeleteManyEntriesByOneSQLstatement) {
-  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
-  mw::CycleTable cycle_table(test_cycle_table_db_filename);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_description = "Тестовое описание слота";
-  MoneyValue_t s_balance = 1000;
-  std::vector<ID_t> entry_ids;
-  int total_entries = 10;
-  entry_ids.reserve(total_entries);
-  for (int index = 0; index < total_entries; ++index) {
-    mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
-    entry_ids.push_back(entry.getID());
-  }
-  cycle_table.deleteEntries(entry_ids);
-  remove(test_cycle_table_db_filename.c_str());
+  std::vector<ID_t> ids = this->getEntryIDs();
+  this->getCycleTable().deleteEntries(ids);
 }
 
 // ----------------------------------------------
-TEST_F (TimeMeasureFixture, CreateDailyTable) {
+TEST (TimeMeasure, CreateDailyTable) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
   mw::DailyTable daily_table(test_daily_table_db_filename);
   remove(test_daily_table_db_filename.c_str());
 }
 
 TEST_F (TimeMeasureFixture, AddRecord) {
-  std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  mw::DailyTable daily_table(test_daily_table_db_filename);
   MoneyValue_t s_balance = 1000;
   mw::WrappedString s_description = "Тестовая запись в таблице";
   mw::Status s_status(mw::SV_INCOME);
-  mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
-  remove(test_daily_table_db_filename.c_str());
+  this->getDailyTable().addRecord(s_balance, s_description, s_status);
 }
 
 TEST_F (TimeMeasureFixture, AddManyRecord) {
-  std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  mw::DailyTable daily_table(test_daily_table_db_filename);
   MoneyValue_t s_balance = 1000;
   mw::WrappedString s_description = "Тестовая запись в таблице";
   mw::Status s_status(mw::SV_INCOME);
-  mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
-  mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
-  mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
-  mw::Record record_4 = daily_table.addRecord(s_balance, s_description, s_status);
-  mw::Record record_5 = daily_table.addRecord(s_balance, s_description, s_status);
-  remove(test_daily_table_db_filename.c_str());
+  this->getDailyTable().addRecord(s_balance, s_description, s_status);
+  this->getDailyTable().addRecord(s_balance, s_description, s_status);
+  this->getDailyTable().addRecord(s_balance, s_description, s_status);
+  this->getDailyTable().addRecord(s_balance, s_description, s_status);
+  this->getDailyTable().addRecord(s_balance, s_description, s_status);
 }
 
 TEST_F (TimeMeasureFixture, ReadRecord) {
-  std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  mw::DailyTable daily_table(test_daily_table_db_filename);
-  MoneyValue_t s_balance = 1000;
-  mw::WrappedString s_description = "Тестовая запись в таблице";
-  mw::Status s_status(mw::SV_INCOME);
-  mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
-  mw::Record read_record = daily_table.readRecord(record.getID());
-  remove(test_daily_table_db_filename.c_str());
+  ID_t id = rand() % TimeMeasureFixture::total_rows;
+  this->getDailyTable().readRecord(id);
 }
 
 TEST_F (TimeMeasureFixture, DeleteRecord) {
-  std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  mw::DailyTable daily_table(test_daily_table_db_filename);
-  MoneyValue_t s_balance = 1000;
-  mw::WrappedString s_description = "Тестовая запись в таблице";
-  mw::Status s_status(mw::SV_INCOME);
-  mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
-  daily_table.deleteRecord(record.getID());
-  remove(test_daily_table_db_filename.c_str());
+  ID_t id = rand() % TimeMeasureFixture::total_rows;
+  this->getDailyTable().deleteRecord(id);
+}
+
+TEST_F (TimeMeasureFixture, DeleteManyRecords) {
+  std::vector<ID_t> ids = this->getRecordIDs();
+  for (ID_t& id : ids) {
+    this->getDailyTable().deleteRecord(id);
+  }
 }
 
 TEST_F (TimeMeasureFixture, DeleteManyRecordsByOneSQLstatement) {
-  std::string test_daily_table_db_filename = "Test-DailyTable.db";
-  mw::DailyTable daily_table(test_daily_table_db_filename);
+  std::vector<ID_t> ids = this->getRecordIDs();
+  this->getDailyTable().deleteRecords(ids);
+}
+
+// ----------------------------------------------
+TEST (TimeMeasure, TableManagerInit) {
+  mw::TableManager table_manager;
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+TEST_F (TableManagerTimeMeasureFixture, TableManagerAdd) {
+  mw::WrappedString s_name = "Имя слота";
   MoneyValue_t s_balance = 1000;
   mw::WrappedString s_description = "Тестовая запись в таблице";
-  mw::Status s_status(mw::SV_INCOME);
-  std::vector<ID_t> record_ids;
-  int total_records = 10;
-  record_ids.reserve(total_records);
-  for (int index = 0; index < total_records; ++index) {
-    mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
-    record_ids.push_back(record.getID());
+  this->getTableManager().add(s_name, s_description, s_balance);
+}
+
+TEST_F (TableManagerTimeMeasureFixture, TableManagerUpdate) {
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_expense = -700;
+  ID_t id = rand() % TableManagerTimeMeasureFixture::total_rows;
+  this->getTableManager().update(id, s_expense, s_update_description);
+}
+
+TEST_F (TableManagerTimeMeasureFixture, TableManagerMultipleUpdate) {
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_expense = -700;
+  std::vector<ID_t> ids = this->getEntryIDs();
+  for (ID_t& id : ids) {
+    this->getTableManager().update(id, s_expense, s_update_description);
   }
-  daily_table.deleteRecords(record_ids);
-  remove(test_daily_table_db_filename.c_str());
 }
 
-// ----------------------------------------------
-TEST_F (TimeMeasureFixture, SingleTableOpenFromTwoHandlers) {
-  std::string test_single_db_filename = "Test-SingleTable.db";
-  mw::CycleTable cycle_table(test_single_db_filename);
-  mw::DailyTable daily_table(test_single_db_filename);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  mw::WrappedString s_record_description = "Тестовая запись в таблице";
-  MoneyValue_t s_entry_balance = 1000;
-  MoneyValue_t s_record_balance = 500;
-  mw::Status s_record_status(mw::SV_INCOME);
-  mw::Entry entry = cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
-  mw::Record record = daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
-  remove(test_single_db_filename.c_str());
-}
-
-// ----------------------------------------------
-TEST_F (TimeMeasureFixture, TableManagerInit) {
-  mw::TableManager table_manager;
-  remove(mw::TableManager::single_database_name.c_str());
-}
-
-TEST_F (TimeMeasureFixture, TableManagerAdd) {
-  mw::TableManager table_manager;
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  MoneyValue_t s_entry_balance = 1000;
-  table_manager.add(s_name, s_entry_description, s_entry_balance);
-  remove(mw::TableManager::single_database_name.c_str());
-}
-
-TEST_F (TimeMeasureFixture, TableManagerUpdate) {
-  mw::TableManager table_manager;
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  mw::WrappedString s_update_description = "Расход на 700 единиц";
-  MoneyValue_t s_entry_balance = 1000;
-  MoneyValue_t s_expense = -700;
-  ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
-  table_manager.update(entry_id, s_expense, s_update_description);
-  remove(mw::TableManager::single_database_name.c_str());
-}
-
-TEST_F (TimeMeasureFixture, TableManagerMultipleUpdate) {
-  mw::TableManager table_manager;
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  mw::WrappedString s_update_description = "Расход на 700 единиц";
-  MoneyValue_t s_entry_balance = 1000;
-  MoneyValue_t s_expense = -700;
-  ID_t entry_id_1 = table_manager.add(s_name, s_entry_description, s_entry_balance);
-  table_manager.add(s_name, s_entry_description, s_entry_balance);
-  ID_t entry_id_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
-  table_manager.add(s_name, s_entry_description, s_entry_balance);
-  ID_t entry_id_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
-  table_manager.update(entry_id_1, s_expense, s_update_description);
-  table_manager.update(entry_id_3, s_expense, s_update_description);
-  table_manager.update(entry_id_5, s_expense, s_update_description);
-  remove(mw::TableManager::single_database_name.c_str());
-}
-
-TEST_F (TimeMeasureFixture, TableManagerRemove) {
-  mw::TableManager table_manager;
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  MoneyValue_t s_entry_balance = 1000;
-  ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
-  table_manager.remove(entry_id);
-  remove(mw::TableManager::single_database_name.c_str());
+TEST_F (TableManagerTimeMeasureFixture, TableManagerRemove) {
+  ID_t id = rand() % TableManagerTimeMeasureFixture::total_rows;
+  this->getTableManager().remove(id);
 }
 
 
