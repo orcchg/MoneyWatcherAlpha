@@ -12,6 +12,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "common.h"
 #include "entry.h"
 #include "hash.h"
@@ -69,6 +70,13 @@ public:
   /// @note Value of next_id remains incremented in case the entry
   /// to be deleted is not the last one, otherwise next_id will be decreased.
   void deleteEntry(const ID_t& entry_id);
+
+  /// @brief Removes many entries from SQLite database.
+  /// @param entry_ids - Vector of primary key of entries of interest
+  /// in SQLite database.
+  /// @note Value of next_id remains incremented in case any of entry
+  /// to be deleted is not the last one, otherwise next_id will be decreased.
+  void deleteEntries(const std::vector<ID_t>& entry_ids);
   /// @}
   /// -------------------------------------------------------------------------
 

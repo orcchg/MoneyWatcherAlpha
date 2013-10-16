@@ -7,11 +7,10 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
-#include <cstring>
-#include <stdexcept>
 #include <utility>
 #include "daily_table.h"
 #include "logger.h"
+#include "service.h"
 #include "sqlite3.h"
 
 
@@ -250,6 +249,57 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
 #endif
 
   INF("exit DailyTable::deleteRecord().");
+}
+
+void DailyTable::deleteRecords(const std::vector<ID_t>& i_record_ids) {
+  INF("enter DailyTable::deleteRecords().");
+
+#if ENABLED_ADVANCED_DEBUG
+  for (ID_t& record_id : i_record_ids) {
+    this->__where_check__(record_id);
+  }
+#endif
+
+  std::string delete_statement = "DELETE FROM '";
+  delete_statement += this->m_table_name;
+  delete_statement += "' WHERE ID IN(";
+  delete_statement += vectorToString(i_record_ids, ", ");
+  delete_statement += ");";
+  int nByte = static_cast<int>(delete_statement.length());
+  // TODO: check length of statement
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      delete_statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      delete_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(delete_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(delete_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(delete_statement.c_str());
+  this->__decrease_rows__(static_cast<int>(i_record_ids.size()));
+  // TODO: update next_id value
+  if (this->__empty__()) {
+    DBG("Table ["%s"] has become empty. Next id value is set to zero.",
+        this->m_table_name.c_str());
+    this->m_next_id = 0;
+  }
+  DBG1("Deleted %lli records from table ["%s"].",
+       static_cast<long long int>(i_record_ids.size()), this->m_table_name.c_str());
+
+#if ENABLED_ADVANCED_DEBUG
+  this->__count_check__();
+#endif
+
+  INF("exit DailyTable::deleteRecords().");
 }
 
 const std::string& DailyTable::getName() const {

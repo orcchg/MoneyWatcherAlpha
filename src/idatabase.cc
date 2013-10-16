@@ -183,12 +183,7 @@ int iDatabase::__count__(const std::string& i_table_name) {
 
 bool iDatabase::__empty__() const {
   DBG("enter iDatabase::__empty__().");
-  if (this->m_rows == ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
-    ERR("Wrong initialization of database instance!");
-    throw TableException(
-        "Wrong initialization of database instance!",
-        TABLE_ASSERTION_ERROR_CODE);
-  }
+  this->__check_rows_init__();
   TRC("Number of rows in table ["%s"]: %i.",
       this->m_table_name.c_str(), this->m_rows);
   DBG("exit iDatabase::__empty__().");
@@ -197,29 +192,35 @@ bool iDatabase::__empty__() const {
 
 void iDatabase::__increment_rows__() {
   DBG("enter iDatabase::__increment_rows__().");
-  if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
-    ERR("Wrong initialization of database instance!");
-    WRN("throw from iDatabase::__increment_rows__().");
-    throw TableException(
-        "Wrong initialization of database instance!",
-        TABLE_ASSERTION_ERROR_CODE);
-  }
+  this->__check_rows_init__();
   ++this->m_rows;
   DBG("exit iDatabase::__increment_rows__().");
 }
 
+void iDatabase::__increase_rows__(int value) {
+  DBG("enter iDatabase::__increase_rows__().");
+  this->__check_rows_init__();
+  this->m_rows += value;
+  DBG("exit iDatabase::__increase_rows__().");
+}
+
 void iDatabase::__decrement_rows__() {
   DBG("enter iDatabase::__decrement_rows__().");
-  if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
-    ERR("Wrong initialization of database instance!");
-    WRN("throw from iDatabase::__decrement_rows__().");
-    throw TableException(
-        "Wrong initialization of database instance!",
-        TABLE_ASSERTION_ERROR_CODE);
-  } else if (this->m_rows > 0) {
+  this->__check_rows_init__();
+  if (this->m_rows > 0) {
     --this->m_rows;
   }
   DBG("exit iDatabase::__decrement_rows__().");
+}
+
+void iDatabase::__decrease_rows__(int value) {
+  DBG("enter iDatabase::__decrease_rows__().");
+  this->__check_rows_init__();
+  this->m_rows -= value;
+  if (this->m_rows <= 0) {
+    this->m_rows = 0;
+  }
+  DBG("exit iDatabase::__decrease_rows__().");
 }
 
 void iDatabase::__terminate__(const char* i_message) {
@@ -496,6 +497,22 @@ void iDatabase::__count_check__() {
   MSG("Leave from advanced debug source branch.");
 }
 #endif
+
+
+/* Private member-functions */
+// ----------------------------------------------------------------------------
+bool iDatabase::__check_rows_init__() const {
+  DBG2("enter iDatabase::__check_rows_init__().");
+  if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
+    ERR("Wrong initialization of database instance!");
+    WRN("throw from iDatabase::__check_rows_init__().");
+    throw TableException(
+        "Wrong initialization of database instance!",
+        TABLE_ASSERTION_ERROR_CODE);
+  }
+  return (true);
+  DBG2("exit iDatabase::__check_rows_init__().");
+}
 
 
 /* Table exception */

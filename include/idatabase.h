@@ -51,7 +51,9 @@ protected:
   int __count__(const std::string& i_table_name);
   bool __empty__() const;  // soft invocation
   void __increment_rows__();  // soft invocation
+  void __increase_rows__(int value);  // soft invocation
   void __decrement_rows__();  // soft invocation
+  void __decrease_rows__(int value);  // soft invocation
   void __terminate__(const char* message);
   void __finalize__(const char* statement);
   void __finalize_and_throw__(const char* statement, int error_code);
@@ -69,6 +71,8 @@ protected:
 
 private:
   const char* m_last_statement;
+
+  bool __check_rows_init__() const;
 
   iDatabase(const iDatabase& obj) = delete;
   iDatabase& operator = (const iDatabase& rhs) = delete;

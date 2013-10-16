@@ -11,8 +11,23 @@
 #define SERVICE_H_
 
 #include <string>
+#include <vector>
 
 
 std::wstring widenString(const std::string& src);
+
+template <typename T>
+std::string vectorToString(const std::vector<T>& array, const std::string& delim = ", ") {
+  std::string result = "";
+  for (const T& item : array) {
+    result += std::to_string(item);
+    result += delim;
+  }
+  size_t length = delim.length();
+  for (size_t index = 0; index < length; ++index) {
+    result.pop_back();
+  }
+  return result;
+}
 
 #endif /* SERVICE_H_ */
