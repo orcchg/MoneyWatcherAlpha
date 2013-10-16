@@ -378,7 +378,8 @@ void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   this->__decrease_rows__(static_cast<int>(i_entry_ids.size()));
-  DBG("Updating next ID if necessary...");
+  DBG("Updating next ID if necessary, initial value is [%lli].",
+      this->m_next_id);
   for (std::vector<ID_t>::const_reverse_iterator it = i_entry_ids.rbegin();
        it != i_entry_ids.rend();
        ++it) {
@@ -389,7 +390,8 @@ void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
       break;
     }
   }
-  DBG("Finished updating next ID.");
+  DBG("Finished updating next ID: [%lli].",
+      this->m_next_id);
   if (this->__empty__()) {
     DBG("Table ["%s"] has become empty. Next ID value is set to zero.",
         this->m_table_name.c_str());
