@@ -7,6 +7,7 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
+#include <algorithm>
 #include <utility>
 #include "daily_table.h"
 #include "logger.h"
@@ -234,10 +235,10 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
   this->__decrement_rows__();
   if (i_record_id + 1 == this->m_next_id) {
     --this->m_next_id;
-    DBG2("Deleted record with largest ID. Next id value has been decremented.");
+    DBG2("Deleted record with largest ID. Next ID value has been decremented.");
   }
   if (this->__empty__()) {
-    DBG("Table ["%s"] has become empty. Next id value is set to zero.",
+    DBG("Table ["%s"] has become empty. Next ID value is set to zero.",
         this->m_table_name.c_str());
     this->m_next_id = 0;
   }
@@ -251,8 +252,9 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
   INF("exit DailyTable::deleteRecord().");
 }
 
-void DailyTable::deleteRecords(const std::vector<ID_t>& i_record_ids) {
+void DailyTable::deleteRecords(std::vector<ID_t>& i_record_ids) {
   INF("enter DailyTable::deleteRecords().");
+  std::sort(i_record_ids.begin(), i_record_ids.end());
 
 #if ENABLED_ADVANCED_DEBUG
   for (ID_t& record_id : i_record_ids) {
@@ -286,7 +288,18 @@ void DailyTable::deleteRecords(const std::vector<ID_t>& i_record_ids) {
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   this->__decrease_rows__(static_cast<int>(i_record_ids.size()));
-  // TODO: update next_id value
+  DBG("Updating next ID if necessary...");
+  for (std::vector<ID_t>::const_reverse_iterator it = i_record_ids.rbegin();
+       it != i_record_ids.rend();
+       ++it) {
+    if (*it + 1 == this->m_next_id) {
+      --this->m_next_id;
+      DBG2("Deleted record with largest ID. Next ID value has been decremented.");
+    } else {
+      break;
+    }
+  }
+  DBG("Finished updating next ID.");
   if (this->__empty__()) {
     DBG("Table ["%s"] has become empty. Next id value is set to zero.",
         this->m_table_name.c_str());

@@ -74,9 +74,10 @@ public:
   /// @brief Removes many entries from SQLite database.
   /// @param entry_ids - Vector of primary key of entries of interest
   /// in SQLite database.
+  /// @details Input array will be sorted.
   /// @note Value of next_id remains incremented in case any of entry
   /// to be deleted is not the last one, otherwise next_id will be decreased.
-  void deleteEntries(const std::vector<ID_t>& entry_ids);
+  void deleteEntries(std::vector<ID_t>& entry_ids);
   /// @}
   /// -------------------------------------------------------------------------
 

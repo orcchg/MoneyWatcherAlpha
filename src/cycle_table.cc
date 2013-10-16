@@ -7,6 +7,7 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
+#include <algorithm>
 #include <utility>
 #include "cycle_table.h"
 #include "logger.h"
@@ -323,10 +324,10 @@ void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   this->__decrement_rows__();
   if (i_entry_id + 1 == this->m_next_id) {
     --this->m_next_id;
-    DBG2("Deleted entry with largest ID. Next id value has been decremented.");
+    DBG2("Deleted entry with largest ID. Next ID value has been decremented.");
   }
   if (this->__empty__()) {
-    DBG("Table ["%s"] has become empty. Next id value is set to zero.",
+    DBG("Table ["%s"] has become empty. Next ID value is set to zero.",
         this->m_table_name.c_str());
     this->m_next_id = 0;
   }
@@ -340,8 +341,9 @@ void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   INF("exit CycleTable::deleteEntry().");
 }
 
-void CycleTable::deleteEntries(const std::vector<ID_t>& i_entry_ids) {
+void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
   INF("enter CycleTable::deleteRecords().");
+  std::sort(i_entry_ids.begin(), i_entry_ids.end());
 
 #if ENABLED_ADVANCED_DEBUG
   for (ID_t& entry_id : i_entry_ids) {
@@ -375,9 +377,20 @@ void CycleTable::deleteEntries(const std::vector<ID_t>& i_entry_ids) {
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   this->__decrease_rows__(static_cast<int>(i_entry_ids.size()));
-  // TODO: update next_id value
+  DBG("Updating next ID if necessary...");
+  for (std::vector<ID_t>::const_reverse_iterator it = i_entry_ids.rbegin();
+       it != i_entry_ids.rend();
+       ++it) {
+    if (*it + 1 == this->m_next_id) {
+      --this->m_next_id;
+      DBG2("Deleted entry with largest ID. Next ID value has been decremented.");
+    } else {
+      break;
+    }
+  }
+  DBG("Finished updating next ID.");
   if (this->__empty__()) {
-    DBG("Table ["%s"] has become empty. Next id value is set to zero.",
+    DBG("Table ["%s"] has become empty. Next ID value is set to zero.",
         this->m_table_name.c_str());
     this->m_next_id = 0;
   }
