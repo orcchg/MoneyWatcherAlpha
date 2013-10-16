@@ -230,7 +230,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
     DBG1("Deleted record [ID: %lli] from table ["%s"].",
          record_id, this->m_daily_table.getName().c_str());
   }
-  // TODO: uncomment:  this->m_daily_table.deleteRecords(record_ids);
+  // TODO: decide, what case is better:  this->m_daily_table.deleteRecords(record_ids);
   DBG2("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
 
