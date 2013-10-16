@@ -9,6 +9,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 #include "logger.h"
 #include "table_manager.h"
 
@@ -209,21 +210,25 @@ void TableManager::remove(const ID_t& i_entry_id) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   DBG2("Loop deletion of records by its ID...");
-  //this->m_daily_table.deleteRecord(3);
+  std::vector<ID_t> record_ids;
+  record_ids.reserve(10000);
   result = sqlite3_step(this->m_db_statement);
-  //this->m_daily_table.deleteRecord(3); wrong
   while (result == SQLITE_ROW) {
     ID_t record_id = sqlite3_column_int64(this->m_db_statement, 0);
+    record_ids.push_back(record_id);
+    DBG("Got record [ID: %lli] from table ["%s"].",
+        record_id, records_table_name.c_str());
+    result = sqlite3_step(this->m_db_statement);
+  }
+  this->__finalize__(select_statement.c_str());
+  for (ID_t& record_id : record_ids) {
     this->m_daily_table.deleteRecord(record_id);
     DBG1("Deleted record [ID: %lli] from table ["%s"].",
          record_id, this->m_daily_table.getName().c_str());
-    result = sqlite3_step(this->m_db_statement);
   }
-  //this->m_daily_table.deleteRecord(3);
-  this->__finalize__(select_statement.c_str());
   DBG2("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
-  //this->m_daily_table.deleteRecord(3);
+
   std::string drop_statement = "DROP TABLE IF EXISTS '";
   drop_statement += records_table_name;
   drop_statement += "';";
