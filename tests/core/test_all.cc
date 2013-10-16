@@ -769,6 +769,7 @@ TEST (CycleTableTest, DeleteEntry) {
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
 
+    EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -853,6 +854,94 @@ TEST (CycleTableTest, DeleteEntryTwice) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (CycleTableTest, DeleteManyEntries) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  try {
+    mw::CycleTable cycle_table(test_cycle_table_db_filename);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
+    MoneyValue_t s_balance = 1000;
+    std::vector<mw::Entry> entries;
+    int total_entries = 10;
+    entries.reserve(total_entries);
+    for (int index = 0; index < total_entries; ++index) {
+      mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+      entries.push_back(entry);
+    }
+    EXPECT_EQ(accessor.getNextID(), total_entries);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    for (std::vector<mw::Entry>::const_reverse_iterator it = entries.rbegin();
+         it != entries.rend();
+         ++it) {
+      cycle_table.deleteEntry(it->getID());
+      --total_entries;
+      EXPECT_EQ(accessor.getNextID(), total_entries);
+      int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+      EXPECT_EQ(rows, total_entries);
+    }
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  remove(test_cycle_table_db_filename.c_str());
+}
+
+TEST (CycleTableTest, DeleteManyEntriesByOneSQLstatement) {
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  try {
+    mw::CycleTable cycle_table(test_cycle_table_db_filename);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
+    MoneyValue_t s_balance = 1000;
+    std::vector<ID_t> entry_ids;
+    int total_entries = 10;
+    entry_ids.reserve(total_entries);
+    for (int index = 0; index < total_entries; ++index) {
+      mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+      entry_ids.push_back(entry.getID());
+    }
+    EXPECT_EQ(accessor.getNextID(), total_entries);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    cycle_table.deleteEntries(entry_ids);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
     EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
@@ -1181,6 +1270,7 @@ TEST (DailyTableTest, DeleteRecord) {
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
 
+    EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1265,6 +1355,94 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (DailyTableTest, DeleteManyRecords) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    MoneyValue_t s_balance = 1000;
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    mw::Status s_status(mw::SV_INCOME);
+    std::vector<mw::Record> records;
+    int total_records = 10;
+    records.reserve(total_records);
+    for (int index = 0; index < total_records; ++index) {
+      mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+      records.push_back(record);
+    }
+    EXPECT_EQ(accessor.getNextID(), total_records);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    for (std::vector<mw::Record>::const_reverse_iterator it = records.rbegin();
+         it != records.rend();
+         ++it) {
+      daily_table.deleteRecord(it->getID());
+      --total_records;
+      EXPECT_EQ(accessor.getNextID(), total_records);
+      int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+      EXPECT_EQ(rows, total_records);
+    }
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_daily_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(test_daily_table_db_filename.c_str());
+}
+
+TEST (DailyTableTest, DeleteManyRecordsByOneSQLstatement) {
+  std::string test_daily_table_db_filename = "Test-DailyTable.db";
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  try {
+    mw::DailyTable daily_table(test_daily_table_db_filename);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::DailyTable> accessor(&daily_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    MoneyValue_t s_balance = 1000;
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    mw::Status s_status(mw::SV_INCOME);
+    std::vector<ID_t> record_ids;
+    int total_records = 10;
+    record_ids.reserve(total_records);
+    for (int index = 0; index < total_records; ++index) {
+      mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
+      record_ids.push_back(record.getID());
+    }
+    EXPECT_EQ(accessor.getNextID(), total_records);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    daily_table.deleteRecords(record_ids);
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
     EXPECT_TRUE(accessor.checkFinalized());
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
