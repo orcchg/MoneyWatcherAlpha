@@ -1641,7 +1641,8 @@ TEST (TableManagerTest, TableManagerAdd) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
-    ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id = init_ids.first;
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
     EXPECT_TRUE(accessor.checkFinalized());
 
@@ -1668,6 +1669,30 @@ TEST (TableManagerTest, TableManagerAdd) {
     std::string records_table_name(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1)));
     std::string check_string = mw::TableManager::records_table_name_prefix + std::to_string(entry_id);
     EXPECT_STREQ(records_table_name.c_str(), check_string.c_str());
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+
+    rows = countRows(records_table_name, accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
+
+    statement_handler = nullptr;
+    value_statement = "SELECT * FROM \'";
+    value_statement += records_table_name;
+    value_statement += "\';";
+    nByte = static_cast<int>(value_statement.length());
+    result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        value_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t record_id = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(record_id, init_ids.second);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -1703,7 +1728,8 @@ TEST (TableManagerTest, TableManagerUpdate) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
-    ID_t entry_id = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id = init_ids.first;
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
     EXPECT_TRUE(accessor.checkFinalized());
 
@@ -1726,6 +1752,10 @@ TEST (TableManagerTest, TableManagerUpdate) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     ID_t id = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(id, init_ids.second);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    id = sqlite3_column_int64(statement_handler, 0);
     EXPECT_EQ(id, record_id);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
@@ -1763,17 +1793,20 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
-    ID_t entry_id_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
-    ID_t entry_id_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_2 = init_ids_2.first;
+    std::pair<ID_t, ID_t> init_ids_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_3 = init_ids_3.first;
     table_manager.add(s_name, s_entry_description, s_entry_balance);
-    ID_t entry_id_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_5 = init_ids_5.first;
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
     EXPECT_TRUE(accessor.checkFinalized());
 
     int rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 5);
     rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
-    EXPECT_EQ(rows, 0);
+    EXPECT_EQ(rows, 0 + 5);  // one row for initial record per entry, 5 entries
 
     std::string count_statement = "SELECT COUNT(*) FROM "
         "sqlite_master WHERE type == 'table' "
@@ -1819,14 +1852,14 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     std::string records_table_name_5 = mw::TableManager::records_table_name_prefix + std::to_string(entry_id_5);
 
     rows = countRows(records_table_name_2, accessor.getDbHandler());
-    EXPECT_EQ(rows, 1);
+    EXPECT_EQ(rows, 1 + 1);  // one row for initial record
     rows = countRows(records_table_name_3, accessor.getDbHandler());
-    EXPECT_EQ(rows, 3);
+    EXPECT_EQ(rows, 3 + 1);  // one row for initial record
     rows = countRows(records_table_name_5, accessor.getDbHandler());
-    EXPECT_EQ(rows, 1);
+    EXPECT_EQ(rows, 1 + 1);  // one row for initial record
 
     rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
-    EXPECT_EQ(rows, 5);
+    EXPECT_EQ(rows, 5 + 5);  // one row for initial record per entry, 5 entries
 
     statement_handler = nullptr;
     std::string check_statement = "SELECT * FROM '";
@@ -1841,6 +1874,10 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
         nullptr);
     EXPECT_TRUE(statement_handler);
     EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t id_init = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(id_init, init_ids_3.second);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
     ID_t id_0 = sqlite3_column_int64(statement_handler, 0);
@@ -1889,10 +1926,13 @@ TEST (TableManagerTest, TableManagerRemove) {
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
-    ID_t entry_id_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
-    ID_t entry_id_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_2 = init_ids_2.first;
+    std::pair<ID_t, ID_t> init_ids_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_3 = init_ids_3.first;
     table_manager.add(s_name, s_entry_description, s_entry_balance);
-    ID_t entry_id_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_5 = init_ids_5.first;
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
     EXPECT_TRUE(accessor.checkFinalized());
 
@@ -1912,7 +1952,7 @@ TEST (TableManagerTest, TableManagerRemove) {
     rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 4);
     rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
-    EXPECT_EQ(rows, 2);
+    EXPECT_EQ(rows, 2 + 5 - 1);  // 5 entries - 5 init records, -1 entry - -1 init record
 
     table_manager.remove(entry_id_5);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
@@ -1921,7 +1961,7 @@ TEST (TableManagerTest, TableManagerRemove) {
     rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 3);
     rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
-    EXPECT_EQ(rows, 1);
+    EXPECT_EQ(rows, 1 + 5 - 2);  // 5 entries - 5 init records, -2 entries - -2 init records
 
     std::string count_statement = "SELECT COUNT(*) FROM "
         "sqlite_master WHERE type == 'table' "
@@ -1976,6 +2016,14 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
 }
 
 TEST (TableManagerTest, TableManagerUndo) {
+  // TODO: impl
+}
+
+TEST (TableManagerTest, TableManagerUndoFreshEntry) {
+  // TODO: impl
+}
+
+TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
   // TODO: impl
 }
 

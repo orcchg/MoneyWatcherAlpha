@@ -13,6 +13,7 @@
 #include <list>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include "cycle_table.h"
 #include "daily_table.h"
 #include "hash.h"
@@ -38,9 +39,11 @@ public:
   /// @param name - Name of entry.
   /// @param description - Text description of last transaction.
   /// @param current_balace - Value of current money balance of entry.
-  /// @return Newly created entry's ID.
-  /// @details Entry will also be stored into SQLite database.
-  ID_t add(
+  /// @return Pair of newly created entry's and record's IDs.
+  /// @details Entry will also be stored into SQLite database. This function
+  /// also provides record, storing entry's initial values, and it will also be
+  /// stored into SQLite database.
+  std::pair<ID_t, ID_t> add(
       const WrappedString& name,
       const WrappedString& description,
       const MoneyValue_t& current_balance);

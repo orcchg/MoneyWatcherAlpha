@@ -11,6 +11,7 @@
 #define TEST_FIXTURE_H_
 
 #include <string>
+#include <utility>
 #include <vector>
 #include "tests/google/gtest/gtest.h"
 #include "cycle_table.h"
@@ -95,7 +96,8 @@ public:
     mw::WrappedString s_description = "Тестовая запись в таблице";
 
     for (int index = 0; index < TableManagerTimeMeasureFixture::total_rows; ++index) {
-      ID_t id = this->m_table_manager.add(s_name, s_description, s_balance);
+      std::pair<ID_t, ID_t> init_ids = this->m_table_manager.add(s_name, s_description, s_balance);
+      ID_t id = init_ids.first;
       this->entry_ids.push_back(id);
     }
   }

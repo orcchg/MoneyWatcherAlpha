@@ -41,15 +41,15 @@ TableManager::~TableManager() {
   INF("exit TableManager destructor.");
 }
 
-ID_t TableManager::add(
+std::pair<ID_t, ID_t> TableManager::add(
     const WrappedString& i_name,
     const WrappedString& i_description,
     const MoneyValue_t& i_current_balance) {
   INF("enter TableManager::add().");
   Entry entry = this->m_cycle_table.addEntry(i_name, i_description, i_current_balance);
   ID_t entry_id = entry.getID();
-  DBG("Added entry into Cycle_Table, got ID: [%lli].",
-      entry_id);
+  DBG("Added entry into table ["%s"], got ID: [%lli].",
+      this->getCycleTableName().c_str(), entry_id);
   std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2);";
@@ -97,17 +97,53 @@ ID_t TableManager::add(
   } else {
     DBG2("All insertions have succeeded.");
   }
+  this->__finalize__(insert_statement.c_str());
+  this->__create_table_entry_records__(records_table_name);
+  DBG1("Created table with name ["%s"] for records of entry [ID: %lli].",
+       records_table_name.c_str(), entry_id);
+
+  // add record, storing entry's initial state values
+  Record record = this->m_daily_table.addRecord(i_current_balance, i_description, entry.getStatus());
+  ID_t record_id = record.getID();
+  DBG("Added record into table ["%s"], got ID: [%lli].",
+       this->getDailyTableName().c_str(), record_id);
+  insert_statement = "INSERT INTO '";
+  insert_statement += records_table_name;
+  insert_statement += "' VALUES(?1);";
+  nByte = static_cast<int>(insert_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      insert_statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      insert_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(insert_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(insert_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
+  sqlite3_step(this->m_db_statement);
+  if (accumulate != SQLITE_OK) {
+    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
+        this->m_db_name.c_str(), insert_statement.c_str());
+    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+  } else {
+    DBG2("All insertions have succeeded.");
+  }
+  this->__finalize__(insert_statement.c_str());
 
 #if ENABLED_DB_CACHING
   // TODO: caching the entry's records
 #endif
 
-  this->__finalize__(insert_statement.c_str());
-  this->__create_table_entry_records__(records_table_name);
-  DBG1("Created table with name ["%s"] for records of entry [ID: %lli].",
-       records_table_name.c_str(), entry_id);
   INF("exit TableManager::add().");
-  return (entry_id);
+  return (std::pair<ID_t, ID_t>(entry_id, record_id));
 }
 
 ID_t TableManager::update(
@@ -313,7 +349,13 @@ void TableManager::undo(const ID_t& i_entry_id) {
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
-  sqlite3_step(this->m_db_statement);
+  result = sqlite3_step(this->m_db_statement);
+  if (result == SQLITE_DONE) {
+    DBG2("Table ["%s"] is empty, nothing to be done with entry [ID: %lli].",
+         records_table_name.c_str(), i_entry_id);
+    INF("exit TableManager::undo().");
+    return;
+  }
   ID_t last_record_id = sqlite3_column_int64(this->m_db_statement, 0);
   DBG("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
       last_record_id, records_table_name.c_str());
