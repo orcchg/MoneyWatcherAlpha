@@ -291,7 +291,61 @@ Entry CycleTable::updateEntry(
 }
 
 Entry CycleTable::rollbackEntry(const ID_t& i_entry_id, const Record& i_record) {
-  // TODO: implement roll back entry
+  INF("enter CycleTable::rollbackEntry().");
+
+#if ENABLED_ADVANCED_DEBUG
+  this->__where_check__(i_entry_id);
+#endif
+
+  Entry entry = this->readEntry(i_entry_id);
+  DBG("Got entry from SQLite database.");
+  entry.rollbackBalance(i_record);
+  DBG1("Rolled back entry [ID: %lli].", i_entry_id);
+  WrappedString update_statement = "UPDATE '";
+  update_statement += WrappedString(this->m_table_name);
+  update_statement += "' SET Description = '";
+  update_statement += entry.getDescription();
+  update_statement += "', CurrentBalance = '";
+  update_statement += WrappedString::to_string(entry.getBalance());
+  update_statement += "', LastTransaction = '";
+  update_statement += WrappedString::to_string(entry.getLastTransaction());
+  update_statement += "', Date = '";
+  update_statement += WrappedString(entry.getDateTime().getDate());
+  update_statement += "', Time = '";
+  update_statement += WrappedString(entry.getDateTime().getTime());
+  update_statement += "', Status = '";
+  update_statement += WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
+  update_statement += "' WHERE ID == '";
+  update_statement += WrappedString::to_string(i_entry_id);
+  update_statement += "';";
+  int nByte = update_statement.n_bytes();
+  TRC("Provided string SQL statement: ["%s"] of length %lli and bytes %i.",
+      update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      update_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(update_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(update_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+
+#if ENABLED_DB_CACHING
+  // TODO: caching the entry
+#endif
+
+  this->__finalize__(update_statement.c_str());
+  DBG2("Updated database row for entry [ID: %lli] in table ["%s"].",
+       i_entry_id, this->m_table_name.c_str());
+  INF("exit CycleTable::rollbackEntry().");
+  return (entry);
 }
 
 void CycleTable::deleteEntry(const ID_t& i_entry_id) {
