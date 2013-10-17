@@ -383,8 +383,9 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
   if (result == SQLITE_DONE) {
     DBG2("Table ["%s"] is empty, nothing to be done with entry [ID: %lli].",
          records_table_name.c_str(), i_entry_id);
-    INF("exit TableManager::undo().");
+    this->__finalize__(select_statement.c_str());
     Entry entry = this->m_cycle_table.readEntry(i_entry_id);
+    INF("exit TableManager::undo().");
     return (entry);
   }
   ID_t undo_record_id = sqlite3_column_int64(this->m_db_statement, 0);
