@@ -232,6 +232,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
          record_id, this->m_daily_table.getName().c_str());
   }
 #else
+  // this approach is a bit faster, but less informative, then the above
   this->m_daily_table.deleteRecords(record_ids);
 #endif
   DBG2("Deleted all records corresponding to entry [ID: %lli].",
