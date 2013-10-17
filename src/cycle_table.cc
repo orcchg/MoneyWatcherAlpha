@@ -91,18 +91,29 @@ Entry CycleTable::addEntry(
           i_description.c_str(),
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG2("Description ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
-       i_description.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
+  DBG2("Description ["%s"] has been stored in table ["%s"], "
+      "SQLite database ["%s"].",
+       i_description.c_str(),
+       this->m_table_name.c_str(),
+       this->m_db_name.c_str());
 
   accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 4, i_current_balance) == SQLITE_OK);
-  DBG("Current balance [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+      (sqlite3_bind_int64(
+          this->m_db_statement,
+          4,
+          i_current_balance) == SQLITE_OK);
+  DBG("Current balance [%lli] has been stored in table ["%s"], "
+      "SQLite database ["%s"].",
       i_current_balance, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   MoneyValue_t last_transaction = 0;
   accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 5, last_transaction) == SQLITE_OK);
-  DBG1("Last transaction balance [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+      (sqlite3_bind_int64(
+          this->m_db_statement,
+          5,
+          last_transaction) == SQLITE_OK);
+  DBG1("Last transaction balance [%lli] has been stored in table ["%s"], "
+      "SQLite database ["%s"].",
        last_transaction, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   DateTime current_datetime;
@@ -130,15 +141,26 @@ Entry CycleTable::addEntry(
 
   Status status = SV_UNKNOWN;
   accumulate = accumulate &&
-      (sqlite3_bind_int64(this->m_db_statement, 8, static_cast<sqlite3_int64>(status)) == SQLITE_OK);
-  DBG1("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
-       static_cast<sqlite3_int64>(status), this->m_table_name.c_str(), this->m_db_name.c_str());
+      (sqlite3_bind_int64(
+          this->m_db_statement,
+          8,
+          static_cast<sqlite3_int64>(status)) == SQLITE_OK);
+  DBG1("Status [%lli] has been stored in table ["%s"], "
+      "SQLite database ["%s"].",
+       static_cast<sqlite3_int64>(status),
+       this->m_table_name.c_str(),
+       this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
-    ERR("Error during saving data into table ["%s"], database ["%s"] by statement ["%s"]!",
-        this->m_table_name.c_str(), this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+    ERR("Error during saving data into table ["%s"], database ["%s"] "
+        "by statement ["%s"]!",
+        this->m_table_name.c_str(),
+        this->m_db_name.c_str(),
+        insert_statement.c_str());
+    this->__finalize_and_throw__(
+        insert_statement.c_str(),
+        SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
     DBG2("All insertions have succeeded.");
   }
@@ -199,24 +221,37 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Read id [%lli] from  table ["%s"] of database ["%s"], input id was [%lli].",
+  DBG("Read id [%lli] from  table ["%s"] of database ["%s"], "
+      "input id was [%lli].",
       id, this->m_table_name.c_str(), this->m_db_name.c_str(), i_entry_id);
-  TABLE_ASSERT("Input entry id does not equal to primary key value from database!" &&
+  TABLE_ASSERT("Input entry id does not equal to primary key value "
+               "from database!" &&
                id == i_entry_id);
 
-  const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1));
+  const void* raw_name = reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 1));
   WrappedString name(raw_name);
-  const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 2));
+  const void* raw_description = reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 2));
   WrappedString description(raw_description);
   MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
   MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 4);
-  std::string date(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 5)));
-  std::string time(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 6)));
+  std::string date(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 5)));
+  std::string time(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 6)));
   DateTime datetime(date, time);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 7);
   Status status(raw_status);
-  DBG1("Loaded column data: Name ["%s"]; Description ["%s"]; Balance [%lli]; Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
-       name.c_str(), description.c_str(), balance, transaction, datetime.getDate().c_str(), datetime.getTime().c_str(), raw_status);
+  DBG1("Loaded column data: Name ["%s"]; Description ["%s"]; Balance [%lli]; "
+       "Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
+       name.c_str(),
+       description.c_str(),
+       balance,
+       transaction,
+       datetime.getDate().c_str(),
+       datetime.getTime().c_str(),
+       raw_status);
   Entry entry(id, name, description, balance, transaction, status, datetime);
   DBG2("Proper entry instance has been constructed.");
 
@@ -256,13 +291,16 @@ Entry CycleTable::updateEntry(
   update_statement += "', Time = '";
   update_statement += WrappedString(entry.getDateTime().getTime());
   update_statement += "', Status = '";
-  update_statement += WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
+  update_statement +=
+      WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
   update_statement += "' WHERE ID == '";
   update_statement += WrappedString::to_string(i_entry_id);
   update_statement += "';";
   int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: ["%s"] of length %lli and bytes %i.",
-      update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
+      update_statement.c_str(),
+      static_cast<long long int>(update_statement.length()),
+      nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -317,13 +355,16 @@ Entry CycleTable::rollbackEntry(
   update_statement += "', Time = '";
   update_statement += WrappedString(entry.getDateTime().getTime());
   update_statement += "', Status = '";
-  update_statement += WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
+  update_statement +=
+      WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
   update_statement += "' WHERE ID == '";
   update_statement += WrappedString::to_string(i_entry_id);
   update_statement += "';";
   int nByte = update_statement.n_bytes();
   TRC("Provided string SQL statement: ["%s"] of length %lli and bytes %i.",
-      update_statement.c_str(), static_cast<long long int>(update_statement.length()), nByte);
+      update_statement.c_str(),
+      static_cast<long long int>(update_statement.length()),
+      nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
@@ -446,7 +487,8 @@ void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
        ++it) {
     if (*it + 1 == this->m_next_id) {
       --this->m_next_id;
-      DBG2("Deleted entry with largest ID. Next ID value has been decremented.");
+      DBG2("Deleted entry with largest ID. "
+           "Next ID value has been decremented.");
     } else {
       break;
     }
@@ -459,7 +501,8 @@ void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
     this->m_next_id = 0;
   }
   DBG1("Deleted %lli entries from table ["%s"].",
-       static_cast<long long int>(i_entry_ids.size()), this->m_table_name.c_str());
+       static_cast<long long int>(i_entry_ids.size()),
+       this->m_table_name.c_str());
 
 #if ENABLED_ADVANCED_DEBUG
   this->__count_check__();
@@ -485,7 +528,8 @@ void CycleTable::__init__() {
   iDatabase::__create_table_for_last_id__(CycleTable::last_row_id_table_name);
   ID_t last_row_id = this->__read_last_id__(CycleTable::last_row_id_table_name);
   this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
-  TRC("Initialization has completed: total rows [%i], last row id [%lli], next_id [%lli].",
+  TRC("Initialization has completed: total rows [%i], last row id [%lli], "
+      "next_id [%lli].",
       this->m_rows, last_row_id, this->m_next_id);
   DBG("exit CycleTable::__init__().");
 }
@@ -520,7 +564,8 @@ void CycleTable::__create_table__() {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  DBG1("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
+  DBG1("Table ["%s"] has been successfully created.",
+       this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit CycleTable::__create_table__().");
 }

@@ -46,7 +46,11 @@ std::pair<Entry, Record> TableManager::add(
     const WrappedString& i_description,
     const MoneyValue_t& i_current_balance) {
   INF("enter TableManager::add().");
-  Entry entry = this->m_cycle_table.addEntry(i_name, i_description, i_current_balance);
+  Entry entry =
+      this->m_cycle_table.addEntry(
+          i_name,
+          i_description,
+          i_current_balance);
   ID_t entry_id = entry.getID();
   DBG("Added entry into table ["%s"], got ID: [%lli].",
       this->getCycleTableName().c_str(), entry_id);
@@ -93,7 +97,9 @@ std::pair<Entry, Record> TableManager::add(
   if (!accumulate) {
     ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
         this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+    this->__finalize_and_throw__(
+        insert_statement.c_str(),
+        SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
     DBG2("All insertions have succeeded.");
   }
@@ -103,7 +109,11 @@ std::pair<Entry, Record> TableManager::add(
        records_table_name.c_str(), entry_id);
 
   // add record, storing entry's initial state values
-  Record record = this->m_daily_table.addRecord(i_current_balance, i_description, entry.getStatus());
+  Record record =
+      this->m_daily_table.addRecord(
+          i_current_balance,
+          i_description,
+          entry.getStatus());
   ID_t record_id = record.getID();
   DBG("Added record into table ["%s"], got ID: [%lli].",
        this->getDailyTableName().c_str(), record_id);
@@ -132,7 +142,9 @@ std::pair<Entry, Record> TableManager::add(
   if (accumulate != SQLITE_OK) {
     ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
         this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+    this->__finalize_and_throw__(
+        insert_statement.c_str(),
+        SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
     DBG2("All insertions have succeeded.");
   }
@@ -151,8 +163,16 @@ Record TableManager::update(
     const MoneyValue_t& i_value,
     const WrappedString& i_description){
   INF("enter TableManager::update().");
-  Entry entry = this->m_cycle_table.updateEntry(i_entry_id, i_value, i_description);
-  Record record = this->m_daily_table.addRecord(i_value, i_description, entry.getStatus());
+  Entry entry =
+      this->m_cycle_table.updateEntry(
+          i_entry_id,
+          i_value,
+          i_description);
+  Record record =
+      this->m_daily_table.addRecord(
+          i_value,
+          i_description,
+          entry.getStatus());
   ID_t record_id = record.getID();
 
   DBG("Reading table name of entry records from SQLite database ["%s"]...",
@@ -180,8 +200,10 @@ Record TableManager::update(
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  std::string records_table_name(reinterpret_cast<const char*>(sqlite3_column_text(this->m_db_statement, 1)));
-  DBG1("Got record [ID: %lli], inserting into table ["%s"] of entry [ID: %lli].",
+  std::string records_table_name(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 1)));
+  DBG1("Got record [ID: %lli], inserting into table ["%s"] "
+       "of entry [ID: %lli].",
        record_id, records_table_name.c_str(), entry.getID());
   this->__finalize__(select_statement.c_str());
 
@@ -210,7 +232,9 @@ Record TableManager::update(
   if (accumulate != SQLITE_OK) {
     ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
         this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+    this->__finalize_and_throw__(
+        insert_statement.c_str(),
+        SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
     DBG2("All insertions have succeeded.");
   }
@@ -224,7 +248,8 @@ void TableManager::remove(const ID_t& i_entry_id) {
   this->m_cycle_table.deleteEntry(i_entry_id);
   DBG("Deleted entry [ID: %lli] from Cycle_Table at %p.",
       i_entry_id, &(this->m_cycle_table));
-  std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
+  std::string records_table_name =
+      TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
   select_statement += "' ORDER BY RecordID ASC;";
@@ -328,7 +353,8 @@ void TableManager::remove(const ID_t& i_entry_id) {
 
 Entry TableManager::undo(const ID_t& i_entry_id) {
   INF("enter TableManager::undo().");
-  std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
+  std::string records_table_name =
+      TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
   select_statement += "' ORDER BY RecordID DESC LIMIT 2;";
@@ -362,7 +388,8 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
     return (entry);
   }
   ID_t undo_record_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Got undo record [ID: %lli] from table ["%s"]. Entry [ID: %lli] will be rolled back...",
+  DBG("Got undo record [ID: %lli] from table ["%s"]. "
+      "Entry [ID: %lli] will be rolled back...",
        undo_record_id, records_table_name.c_str(), i_entry_id);
   this->__finalize__(select_statement.c_str());
 
@@ -397,9 +424,16 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
   this->__finalize__(delete_statement.c_str());
 
   Record undo_record = this->m_daily_table.readRecord(undo_record_id);
-  Entry entry = this->m_cycle_table.rollbackEntry(i_entry_id, last_record.getBalance(), undo_record);
-  DBG2("Entry [ID: %lli] has been rolled back to state it had on ["%s"] at ["%s"].",
-       i_entry_id, undo_record.getDateTime().getDate().c_str(), undo_record.getDateTime().getTime().c_str());
+  Entry entry =
+      this->m_cycle_table.rollbackEntry(
+          i_entry_id,
+          last_record.getBalance(),
+          undo_record);
+  DBG2("Entry [ID: %lli] has been rolled back to state "
+       "it had on ["%s"] at ["%s"].",
+       i_entry_id,
+       undo_record.getDateTime().getDate().c_str(),
+       undo_record.getDateTime().getTime().c_str());
   INF("exit TableManager::undo().");
   return (entry);
 }
@@ -458,7 +492,8 @@ void TableManager::__create_table__() {
   DBG("exit TableManager::__create_table__().");
 }
 
-void TableManager::__create_table_entry_records__(const std::string& i_table_name) {
+void TableManager::__create_table_entry_records__(
+    const std::string& i_table_name) {
   DBG("enter TableManager::__create_table_entry_records__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += i_table_name;

@@ -86,9 +86,13 @@ void iDatabase::__open_database__() {
     WRN("throw from iDatabase::__open_database__().");
     throw TableException("Unable to open database!", result);
   }
-  DBG1("SQLite database ["%s"] has been successfully opened and placed into %p.",
+  DBG1("SQLite database ["%s"] has been successfully opened and "
+      "placed into %p.",
        this->m_db_name.c_str(), this->m_db_handler);
-  sqlite3_limit(m_db_handler, SQLITE_LIMIT_SQL_LENGTH, iDatabase::sql_statement_limit_length);
+  sqlite3_limit(
+      m_db_handler,
+      SQLITE_LIMIT_SQL_LENGTH,
+      iDatabase::sql_statement_limit_length);
   DBG2("SQL-statement max limit was set to %i in bytes.",
        iDatabase::sql_statement_limit_length);
   DBG("exit iDatabase::__open_database__().");
@@ -249,7 +253,9 @@ void iDatabase::__finalize__(const char* i_statement) {
   DBG("exit iDatabase::__finalize__().");
 }
 
-void iDatabase::__finalize_and_throw__(const char* i_statement, int i_error_code) {
+void iDatabase::__finalize_and_throw__(
+    const char* i_statement,
+    int i_error_code) {
   DBG("enter iDatabase::__finalize_and_throw__().");
   ERR("Unable to prepare statement ["%s"] (%i bytes)!",
       i_statement, static_cast<int>(strlen(i_statement) * sizeof(char)));
@@ -311,7 +317,9 @@ void iDatabase::__create_table_for_last_id__(const std::string& i_table_name) {
   DBG("exit iDatabase::__create_table_for_last_id__().");
 }
 
-void iDatabase::__write_last_id__(const std::string& i_table_name, const ID_t& i_last_id) {
+void iDatabase::__write_last_id__(
+    const std::string& i_table_name,
+    const ID_t& i_last_id) {
   DBG("enter iDatabase::__write_last_id__().");
   std::string count_statement = "SELECT COUNT(*) FROM '";
   count_statement += i_table_name;
@@ -365,7 +373,9 @@ void iDatabase::__write_last_id__(const std::string& i_table_name, const ID_t& i
     if (accumulate != SQLITE_OK) {
       ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
           this->m_db_name.c_str(), insert_statement.c_str());
-      this->__finalize_and_throw__(insert_statement.c_str(), SQLITE_ACCUMULATED_PREPARE_ERROR);
+      this->__finalize_and_throw__(
+          insert_statement.c_str(),
+          SQLITE_ACCUMULATED_PREPARE_ERROR);
     } else {
       DBG2("All insertions have succeeded.");
     }

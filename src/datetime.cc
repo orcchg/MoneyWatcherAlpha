@@ -20,7 +20,8 @@ DateTime::DateTime()
   : _datetime(boost::posix_time::second_clock::local_time()) {
   std::ostringstream oss;
   oss << _datetime.date().day() << " " << _datetime.date().month()
-      << " " << _datetime.date().year() << " " << _datetime.date().day_of_week();
+      << " " << _datetime.date().year()
+      << " " << _datetime.date().day_of_week();
   if (!oss.good()) {
   throw std::runtime_error("Error during date processing!");
   }

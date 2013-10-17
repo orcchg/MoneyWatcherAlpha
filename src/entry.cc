@@ -63,7 +63,9 @@ const Status& Entry::getStatus() const {
 }
 
 // ----------------------------------------------
-Status Entry::updateBalance(const MoneyValue_t& i_value, const WrappedString& i_description) {
+Status Entry::updateBalance(
+    const MoneyValue_t& i_value,
+    const WrappedString& i_description) {
   DBG("enter Entry::updateBalance().");
   Status status(SV_UNKNOWN);
   this->m_description = i_description;
@@ -78,21 +80,31 @@ Status Entry::updateBalance(const MoneyValue_t& i_value, const WrappedString& i_
     TRC("Balance update as income.");
   }
   this->m_status = status;
-  TRC("Updated current balance of entry ["%s"] at ["%s" - "%s"] for value [%lli]. It was changed by [%lli].",
-      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), this->m_current_balance, i_value);
+  TRC("Updated current balance of entry ["%s"] at ["%s" - "%s"] "
+      "for value [%lli]. It was changed by [%lli].",
+      this->m_name.c_str(),
+      this->m_datetime.getDate().c_str(),
+      this->m_datetime.getTime().c_str(),
+      this->m_current_balance, i_value);
   DBG("exit Entry::updateBalance().");
   return (status);
 }
 
-Status Entry::rollbackBalance(const MoneyValue_t& i_value, const Record& i_record) {
+Status Entry::rollbackBalance(
+    const MoneyValue_t& i_value,
+    const Record& i_record) {
   DBG("enter Entry::rollbackBalance().");
   this->m_description = i_record.getDescription();
   this->m_last_transaction = i_record.getBalance();
   this->m_current_balance -= i_value;
   this->m_datetime = i_record.getDateTime();
   this->m_status = i_record.getStatus();
-  TRC("Rolled back current balance of entry ["%s"] at ["%s" - "%s"] for value [%lli]. It was changed by [%lli].",
-      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), this->m_current_balance, i_value);
+  TRC("Rolled back current balance of entry ["%s"] at ["%s" - "%s"] "
+      "for value [%lli]. It was changed by [%lli].",
+      this->m_name.c_str(),
+      this->m_datetime.getDate().c_str(),
+      this->m_datetime.getTime().c_str(),
+      this->m_current_balance, i_value);
   DBG("exit Entry::rollbackBalance().");
   return (this->m_status);
 }
