@@ -290,14 +290,29 @@ void TableManager::remove(const ID_t& i_entry_id) {
   INF("exit TableManager::remove().");
 }
 
-void TableManager::redo(const ID_t& entry_id) {
-  INF("enter TableManager::redo().");
-  // TODO: impl
-  INF("exit TableManager::redo().");
-}
-
-void TableManager::undo(const ID_t& entry_id) {
+void TableManager::undo(const ID_t& i_entry_id) {
   INF("enter TableManager::undo().");
+  std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
+  std::string select_statement = "SELECT * FROM '";
+  select_statement += records_table_name;
+  select_statement += "';";
+  int nByte = static_cast<int>(select_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      select_statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  int result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      select_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(select_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(select_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
   // TODO: impl
   INF("exit TableManager::undo().");
 }

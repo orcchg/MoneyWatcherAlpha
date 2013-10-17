@@ -65,11 +65,6 @@ public:
   /// @note Result of this invocation cannot be undone.
   void remove(const ID_t& entry_id);
 
-  /// @brief Restores state of existing entry being just undone.
-  /// @param entry_id - Primary key of entry of interest in SQLite database.
-  /// @note This function provides no effect in case undo action has not performed.
-  void redo(const ID_t& entry_id);
-
   /// @brief Undoes last operation with existing entry, rolling its state
   /// back to last transaction.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
