@@ -689,6 +689,10 @@ TEST (CycleTableTest, UpdateEntryWrongId) {
   remove(test_cycle_table_db_filename.c_str());
 }
 
+TEST (CycleTableTest, RollbackEntry) {
+  // TODO: implement
+}
+
 TEST (CycleTableTest, DeleteEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -1968,6 +1972,10 @@ TEST (TableManagerTest, TableManagerRemove) {
 }
 
 TEST (TableManagerTest, TableManagerRemoveWrongId) {
+  // TODO: impl
+}
+
+TEST (TableManagerTest, TableManagerUndo) {
   // TODO: impl
 }
 
