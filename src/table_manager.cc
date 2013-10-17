@@ -225,12 +225,15 @@ void TableManager::remove(const ID_t& i_entry_id) {
   // from another table, because when certain sqlite_step() is in progress,
   // other tables become READ ONLY, so 'INSERT', 'UPDATE' and 'DELETE'
   // are prohibited.
-  /*for (ID_t& record_id : record_ids) {
+#if ENABLED_ADVANCED_DEBUG
+  for (ID_t& record_id : record_ids) {
     this->m_daily_table.deleteRecord(record_id);
     DBG1("Deleted record [ID: %lli] from table ["%s"].",
          record_id, this->m_daily_table.getName().c_str());
-  }*/
+  }
+#else
   this->m_daily_table.deleteRecords(record_ids);
+#endif
   DBG2("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
 
