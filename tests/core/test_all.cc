@@ -2012,7 +2012,100 @@ TEST (TableManagerTest, TableManagerRemove) {
 }
 
 TEST (TableManagerTest, TableManagerRemoveWrongId) {
-  // TODO: impl
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_update_description = "Расход на 700 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_expense = -700;
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_2 = init_ids_2.first;
+    std::pair<ID_t, ID_t> init_ids_3 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_3 = init_ids_3.first;
+    table_manager.add(s_name, s_entry_description, s_entry_balance);
+    std::pair<ID_t, ID_t> init_ids_5 = table_manager.add(s_name, s_entry_description, s_entry_balance);
+    ID_t entry_id_5 = init_ids_5.first;
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    table_manager.update(entry_id_2, s_expense, s_update_description);  // 0 record id
+    table_manager.update(entry_id_3, s_expense, s_update_description);  // 1 record id
+    table_manager.update(entry_id_3, s_expense, s_update_description);  // 2 record id
+    table_manager.update(entry_id_5, s_expense, s_update_description);  // 3 record id
+    table_manager.update(entry_id_3, s_expense, s_update_description);  // 4 record id
+    std::string records_table_name_2 = mw::TableManager::records_table_name_prefix + std::to_string(entry_id_2);
+    std::string records_table_name_3 = mw::TableManager::records_table_name_prefix + std::to_string(entry_id_3);
+    std::string records_table_name_5 = mw::TableManager::records_table_name_prefix + std::to_string(entry_id_5);
+
+    int number_of_caught_exceptions = 0;
+    try {
+      table_manager.remove(entry_id_5 + 5);
+      int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+      EXPECT_EQ(rows, 5);
+      rows = countRows(table_manager.getCycleTableName(), accessor.getDbHandler());
+      EXPECT_EQ(rows, 5);
+      rows = countRows(table_manager.getDailyTableName(), accessor.getDbHandler());
+      EXPECT_EQ(rows, 5 + 5);  // 5 updates
+    } catch (mw::TableException& e) {
+      ++number_of_caught_exceptions;
+      EXPECT_EQ(e.error(), SQLITE_ERROR);
+    }
+    EXPECT_EQ(number_of_caught_exceptions, 1);
+
+    std::string count_statement = "SELECT COUNT(*) FROM "
+        "sqlite_master WHERE type == 'table' "
+        "AND name != '";
+    count_statement += accessor.getTableName();
+    count_statement += "' AND name != '" + table_manager.getCycleTableName();
+    count_statement += "' AND name != '" + table_manager.getDailyTableName();
+    count_statement += "' AND name != '" + mw::CycleTable::last_row_id_table_name;
+    count_statement += "' AND name != '" + mw::DailyTable::last_row_id_table_name;
+    count_statement += "' AND name != 'sqlite_sequence';";
+    int nByte = static_cast<int>(count_statement.length());
+    DB_Statement statement_handler = nullptr;
+    int result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        count_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    EXPECT_EQ(sqlite3_column_count(statement_handler), 1);
+    int type = sqlite3_column_type(statement_handler, 0);
+    EXPECT_EQ(type, SQLITE_INTEGER);
+    int value = sqlite3_column_int(statement_handler, 0);
+    // 3 Records tables
+    EXPECT_EQ(value, 5);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+
+    EXPECT_TRUE(accessor.checkFinalized());
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
 }
 
 TEST (TableManagerTest, TableManagerUndo) {
