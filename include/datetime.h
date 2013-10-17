@@ -17,7 +17,8 @@
 namespace mw {
 
 /// @class DateTime
-/// @brief Class always represents current Date and Time when it's instance is constructed.
+/// @brief Class always represents current Date and
+/// Time when it's instance is constructed.
 class DateTime {
 public:
   /// @brief Record current Date and Time into class' new instance.

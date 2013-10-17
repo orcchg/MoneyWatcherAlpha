@@ -18,9 +18,9 @@
 #define TABLE_ASSERTION_ERROR_CODE -2
 
 #define EXPR_TO_STRING(x) #x
-#define TABLE_ASSERT(expr)                                                     \
-  ((expr)                                                                      \
-   ? static_cast<void>(0)                                                      \
+#define TABLE_ASSERT(expr)                                                    \
+  ((expr)                                                                     \
+   ? static_cast<void>(0)                                                     \
    : throw TableException(EXPR_TO_STRING(expr), TABLE_ASSERTION_ERROR_CODE))
 
 

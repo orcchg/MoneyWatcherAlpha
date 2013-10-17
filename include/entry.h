@@ -60,15 +60,19 @@ public:
   /// -------------------------------------------------------------------------
   /// @defgroup SET Setters for class members.
   /// @{
-  /// @brief Updates an actual money balance and description of the current entry.
+  /// @brief Updates an actual money balance and
+  /// description of the current entry.
   /// @param value - Amount to which the actual money balance should
   /// be updated - it could be both positive (income) or negative (expense)
   /// value.
   /// @param description - Description of provided transaction.
   /// @return Status of last transaction.
-  Status updateBalance(const MoneyValue_t& value, const WrappedString& description);
+  Status updateBalance(
+      const MoneyValue_t& value,
+      const WrappedString& description);
 
-  /// @brief Updates an actual money balance and description of the current entry
+  /// @brief Updates an actual money balance and
+  /// description of the current entry
   /// by values of giver record, i.e. rolls entry back from its current state
   /// to those assigned in record.
   /// @param value - Amount to which the actual money balance should

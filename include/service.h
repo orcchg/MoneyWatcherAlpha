@@ -18,7 +18,9 @@
 std::wstring widenString(const std::string& src);
 
 template <typename T>
-std::string vectorToString(const std::vector<T>& array, const std::string& delim = ", ") {
+std::string vectorToString(
+    const std::vector<T>& array,
+    const std::string& delim = ", ") {
   std::string result = "";
   if (array.empty()) {
     return (result);
