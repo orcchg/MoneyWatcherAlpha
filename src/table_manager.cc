@@ -191,7 +191,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
-  select_statement += "';";
+  select_statement += "' ORDER BY RecordID ASC;";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.",
       select_statement.c_str(), nByte);
@@ -295,7 +295,7 @@ void TableManager::undo(const ID_t& i_entry_id) {
   std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
-  select_statement += "';";
+  select_statement += "' ORDER BY RecordID DESC LIMIT 1;";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.",
       select_statement.c_str(), nByte);
