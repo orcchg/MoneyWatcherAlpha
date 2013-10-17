@@ -41,7 +41,7 @@ TableManager::~TableManager() {
   INF("exit TableManager destructor.");
 }
 
-std::pair<ID_t, ID_t> TableManager::add(
+std::pair<Entry, Record> TableManager::add(
     const WrappedString& i_name,
     const WrappedString& i_description,
     const MoneyValue_t& i_current_balance) {
@@ -143,10 +143,10 @@ std::pair<ID_t, ID_t> TableManager::add(
 #endif
 
   INF("exit TableManager::add().");
-  return (std::pair<ID_t, ID_t>(entry_id, record_id));
+  return (std::pair<Entry, Record>(entry, record));
 }
 
-ID_t TableManager::update(
+Record TableManager::update(
     const ID_t& i_entry_id,
     const MoneyValue_t& i_value,
     const WrappedString& i_description){
@@ -216,7 +216,7 @@ ID_t TableManager::update(
   }
   this->__finalize__(insert_statement.c_str());
   INF("exit TableManager::update().");
-  return (record_id);
+  return (record);
 }
 
 void TableManager::remove(const ID_t& i_entry_id) {
@@ -326,7 +326,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   INF("exit TableManager::remove().");
 }
 
-void TableManager::undo(const ID_t& i_entry_id) {
+Entry TableManager::undo(const ID_t& i_entry_id) {
   INF("enter TableManager::undo().");
   std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
@@ -349,29 +349,59 @@ void TableManager::undo(const ID_t& i_entry_id) {
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  ID_t last_record_id = sqlite3_column_int64(this->m_db_statement, 0);
+  DBG("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
+      last_record_id, records_table_name.c_str());
   result = sqlite3_step(this->m_db_statement);
   if (result == SQLITE_DONE) {
     DBG2("Table ["%s"] is empty, nothing to be done with entry [ID: %lli].",
          records_table_name.c_str(), i_entry_id);
     INF("exit TableManager::undo().");
-    return;
+    Entry entry = this->m_cycle_table.readEntry(i_entry_id);
+    return (entry);
   }
-  ID_t last_record_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
-      last_record_id, records_table_name.c_str());
-  sqlite3_step(this->m_db_statement);
   ID_t undo_record_id = sqlite3_column_int64(this->m_db_statement, 0);
   DBG("Got undo record [ID: %lli] from table ["%s"]. Entry [ID: %lli] will be rolled back...",
        undo_record_id, records_table_name.c_str(), i_entry_id);
   this->__finalize__(select_statement.c_str());
+
+  Record last_record = this->m_daily_table.readRecord(last_record_id);
   this->m_daily_table.deleteRecord(last_record_id);
   DBG1("Deleted last record [ID: %lli] from table ["%s"].",
        last_record_id, this->m_daily_table.getName().c_str());
+
+  std::string delete_statement = "DELETE FROM '";
+  delete_statement += records_table_name;
+  delete_statement += "' WHERE RecordID == '";
+  delete_statement += std::to_string(last_record_id);
+  delete_statement += "';";
+  nByte = static_cast<int>(delete_statement.length());
+  TRC("Provided string SQL statement: ["%s"] of length %i.",
+      delete_statement.c_str(), nByte);
+  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
+               this->m_db_handler);
+  result = sqlite3_prepare_v2(
+      this->m_db_handler,
+      delete_statement.c_str(),
+      nByte,
+      &(this->m_db_statement),
+      nullptr);
+  this->__set_last_statement__(delete_statement.c_str());
+  if (result != SQLITE_OK) {
+    this->__finalize_and_throw__(delete_statement.c_str(), result);
+  }
+  TRC("SQL statement has been compiled into byte-code and placed into %p.",
+      this->m_db_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(delete_statement.c_str());
+
   Record undo_record = this->m_daily_table.readRecord(undo_record_id);
-  this->m_cycle_table.rollbackEntry(i_entry_id, undo_record);
+  Entry entry = this->m_cycle_table.rollbackEntry(i_entry_id, last_record.getBalance(), undo_record);
   DBG2("Entry [ID: %lli] has been rolled back to state it had on ["%s"] at ["%s"].",
-      i_entry_id, undo_record.getDateTime().getDate().c_str(), undo_record.getDateTime().getTime().c_str());
+       i_entry_id, undo_record.getDateTime().getDate().c_str(), undo_record.getDateTime().getTime().c_str());
   INF("exit TableManager::undo().");
+  return (entry);
 }
 
 const std::string& TableManager::getCycleTableName() const {

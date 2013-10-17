@@ -39,11 +39,11 @@ public:
   /// @param name - Name of entry.
   /// @param description - Text description of last transaction.
   /// @param current_balace - Value of current money balance of entry.
-  /// @return Pair of newly created entry's and record's IDs.
+  /// @return Pair of newly created entry and corresponding record.
   /// @details Entry will also be stored into SQLite database. This function
   /// also provides record, storing entry's initial values, and it will also be
   /// stored into SQLite database.
-  std::pair<ID_t, ID_t> add(
+  std::pair<Entry, Record> add(
       const WrappedString& name,
       const WrappedString& description,
       const MoneyValue_t& current_balance);
@@ -55,9 +55,9 @@ public:
   /// be updated - it could be both positive (income) or negative (expense)
   /// value.
   /// @param description - Description of provided transaction.
-  /// @return ID of corresponding record.
+  /// @return Correspondingly added record.
   /// @details Entry will also be updated in SQLite database.
-  ID_t update(
+  Record update(
 	    const ID_t& entry_id,
 	    const MoneyValue_t& value,
 	    const WrappedString& description);
@@ -71,9 +71,10 @@ public:
   /// @brief Undoes last operation with existing entry, rolling its state
   /// back to last transaction.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @return Rolled back entry.
   /// @note If there is no last transaction provided with entry, the entry
   /// becomes empty. Also deletes associated record from daily_table.
-  void undo(const ID_t& entry_id);
+  Entry undo(const ID_t& entry_id);
   /// @}
   /// -------------------------------------------------------------------------
 

@@ -69,11 +69,17 @@ public:
   /// i.e. rolls entry back from its current state to those assigned
   /// in record.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @param value - Amount to which the actual money balance should
+  /// be rolled back - it could be both positive (expense) or negative (income)
+  /// value. Note the reversed logic compared to updateEntry().
   /// @param record - Record, whose balance, description and date & time
   /// values will be assigned to entry's data members.
   /// @return Rolled back entry.
   /// @details Entry will also be updated in SQLite database.
-  Entry rollbackEntry(const ID_t& entry_id, const Record& record);
+  Entry rollbackEntry(
+      const ID_t& entry_id,
+      const MoneyValue_t& value,
+      const Record& record);
 
   /// @brief Removes entry from SQLite database.
   /// @param entry_id - Primary key of entry of interest in SQLite database.

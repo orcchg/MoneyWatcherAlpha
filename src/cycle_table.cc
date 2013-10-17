@@ -290,7 +290,10 @@ Entry CycleTable::updateEntry(
   return (entry);
 }
 
-Entry CycleTable::rollbackEntry(const ID_t& i_entry_id, const Record& i_record) {
+Entry CycleTable::rollbackEntry(
+    const ID_t& i_entry_id,
+    const MoneyValue_t& i_value,
+    const Record& i_record) {
   INF("enter CycleTable::rollbackEntry().");
 
 #if ENABLED_ADVANCED_DEBUG
@@ -299,7 +302,7 @@ Entry CycleTable::rollbackEntry(const ID_t& i_entry_id, const Record& i_record) 
 
   Entry entry = this->readEntry(i_entry_id);
   DBG("Got entry from SQLite database.");
-  entry.rollbackBalance(i_record);
+  entry.rollbackBalance(i_value, i_record);
   DBG1("Rolled back entry [ID: %lli].", i_entry_id);
   WrappedString update_statement = "UPDATE '";
   update_statement += WrappedString(this->m_table_name);

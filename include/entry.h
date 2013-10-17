@@ -71,9 +71,10 @@ public:
   /// @brief Updates an actual money balance and description of the current entry
   /// by values of giver record, i.e. rolls entry back from its current state
   /// to those assigned in record.
+  /// @param value - Amount to which the actual money balance should
   /// @param record - Record, whose balance, description and date & time
   /// @return Status of input record.
-  Status rollbackBalance(const Record& record);
+  Status rollbackBalance(const MoneyValue_t& i_value, const Record& record);
   /// @}
   /// -------------------------------------------------------------------------
 

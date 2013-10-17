@@ -96,8 +96,8 @@ public:
     mw::WrappedString s_description = "Тестовая запись в таблице";
 
     for (int index = 0; index < TableManagerTimeMeasureFixture::total_rows; ++index) {
-      std::pair<ID_t, ID_t> init_ids = this->m_table_manager.add(s_name, s_description, s_balance);
-      ID_t id = init_ids.first;
+      std::pair<mw::Entry, mw::Record> init = this->m_table_manager.add(s_name, s_description, s_balance);
+      ID_t id = init.first.getID();
       this->entry_ids.push_back(id);
     }
   }

@@ -78,22 +78,21 @@ Status Entry::updateBalance(const MoneyValue_t& i_value, const WrappedString& i_
     TRC("Balance update as income.");
   }
   this->m_status = status;
-  TRC("Updated current balance of entry ["%s"] at ["%s" - "%s"] for value [%lli].",
-      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), i_value);
+  TRC("Updated current balance of entry ["%s"] at ["%s" - "%s"] for value [%lli]. It was changed by [%lli].",
+      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), this->m_current_balance, i_value);
   DBG("exit Entry::updateBalance().");
   return (status);
 }
 
-Status Entry::rollbackBalance(const Record& i_record) {
+Status Entry::rollbackBalance(const MoneyValue_t& i_value, const Record& i_record) {
   DBG("enter Entry::rollbackBalance().");
   this->m_description = i_record.getDescription();
-  MoneyValue_t balance = i_record.getBalance();
-  this->m_last_transaction = balance;
-  this->m_current_balance -= balance;
+  this->m_last_transaction = i_record.getBalance();
+  this->m_current_balance -= i_value;
   this->m_datetime = i_record.getDateTime();
   this->m_status = i_record.getStatus();
-  TRC("Rolled back current balance of entry ["%s"] at ["%s" - "%s"] for value [%lli].",
-      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), balance);
+  TRC("Rolled back current balance of entry ["%s"] at ["%s" - "%s"] for value [%lli]. It was changed by [%lli].",
+      this->m_name.c_str(), this->m_datetime.getDate().c_str(), this->m_datetime.getTime().c_str(), this->m_current_balance, i_value);
   DBG("exit Entry::rollbackBalance().");
   return (this->m_status);
 }
