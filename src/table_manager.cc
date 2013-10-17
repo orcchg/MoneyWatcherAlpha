@@ -295,7 +295,7 @@ void TableManager::undo(const ID_t& i_entry_id) {
   std::string records_table_name = TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
-  select_statement += "' ORDER BY RecordID DESC LIMIT 1;";
+  select_statement += "' ORDER BY RecordID DESC LIMIT 2;";
   int nByte = static_cast<int>(select_statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.",
       select_statement.c_str(), nByte);
@@ -313,7 +313,22 @@ void TableManager::undo(const ID_t& i_entry_id) {
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
-  // TODO: impl
+  sqlite3_step(this->m_db_statement);
+  ID_t last_record_id = sqlite3_column_int64(this->m_db_statement, 0);
+  DBG("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
+      last_record_id, records_table_name.c_str());
+  sqlite3_step(this->m_db_statement);
+  ID_t undo_record_id = sqlite3_column_int64(this->m_db_statement, 0);
+  DBG("Got undo record [ID: %lli] from table ["%s"]. Entry [ID: %lli] will be rolled back...",
+       undo_record_id, records_table_name.c_str(), i_entry_id);
+  this->__finalize__(select_statement.c_str());
+  this->m_daily_table.deleteRecord(last_record_id);
+  DBG1("Deleted last record [ID: %lli] from table ["%s"].",
+       last_record_id, this->m_daily_table.getName().c_str());
+  Record undo_record = this->m_daily_table.readRecord(undo_record_id);
+  this->m_cycle_table.rollbackEntry(i_entry_id, undo_record);
+  DBG2("Entry [ID: %lli] has been rolled back to state it had on ["%s"] at ["%s"].",
+      i_entry_id, undo_record.getDateTime().getDate().c_str(), undo_record.getDateTime().getTime().c_str());
   INF("exit TableManager::undo().");
 }
 

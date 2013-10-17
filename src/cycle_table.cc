@@ -290,6 +290,10 @@ Entry CycleTable::updateEntry(
   return (entry);
 }
 
+Entry CycleTable::rollbackEntry(const ID_t& i_entry_id, const Record& i_record) {
+  // TODO: implement roll back entry
+}
+
 void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   INF("enter CycleTable::deleteEntry().");
 

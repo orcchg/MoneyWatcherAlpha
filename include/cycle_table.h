@@ -52,7 +52,7 @@ public:
   /// @return Newly read entry.
   Entry readEntry(const ID_t& entry_id);
 
-  /// @brief Updates current balance of existing entry.
+  /// @brief Updates current balance and description of existing entry.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
   /// @param value - Amount to which the actual money balance should
   /// be updated - it could be both positive (income) or negative (expense)
@@ -64,6 +64,16 @@ public:
       const ID_t& entry_id,
       const MoneyValue_t& value,
       const WrappedString& description);
+
+  /// @brief Updates existing entry by values of given record,
+  /// i.e. rolls entry back from its current state to those assigned
+  /// in record.
+  /// @param entry_id - Primary key of entry of interest in SQLite database.
+  /// @param record - Record, whose balance, description and date & time
+  /// values will be assigned to entry's data members.
+  /// @return Rolled back entry.
+  /// @details Entry will also be updated in SQLite database.
+  Entry rollbackEntry(const ID_t& entry_id, const Record& record);
 
   /// @brief Removes entry from SQLite database.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
