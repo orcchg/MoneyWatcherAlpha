@@ -57,23 +57,7 @@ std::pair<Entry, Record> TableManager::add(
   std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2);";
-  int nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      insert_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      insert_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(insert_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(insert_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(insert_statement);
 
   bool accumulate = true;
   accumulate = accumulate &&
@@ -120,23 +104,7 @@ std::pair<Entry, Record> TableManager::add(
   insert_statement = "INSERT INTO '";
   insert_statement += records_table_name;
   insert_statement += "' VALUES(?1);";
-  nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      insert_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      insert_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(insert_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(insert_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(insert_statement);
   accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
   sqlite3_step(this->m_db_statement);
   if (accumulate != SQLITE_OK) {
@@ -182,23 +150,7 @@ Record TableManager::update(
   select_statement += "' WHERE EntryID == '";
   select_statement += std::to_string(i_entry_id);
   select_statement += "';";
-  int nByte = static_cast<int>(select_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      select_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      select_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(select_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(select_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(select_statement);
   sqlite3_step(this->m_db_statement);
   std::string records_table_name(reinterpret_cast<const char*>(
       sqlite3_column_text(this->m_db_statement, 1)));
@@ -210,23 +162,7 @@ Record TableManager::update(
   std::string insert_statement = "INSERT INTO '";
   insert_statement += records_table_name;
   insert_statement += "' VALUES(?1);";
-  nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      insert_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      insert_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(insert_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(insert_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(insert_statement);
   int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
   sqlite3_step(this->m_db_statement);
   if (accumulate != SQLITE_OK) {
@@ -253,23 +189,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
   select_statement += "' ORDER BY RecordID ASC;";
-  int nByte = static_cast<int>(select_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      select_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      select_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(select_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(select_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  int result = this->__prepare_statement__(select_statement);
   DBG2("Loop deletion of records by its ID...");
   std::vector<ID_t> record_ids;
   record_ids.reserve(10000);
@@ -302,21 +222,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   std::string drop_statement = "DROP TABLE IF EXISTS '";
   drop_statement += records_table_name;
   drop_statement += "';";
-  nByte = static_cast<int>(drop_statement.length());
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      drop_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(drop_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(drop_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(drop_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(drop_statement.c_str());
   DBG("Table with records ["%s"] has been dropped.",
@@ -327,23 +233,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   delete_statement += "' WHERE EntryID == '";
   delete_statement += std::to_string(i_entry_id);
   delete_statement += "';";
-  nByte = static_cast<int>(delete_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      delete_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      delete_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(delete_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(delete_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(delete_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   DBG1("Removed row of entry [ID: %lli] from table ["%s"].",
@@ -358,23 +248,7 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
   select_statement += "' ORDER BY RecordID DESC LIMIT 2;";
-  int nByte = static_cast<int>(select_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      select_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      select_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(select_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(select_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  int result = this->__prepare_statement__(select_statement);
   sqlite3_step(this->m_db_statement);
   ID_t last_record_id = sqlite3_column_int64(this->m_db_statement, 0);
   DBG("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
@@ -404,23 +278,7 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
   delete_statement += "' WHERE RecordID == '";
   delete_statement += std::to_string(last_record_id);
   delete_statement += "';";
-  nByte = static_cast<int>(delete_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      delete_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      delete_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(delete_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(delete_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(delete_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
 
@@ -469,23 +327,7 @@ void TableManager::__create_table__() {
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += this->m_table_name;
   statement += "('EntryID' INTEGER PRIMARY KEY, 'RecordsTableName' TEXT);";
-  int nByte = static_cast<int>(statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
   DBG1("Table ["%s"] has been successfully created.",
        this->m_table_name.c_str());
@@ -499,23 +341,7 @@ void TableManager::__create_table_entry_records__(
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += i_table_name;
   statement += "('RecordID' INTEGER PRIMARY KEY);";
-  int nByte = static_cast<int>(statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
   DBG1("Table ["%s"] has been successfully created.",
        this->m_table_name.c_str());
