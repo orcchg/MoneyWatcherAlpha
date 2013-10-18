@@ -74,6 +74,7 @@ protected:
 private:
   const char* m_last_statement;
 
+  int __count_rows__(const std::string& i_table_name);
   bool __check_rows_init__() const;
 
   iDatabase(const iDatabase& obj) = delete;

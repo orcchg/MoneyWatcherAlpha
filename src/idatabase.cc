@@ -161,27 +161,7 @@ int iDatabase::__count__(const std::string& i_table_name) {
   DBG("enter iDatabase::__count__().");
   if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
     TRC("Rows count initialization has started.");
-    std::string count_statement = "SELECT COUNT(*) FROM '";
-    count_statement += i_table_name;
-    count_statement += "';";
-    int nByte = static_cast<int>(count_statement.length());
-    TRC("Provided string SQL statement: ["%s"] of length %i.",
-        count_statement.c_str(), nByte);
-    TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-                 this->m_db_handler);
-    int result = sqlite3_prepare_v2(
-        this->m_db_handler,
-        count_statement.c_str(),
-        nByte,
-        &(this->m_db_statement),
-        nullptr);
-    this->__set_last_statement__(count_statement.c_str());
-    if (result != SQLITE_OK) {
-      this->__finalize_and_throw__(count_statement.c_str(), result);
-    }
-    sqlite3_step(this->m_db_statement);
-    this->m_rows = sqlite3_column_int(this->m_db_statement, 0);
-    this->__finalize__(count_statement.c_str());
+    this->m_rows = this->__count_rows__(i_table_name);
   }
   TRC("Number of rows in table ["%s"]: %i.",
       i_table_name.c_str(), this->m_rows);
@@ -321,29 +301,7 @@ void iDatabase::__write_last_id__(
     const std::string& i_table_name,
     const ID_t& i_last_id) {
   DBG("enter iDatabase::__write_last_id__().");
-  std::string count_statement = "SELECT COUNT(*) FROM '";
-  count_statement += i_table_name;
-  count_statement += "';";
-  int nByte = static_cast<int>(count_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      count_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      count_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(count_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(count_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
-  sqlite3_step(this->m_db_statement);
-  int rows = sqlite3_column_int(this->m_db_statement, 0);
-  this->__finalize__(count_statement.c_str());
+  int rows = this->__count_rows__(i_table_name);
 
   if (rows == 0) {
     DBG1("Table ["%s"] is empty. Inserting first value...",
@@ -351,12 +309,12 @@ void iDatabase::__write_last_id__(
     std::string insert_statement = "INSERT INTO '";
     insert_statement += i_table_name;
     insert_statement += "' VALUES(?1);";
-    nByte = static_cast<int>(insert_statement.length());
+    int nByte = static_cast<int>(insert_statement.length());
     TRC("Provided string SQL statement: ["%s"] of length %i.",
         insert_statement.c_str(), nByte);
     TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                  this->m_db_handler);
-    result = sqlite3_prepare_v2(
+    int result = sqlite3_prepare_v2(
         this->m_db_handler,
         insert_statement.c_str(),
         nByte,
@@ -389,12 +347,12 @@ void iDatabase::__write_last_id__(
     update_statement += "' SET LastRowID = '";
     update_statement += std::to_string(i_last_id);
     update_statement += "';";
-    nByte = static_cast<int>(update_statement.length());
+    int nByte = static_cast<int>(update_statement.length());
     TRC("Provided string SQL statement: ["%s"] of length %i.",
         update_statement.c_str(), nByte);
     TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                  this->m_db_handler);
-    result = sqlite3_prepare_v2(
+    int result = sqlite3_prepare_v2(
         this->m_db_handler,
         update_statement.c_str(),
         nByte,
@@ -483,8 +441,20 @@ void iDatabase::__where_check__(const ID_t& i_id) {
 
 void iDatabase::__count_check__() {
   MSG("Entrance into advanced debug source branch.");
+  int rows = this->__count_rows__(this->m_table_name);
+  INF1("Count of rows in table ["%s"] is equal to %lli.",
+       this->m_table_name.c_str(), rows);
+  MSG("Leave from advanced debug source branch.");
+}
+#endif
+
+
+/* Private member-functions */
+// ----------------------------------------------------------------------------
+int iDatabase::__count_rows__(const std::string& i_table_name) {
+  DBG2("enter iDatabase::__count_rows__().");
   std::string count_statement = "SELECT COUNT(*) FROM \'";
-  count_statement += this->m_table_name;
+  count_statement += i_table_name;
   count_statement += "\';";
   int n_bytes = static_cast<int>(count_statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.",
@@ -504,17 +474,12 @@ void iDatabase::__count_check__() {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   sqlite3_step(this->m_db_statement);
-  sqlite3_int64 answer = sqlite3_column_int64(this->m_db_statement, 0);
-  INF1("Count of rows in table ["%s"] is equal to %lli.",
-       this->m_table_name.c_str(), answer);
+  int answer = sqlite3_column_int(this->m_db_statement, 0);
   this->__finalize__(count_statement.c_str());
-  MSG("Leave from advanced debug source branch.");
+  return (answer);
+  DBG2("exit iDatabase::__count_rows__().");
 }
-#endif
 
-
-/* Private member-functions */
-// ----------------------------------------------------------------------------
 bool iDatabase::__check_rows_init__() const {
   DBG2("enter iDatabase::__check_rows_init__().");
   if (this->m_rows <= ROWS_IN_CASE_OF_NOT_EXISTING_TABLE) {
