@@ -13,6 +13,7 @@
 #include <string>
 #include "common.h"
 #include "types.h"
+#include "unistring.h"
 
 #define SQLITE_ACCUMULATED_PREPARE_ERROR -1
 #define TABLE_ASSERTION_ERROR_CODE -2
@@ -49,6 +50,8 @@ protected:
 
   void __open_database__();
   void __close_database__();
+  void __prepare_statement__(const std::string& statement);
+  void __prepare_statement__(const WrappedString& statement);
   bool __does_table_exist__();
   int __count__(const std::string& i_table_name);
   bool __empty__() const;  // soft invocation
@@ -68,7 +71,7 @@ protected:
 
 #if ENABLED_ADVANCED_DEBUG
   void __where_check__(const ID_t& id);
-  void __count_check__();
+  int __count_check__();
 #endif
 
 private:
@@ -82,6 +85,8 @@ private:
   iDatabase& operator = (iDatabase&& rval_rhs) = delete;
 };
 
+
+// ----------------------------------------------------------------------------
 /// @class TableException
 /// @brief Represents a common exception raised by Table class methods.
 class TableException : public std::exception {
