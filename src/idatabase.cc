@@ -122,7 +122,7 @@ void iDatabase::__close_database__() {
   DBG("exit iDatabase::__close_database__().");
 }
 
-void iDatabase::__prepare_statement__(const std::string& statement) {
+int iDatabase::__prepare_statement__(const std::string& statement) {
   DBG("enter iDatabase::__prepare_statement__().");
   int nByte = static_cast<int>(statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.",
@@ -142,9 +142,10 @@ void iDatabase::__prepare_statement__(const std::string& statement) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   DBG("exit iDatabase::__prepare_statement__().");
+  return (result);
 }
 
-void iDatabase::__prepare_statement__(const WrappedString& statement) {
+int iDatabase::__prepare_statement__(const WrappedString& statement) {
   DBG("enter iDatabase::__prepare_statement__().");
   int nByte = statement.n_bytes();
   TRC("Provided string SQL statement: ["%s"] of length %lli and bytes %i.",
@@ -166,6 +167,7 @@ void iDatabase::__prepare_statement__(const WrappedString& statement) {
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
   DBG("exit iDatabase::__prepare_statement__().");
+  return (result);
 }
 
 bool iDatabase::__does_table_exist__() {

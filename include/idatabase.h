@@ -50,8 +50,8 @@ protected:
 
   void __open_database__();
   void __close_database__();
-  void __prepare_statement__(const std::string& statement);
-  void __prepare_statement__(const WrappedString& statement);
+  int __prepare_statement__(const std::string& statement);
+  int __prepare_statement__(const WrappedString& statement);
   bool __does_table_exist__();
   int __count__(const std::string& i_table_name);
   bool __empty__() const;  // soft invocation
