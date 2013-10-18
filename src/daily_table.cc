@@ -47,23 +47,7 @@ Record DailyTable::addRecord(
   std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
-  int nByte = static_cast<int>(insert_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      insert_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      insert_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(insert_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(insert_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(insert_statement);
 
   bool accumulate = true;
   ID_t record_id = this->m_next_id++;
@@ -174,23 +158,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   select_statement += "' WHERE ID == '";
   select_statement += std::to_string(i_record_id);
   select_statement += "';";
-  int nByte = static_cast<int>(select_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      select_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      select_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(select_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(select_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(select_statement);
   sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
   DBG("Read id [%lli] from  table ["%s"] of database ["%s"], "
@@ -211,7 +179,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
   Status status(raw_status);
   DBG1("Loaded column data: Date ["%s"]; Time ["%s"]; "
-      "Balance [%lli]; Description ["%s"]; Status [%lli].",
+       "Balance [%lli]; Description ["%s"]; Status [%lli].",
        datetime.getDate().c_str(),
        datetime.getTime().c_str(),
        balance,
@@ -241,23 +209,7 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
   delete_statement += "' WHERE ID == '";
   delete_statement += std::to_string(i_record_id);
   delete_statement += "';";
-  int nByte = static_cast<int>(delete_statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      delete_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      delete_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(delete_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(delete_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(delete_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   this->__decrement_rows__();
@@ -296,25 +248,7 @@ void DailyTable::deleteRecords(std::vector<ID_t>& i_record_ids) {
   delete_statement += "' WHERE ID IN(";
   delete_statement += vectorToString(i_record_ids, ", ");
   delete_statement += ");";
-  int nByte = static_cast<int>(delete_statement.length());
-  TABLE_ASSERT("SQL-statement number of bytes exceeds the limitations!" &&
-               nByte < iDatabase::sql_statement_limit_length);
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      delete_statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      delete_statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(delete_statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(delete_statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(delete_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   this->__decrease_rows__(static_cast<int>(i_record_ids.size()));
@@ -393,23 +327,7 @@ void DailyTable::__create_table__() {
       "'Balance' INTEGER, "
       "'Description' TEXT, "
       "'Status' INTEGER);";
-  int nByte = static_cast<int>(statement.length());
-  TRC("Provided string SQL statement: ["%s"] of length %i.",
-      statement.c_str(), nByte);
-  TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
-               this->m_db_handler);
-  int result = sqlite3_prepare_v2(
-      this->m_db_handler,
-      statement.c_str(),
-      nByte,
-      &(this->m_db_statement),
-      nullptr);
-  this->__set_last_statement__(statement.c_str());
-  if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str(), result);
-  }
-  TRC("SQL statement has been compiled into byte-code and placed into %p.",
-      this->m_db_statement);
+  this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
   DBG1("Table ["%s"] has been successfully created.",
        this->m_table_name.c_str());
