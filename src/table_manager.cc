@@ -52,8 +52,8 @@ std::pair<Entry, Record> TableManager::add(
           i_description,
           i_current_balance);
   ID_t entry_id = entry.getID();
-  DBG("Added entry into table ["%s"], got ID: [%lli].",
-      this->getCycleTableName().c_str(), entry_id);
+  DBG3("Added entry into table ["%s"], got ID: [%lli].",
+       this->getCycleTableName().c_str(), entry_id);
   std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
   insert_statement += "' VALUES(?1, ?2);";
@@ -62,7 +62,7 @@ std::pair<Entry, Record> TableManager::add(
   bool accumulate = true;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, entry_id) == SQLITE_OK);
-  DBG1("ID [%lli] has been stored in SQLite database ["%s"].",
+  DBG3("ID [%lli] has been stored in SQLite database ["%s"].",
        entry_id, this->m_db_name.c_str());
 
   std::string records_table_name =
@@ -74,8 +74,8 @@ std::pair<Entry, Record> TableManager::add(
           records_table_name.c_str(),
           records_table_name.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG("Records table name ["%s"] has been stored in SQLite database ["%s"].",
-      records_table_name.c_str(), this->m_db_name.c_str());
+  DBG3("Records table name ["%s"] has been stored in SQLite database ["%s"].",
+       records_table_name.c_str(), this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
@@ -85,11 +85,11 @@ std::pair<Entry, Record> TableManager::add(
         insert_statement.c_str(),
         SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG2("All insertions have succeeded.");
+    DBG3("All insertions have succeeded.");
   }
   this->__finalize__(insert_statement.c_str());
   this->__create_table_entry_records__(records_table_name);
-  DBG1("Created table with name ["%s"] for records of entry [ID: %lli].",
+  DBG3("Created table with name ["%s"] for records of entry [ID: %lli].",
        records_table_name.c_str(), entry_id);
 
   // add record, storing entry's initial state values
@@ -99,7 +99,7 @@ std::pair<Entry, Record> TableManager::add(
           i_description,
           entry.getStatus());
   ID_t record_id = record.getID();
-  DBG("Added record into table ["%s"], got ID: [%lli].",
+  DBG3("Added record into table ["%s"], got ID: [%lli].",
        this->getDailyTableName().c_str(), record_id);
   insert_statement = "INSERT INTO '";
   insert_statement += records_table_name;
@@ -114,7 +114,7 @@ std::pair<Entry, Record> TableManager::add(
         insert_statement.c_str(),
         SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG2("All insertions have succeeded.");
+    DBG3("All insertions have succeeded.");
   }
   this->__finalize__(insert_statement.c_str());
 
@@ -143,8 +143,8 @@ Record TableManager::update(
           entry.getStatus());
   ID_t record_id = record.getID();
 
-  DBG("Reading table name of entry records from SQLite database ["%s"]...",
-      this->m_db_name.c_str());
+  DBG3("Reading table name of entry records from SQLite database ["%s"]...",
+       this->m_db_name.c_str());
   std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
   select_statement += "' WHERE EntryID == '";
@@ -154,7 +154,7 @@ Record TableManager::update(
   sqlite3_step(this->m_db_statement);
   std::string records_table_name(reinterpret_cast<const char*>(
       sqlite3_column_text(this->m_db_statement, 1)));
-  DBG1("Got record [ID: %lli], inserting into table ["%s"] "
+  DBG3("Got record [ID: %lli], inserting into table ["%s"] "
        "of entry [ID: %lli].",
        record_id, records_table_name.c_str(), entry.getID());
   this->__finalize__(select_statement.c_str());
@@ -172,7 +172,7 @@ Record TableManager::update(
         insert_statement.c_str(),
         SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG2("All insertions have succeeded.");
+    DBG3("All insertions have succeeded.");
   }
   this->__finalize__(insert_statement.c_str());
   INF("exit TableManager::update().");
@@ -182,23 +182,23 @@ Record TableManager::update(
 void TableManager::remove(const ID_t& i_entry_id) {
   INF("enter TableManager::remove().");
   this->m_cycle_table.deleteEntry(i_entry_id);
-  DBG("Deleted entry [ID: %lli] from Cycle_Table at %p.",
-      i_entry_id, &(this->m_cycle_table));
+  DBG3("Deleted entry [ID: %lli] from Cycle_Table at %p.",
+       i_entry_id, &(this->m_cycle_table));
   std::string records_table_name =
       TableManager::records_table_name_prefix + std::to_string(i_entry_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += records_table_name;
   select_statement += "' ORDER BY RecordID ASC;";
   int result = this->__prepare_statement__(select_statement);
-  DBG2("Loop deletion of records by its ID...");
+  DBG3("Loop deletion of records by its ID...");
   std::vector<ID_t> record_ids;
   record_ids.reserve(10000);
   result = sqlite3_step(this->m_db_statement);
   while (result == SQLITE_ROW) {
     ID_t record_id = sqlite3_column_int64(this->m_db_statement, 0);
     record_ids.push_back(record_id);
-    DBG("Got record [ID: %lli] from table ["%s"].",
-        record_id, records_table_name.c_str());
+    DBG3("Got record [ID: %lli] from table ["%s"].",
+         record_id, records_table_name.c_str());
     result = sqlite3_step(this->m_db_statement);
   }
   this->__finalize__(select_statement.c_str());
@@ -209,14 +209,14 @@ void TableManager::remove(const ID_t& i_entry_id) {
 #if ENABLED_ADVANCED_DEBUG
   for (ID_t& record_id : record_ids) {
     this->m_daily_table.deleteRecord(record_id);
-    DBG1("Deleted record [ID: %lli] from table ["%s"].",
+    DBG3("Deleted record [ID: %lli] from table ["%s"].",
          record_id, this->m_daily_table.getName().c_str());
   }
 #else
   // this approach is a bit faster, but less informative, then the above
   this->m_daily_table.deleteRecords(record_ids);
 #endif
-  DBG2("Deleted all records corresponding to entry [ID: %lli].",
+  DBG3("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
 
   std::string drop_statement = "DROP TABLE IF EXISTS '";
@@ -225,8 +225,8 @@ void TableManager::remove(const ID_t& i_entry_id) {
   this->__prepare_statement__(drop_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(drop_statement.c_str());
-  DBG("Table with records ["%s"] has been dropped.",
-      records_table_name.c_str());
+  DBG3("Table with records ["%s"] has been dropped.",
+       records_table_name.c_str());
 
   std::string delete_statement = "DELETE FROM '";
   delete_statement += this->m_table_name;
@@ -236,7 +236,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   this->__prepare_statement__(delete_statement);
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
-  DBG1("Removed row of entry [ID: %lli] from table ["%s"].",
+  DBG3("Removed row of entry [ID: %lli] from table ["%s"].",
        i_entry_id, this->m_table_name.c_str());
   INF("exit TableManager::remove().");
 }
@@ -251,11 +251,11 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
   int result = this->__prepare_statement__(select_statement);
   sqlite3_step(this->m_db_statement);
   ID_t last_record_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
-      last_record_id, records_table_name.c_str());
+  DBG3("Got last record [ID: %lli] from table ["%s"]. To be deleted...",
+       last_record_id, records_table_name.c_str());
   result = sqlite3_step(this->m_db_statement);
   if (result == SQLITE_DONE) {
-    DBG2("Table ["%s"] is empty, nothing to be done with entry [ID: %lli].",
+    DBG3("Table ["%s"] is empty, nothing to be done with entry [ID: %lli].",
          records_table_name.c_str(), i_entry_id);
     this->__finalize__(select_statement.c_str());
     Entry entry = this->m_cycle_table.readEntry(i_entry_id);
@@ -263,14 +263,14 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
     return (entry);
   }
   ID_t undo_record_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Got undo record [ID: %lli] from table ["%s"]. "
-      "Entry [ID: %lli] will be rolled back...",
+  DBG3("Got undo record [ID: %lli] from table ["%s"]. "
+       "Entry [ID: %lli] will be rolled back...",
        undo_record_id, records_table_name.c_str(), i_entry_id);
   this->__finalize__(select_statement.c_str());
 
   Record last_record = this->m_daily_table.readRecord(last_record_id);
   this->m_daily_table.deleteRecord(last_record_id);
-  DBG1("Deleted last record [ID: %lli] from table ["%s"].",
+  DBG3("Deleted last record [ID: %lli] from table ["%s"].",
        last_record_id, this->m_daily_table.getName().c_str());
 
   std::string delete_statement = "DELETE FROM '";
@@ -288,7 +288,7 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
           i_entry_id,
           last_record.getBalance(),
           undo_record);
-  DBG2("Entry [ID: %lli] has been rolled back to state "
+  DBG3("Entry [ID: %lli] has been rolled back to state "
        "it had on ["%s"] at ["%s"].",
        i_entry_id,
        undo_record.getDateTime().getDate().c_str(),
@@ -299,16 +299,14 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
 
 const std::string& TableManager::getCycleTableName() const {
   INF("enter TableManager::getCycleTableName().");
-  DBG("Cycle Table name is ["%s"].",
-      this->m_cycle_table.getName().c_str());
+  DBG3("Cycle Table name is ["%s"].", this->m_cycle_table.getName().c_str());
   INF("exit TableManager::getCycleTableName().");
   return (this->m_cycle_table.getName());
 }
 
 const std::string& TableManager::getDailyTableName() const {
   INF("enter TableManager::getDailyTableName().");
-  DBG("Daily Table name is ["%s"].",
-      this->m_daily_table.getName().c_str());
+  DBG3("Daily Table name is ["%s"].", this->m_daily_table.getName().c_str());
   INF("exit TableManager::getDailyTableName().");
   return (this->m_daily_table.getName());
 }
@@ -317,36 +315,36 @@ const std::string& TableManager::getDailyTableName() const {
 /* Private members */
 // ----------------------------------------------------------------------------
 void TableManager::__init__() {
-  DBG("enter TableManager::__init__().");
+  DBG4("enter TableManager::__init__().");
   iDatabase::__init__();
-  DBG("exit TableManager::__init__().");
+  DBG4("exit TableManager::__init__().");
 }
 
 void TableManager::__create_table__() {
-  DBG("enter TableManager::__create_table__().");
+  DBG4("enter TableManager::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += this->m_table_name;
   statement += "('EntryID' INTEGER PRIMARY KEY, 'RecordsTableName' TEXT);";
   this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
-  DBG1("Table ["%s"] has been successfully created.",
+  DBG4("Table ["%s"] has been successfully created.",
        this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
-  DBG("exit TableManager::__create_table__().");
+  DBG4("exit TableManager::__create_table__().");
 }
 
 void TableManager::__create_table_entry_records__(
     const std::string& i_table_name) {
-  DBG("enter TableManager::__create_table_entry_records__().");
+  DBG4("enter TableManager::__create_table_entry_records__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += i_table_name;
   statement += "('RecordID' INTEGER PRIMARY KEY);";
   this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
-  DBG1("Table ["%s"] has been successfully created.",
+  DBG4("Table ["%s"] has been successfully created.",
        this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
-  DBG("exit TableManager::__create_table_entry_records__().");
+  DBG4("exit TableManager::__create_table_entry_records__().");
 }
 
 }  /* namespace mw */

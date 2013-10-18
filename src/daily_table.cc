@@ -53,8 +53,8 @@ Record DailyTable::addRecord(
   ID_t record_id = this->m_next_id++;
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 1, record_id) == SQLITE_OK);
-  DBG("ID [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
-      record_id, this->m_table_name.c_str(), this->m_db_name.c_str());
+  DBG1("ID [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+       record_id, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   DateTime current_datetime;
   std::string date = current_datetime.getDate();
@@ -76,14 +76,14 @@ Record DailyTable::addRecord(
           time.c_str(),
           time.length(),
           SQLITE_TRANSIENT) == SQLITE_OK);
-  DBG2("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
+  DBG1("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
        time.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
   accumulate = accumulate &&
       (sqlite3_bind_int64(this->m_db_statement, 4, i_balance) == SQLITE_OK);
-  DBG("Balance [%lli] has been stored in table ["%s"], "
-      "SQLite database ["%s"].",
-      i_balance, this->m_table_name.c_str(), this->m_db_name.c_str());
+  DBG1("Balance [%lli] has been stored in table ["%s"], "
+       "SQLite database ["%s"].",
+       i_balance, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   int description_n_bytes = i_description.n_bytes();
   accumulate = accumulate &&
@@ -94,7 +94,7 @@ Record DailyTable::addRecord(
           description_n_bytes,
           SQLITE_TRANSIENT) == SQLITE_OK);
   DBG1("Description ["%s"] has been stored in table ["%s"], "
-      "SQLite database ["%s"].",
+       "SQLite database ["%s"].",
        i_description.c_str(),
        this->m_table_name.c_str(),
        this->m_db_name.c_str());
@@ -104,10 +104,10 @@ Record DailyTable::addRecord(
           this->m_db_statement,
           6,
           static_cast<sqlite3_int64>(i_status)) == SQLITE_OK);
-  DBG("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
-      static_cast<sqlite3_int64>(i_status),
-      this->m_table_name.c_str(),
-      this->m_db_name.c_str());
+  DBG1("Status [%lli] has been stored in table ["%s"], SQLite database ["%s"].",
+       static_cast<sqlite3_int64>(i_status),
+       this->m_table_name.c_str(),
+       this->m_db_name.c_str());
 
   sqlite3_step(this->m_db_statement);
   if (!accumulate) {
@@ -120,7 +120,7 @@ Record DailyTable::addRecord(
         insert_statement.c_str(),
         SQLITE_ACCUMULATED_PREPARE_ERROR);
   } else {
-    DBG2("All insertions have succeeded.");
+    DBG1("All insertions have succeeded.");
   }
 
 #if ENABLED_DB_CACHING
@@ -161,9 +161,9 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   this->__prepare_statement__(select_statement);
   sqlite3_step(this->m_db_statement);
   ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Read id [%lli] from  table ["%s"] of database ["%s"], "
-      "input id was [%lli].",
-      id, this->m_table_name.c_str(), this->m_db_name.c_str(), i_record_id);
+  DBG1("Read id [%lli] from  table ["%s"] of database ["%s"], "
+       "input id was [%lli].",
+       id, this->m_table_name.c_str(), this->m_db_name.c_str(), i_record_id);
   TABLE_ASSERT("Input record id does not equal to primary key value "
                "from database!" &&
                id == i_record_id);
@@ -186,7 +186,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
        description.c_str(),
        raw_status);
   Record record(id, balance, description, status, datetime);
-  DBG2("Proper record instance has been constructed.");
+  DBG1("Proper record instance has been constructed.");
 
 #if ENABLED_DB_CACHING
   // TODO: caching the record
@@ -215,12 +215,12 @@ void DailyTable::deleteRecord(const ID_t& i_record_id) {
   this->__decrement_rows__();
   if (i_record_id + 1 == this->m_next_id) {
     --this->m_next_id;
-    DBG2("Deleted record with largest ID. "
+    DBG1("Deleted record with largest ID. "
          "Next ID value has been decremented.");
   }
   if (this->__empty__()) {
-    DBG("Table ["%s"] has become empty. Next ID value is set to zero.",
-        this->m_table_name.c_str());
+    DBG1("Table ["%s"] has become empty. Next ID value is set to zero.",
+         this->m_table_name.c_str());
     this->m_next_id = 0;
   }
   DBG1("Deleted record [ID: %lli] in table ["%s"].",
@@ -252,24 +252,23 @@ void DailyTable::deleteRecords(std::vector<ID_t>& i_record_ids) {
   sqlite3_step(this->m_db_statement);
   this->__finalize__(delete_statement.c_str());
   this->__decrease_rows__(static_cast<int>(i_record_ids.size()));
-  DBG("Updating next ID if necessary, initial value is [%lli].",
-      this->m_next_id);
+  DBG1("Updating next ID if necessary, initial value is [%lli].",
+       this->m_next_id);
   for (std::vector<ID_t>::const_reverse_iterator it = i_record_ids.rbegin();
        it != i_record_ids.rend();
        ++it) {
     if (*it + 1 == this->m_next_id) {
       --this->m_next_id;
-      DBG2("Deleted record with largest ID. "
+      DBG1("Deleted record with largest ID. "
            "Next ID value has been decremented.");
     } else {
       break;
     }
   }
-  DBG("Finished updating next ID: [%lli].",
-      this->m_next_id);
+  DBG1("Finished updating next ID: [%lli].", this->m_next_id);
   if (this->__empty__()) {
-    DBG("Table ["%s"] has become empty. Next id value is set to zero.",
-        this->m_table_name.c_str());
+    DBG1("Table ["%s"] has become empty. Next id value is set to zero.",
+         this->m_table_name.c_str());
     this->m_next_id = 0;
   }
   DBG1("Deleted %lli records from table ["%s"].",
@@ -285,8 +284,8 @@ void DailyTable::deleteRecords(std::vector<ID_t>& i_record_ids) {
 
 const std::string& DailyTable::getName() const {
   INF("enter DailyTable::getName().");
-  DBG("Return the name ["%s"] of DailyTable at %p.",
-      this->m_table_name.c_str(), this);
+  DBG1("Return the name ["%s"] of DailyTable at %p.",
+       this->m_table_name.c_str(), this);
   INF("exit DailyTable::getName().");
   return (this->m_table_name);
 }
@@ -306,7 +305,7 @@ bool DailyTable::load() {
 /* Private members */
 // ----------------------------------------------------------------------------
 void DailyTable::__init__() {
-  DBG("enter DailyTable::__init__().");
+  DBG2("enter DailyTable::__init__().");
   iDatabase::__init__();
   iDatabase::__create_table_for_last_id__(DailyTable::last_row_id_table_name);
   ID_t last_row_id = this->__read_last_id__(DailyTable::last_row_id_table_name);
@@ -314,11 +313,11 @@ void DailyTable::__init__() {
   TRC("Initialization has completed: total rows [%i], "
       "last row id [%lli], next_id [%lli].",
       this->m_rows, last_row_id, this->m_next_id);
-  DBG("exit DailyTable::__init__().");
+  DBG2("exit DailyTable::__init__().");
 }
 
 void DailyTable::__create_table__() {
-  DBG("enter DailyTable::__create_table__().");
+  DBG2("enter DailyTable::__create_table__().");
   std::string statement = "CREATE TABLE IF NOT EXISTS ";
   statement += this->m_table_name;
   statement += "('ID' INTEGER PRIMARY KEY, "
@@ -329,10 +328,10 @@ void DailyTable::__create_table__() {
       "'Status' INTEGER);";
   this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
-  DBG1("Table ["%s"] has been successfully created.",
+  DBG2("Table ["%s"] has been successfully created.",
        this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
-  DBG("exit DailyTable::__create_table__().");
+  DBG2("exit DailyTable::__create_table__().");
 }
 
 }  /* namespace mw */

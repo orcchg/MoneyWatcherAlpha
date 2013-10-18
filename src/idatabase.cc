@@ -120,22 +120,22 @@ void iDatabase::__close_database__() {
   DBG("exit iDatabase::__close_database__().");
 }
 
-int iDatabase::__prepare_statement__(const std::string& statement) {
+int iDatabase::__prepare_statement__(const std::string& i_statement) {
   DBG("enter iDatabase::__prepare_statement__().");
-  int nByte = static_cast<int>(statement.length());
+  int nByte = static_cast<int>(i_statement.length());
   TRC("Provided string SQL statement: ["%s"] of length %i.",
-      statement.c_str(), nByte);
+      i_statement.c_str(), nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
-      statement.c_str(),
+      i_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
-  this->__set_last_statement__(statement.c_str());
+  this->__set_last_statement__(i_statement.c_str());
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str(), result);
+    this->__finalize_and_throw__(i_statement.c_str(), result);
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
@@ -143,24 +143,24 @@ int iDatabase::__prepare_statement__(const std::string& statement) {
   return (result);
 }
 
-int iDatabase::__prepare_statement__(const WrappedString& statement) {
+int iDatabase::__prepare_statement__(const WrappedString& i_statement) {
   DBG("enter iDatabase::__prepare_statement__().");
-  int nByte = statement.n_bytes();
+  int nByte = i_statement.n_bytes();
   TRC("Provided string SQL statement: ["%s"] of length %lli and bytes %i.",
-      update_statement.c_str(),
-      static_cast<long long int>(update_statement.length()),
+      i_statement.c_str(),
+      static_cast<long long int>(i_statement.length()),
       nByte);
   TABLE_ASSERT("Invalid database handler! Database probably was not open." &&
                this->m_db_handler);
   int result = sqlite3_prepare_v2(
       this->m_db_handler,
-      statement.c_str(),
+      i_statement.c_str(),
       nByte,
       &(this->m_db_statement),
       nullptr);
-  this->__set_last_statement__(statement.c_str());
+  this->__set_last_statement__(i_statement.c_str());
   if (result != SQLITE_OK) {
-    this->__finalize_and_throw__(statement.c_str(), result);
+    this->__finalize_and_throw__(i_statement.c_str(), result);
   }
   TRC("SQL statement has been compiled into byte-code and placed into %p.",
       this->m_db_statement);
@@ -400,7 +400,7 @@ void iDatabase::__where_check__(const ID_t& i_id) {
 int iDatabase::__count_check__() {
   MSG("Entrance into advanced debug source branch.");
   int rows = this->__count_rows__(this->m_table_name);
-  INF1("Count of rows in table ["%s"] is equal to %lli.",
+  INF1("Count of rows in table ["%s"] is equal to %i.",
        this->m_table_name.c_str(), rows);
   MSG("Leave from advanced debug source branch.");
   return (rows);
