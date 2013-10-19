@@ -391,6 +391,10 @@ void CycleTable::deleteEntries(std::vector<ID_t>& i_entry_ids) {
       break;
     }
   }
+  ID_t last_row_id = this->__read_last_id__(this->m_table_name);
+  this->m_next_id = last_row_id + 1;
+  DBG1("Deleted entry with largest ID. Next ID value is set to [%lli].",
+       this->m_next_id);
   DBG1("Finished updating next ID: [%lli].", this->m_next_id);
   if (this->__empty__()) {
     DBG1("Table ["%s"] has become empty. Next ID value is set to zero.",
