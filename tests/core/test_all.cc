@@ -29,7 +29,7 @@ TEST (SimpleDemoTest, /*DISABLED_*/SimpleDemo) {
 
 #if ENABLED_TIME_MEASURE_ONLY
 /* Time consumption measurements */
-// TODO(navigation): Time measurements
+// XXX(navigation): Time measurements
 // ----------------------------------------------------------------------------
 const std::string TimeMeasureFixture::test_db_filename = "Test-TimeMeasureFixture.db";
 
@@ -279,7 +279,7 @@ static int countRows(const std::string& table_name, const DB_Handler& handler) {
 
 
 /* CycleTable testing */
-// TODO(navigation): CycleTable testing
+// XXX(navigation): CycleTable testing
 // ----------------------------------------------------------------------------
 TEST (CycleTableTest, CreateCycleTable) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
@@ -982,7 +982,7 @@ TEST (CycleTableTest, DeleteManyEntriesByOneSQLstatement) {
 
 
 /* DailyTable testing */
-// TODO(navigation): DailyTable testing
+// XXX(navigation): DailyTable testing
 // ----------------------------------------------------------------------------
 TEST (DailyTableTest, CreateDailyTable) {
   std::string test_daily_table_db_filename = "Test-DailyTable.db";
@@ -1544,7 +1544,7 @@ TEST (DailyTableTest, DeleteManyRecordsByOneSQLstatement) {
 
 
 /* SQLite database testing */
-// TODO(navigation): SQLite database testing
+// XXX(navigation): SQLite database testing
 // ----------------------------------------------------------------------------
 TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
   std::string test_single_db_filename = "Test-SingleTable.db";
@@ -1673,7 +1673,33 @@ TEST (SQLiteDatabaseTest, TablePersistense) {
       EXPECT_TRUE(cycle_accessor.checkFinalized());
     }
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+    {  // open again, delete entries
+      mw::CycleTable cycle_table(test_single_db_filename);
+      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::CycleTable> cycle_accessor(&cycle_table);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+      std::string cycle_table_name = cycle_accessor.getTableName();
+      cycle_table.deleteEntry(2);
+      EXPECT_EQ(cycle_accessor.countRows(cycle_table_name), 6);
+      EXPECT_EQ(cycle_accessor.getNextID(), 7);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+    {  // open again, check ids
+      mw::CycleTable cycle_table(test_single_db_filename);
+      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::CycleTable> cycle_accessor(&cycle_table);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+      std::string cycle_table_name = cycle_accessor.getTableName();
+      std::vector<ID_t> entry_ids = {4, 6, 3, 5};
+      cycle_table.deleteEntries(entry_ids);
+      EXPECT_EQ(cycle_accessor.countRows(cycle_table_name), 2);
+      EXPECT_EQ(cycle_accessor.getNextID(), 1 + 1);
+      EXPECT_TRUE(cycle_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
 
+    // ------------------------------------------------------------------------
     {  // open single database and fill Daily_Table
       mw::DailyTable daily_table(test_single_db_filename);
       EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
@@ -1704,6 +1730,52 @@ TEST (SQLiteDatabaseTest, TablePersistense) {
       EXPECT_TRUE(daily_accessor.checkFinalized());
     }
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+    {  // open again, delete records
+      mw::DailyTable daily_table(test_single_db_filename);
+      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::DailyTable> daily_accessor(&daily_table);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+      std::string daily_table_name = daily_accessor.getTableName();
+      daily_table.deleteRecord(2);
+      daily_table.deleteRecord(1);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 3);
+      EXPECT_EQ(daily_accessor.getNextID(), 5);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+    {  // open again, check ids
+      mw::DailyTable daily_table(test_single_db_filename);
+      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::DailyTable> daily_accessor(&daily_table);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+      std::string daily_table_name = daily_accessor.getTableName();
+      std::vector<ID_t> record_ids = {4, 3};
+      daily_table.deleteRecords(record_ids);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 1);
+      EXPECT_EQ(daily_accessor.getNextID(), 0 + 1);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      daily_table.addRecord(s_record_balance, s_record_description, s_record_status);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 3);
+      EXPECT_EQ(daily_accessor.getNextID(), 3);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+    {  // open again, check ids
+      mw::DailyTable daily_table(test_single_db_filename);
+      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+      mw::TestAccessTable<mw::DailyTable> daily_accessor(&daily_table);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+      std::string daily_table_name = daily_accessor.getTableName();
+      daily_table.deleteRecord(2);
+      daily_table.deleteRecord(1);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 1);
+      EXPECT_EQ(daily_accessor.getNextID(), 0 + 1);
+      daily_table.deleteRecord(0);
+      EXPECT_EQ(daily_accessor.countRows(daily_table_name), 0);
+      EXPECT_EQ(daily_accessor.getNextID(), 0);
+      EXPECT_TRUE(daily_accessor.checkFinalized());
+    }
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
 
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
@@ -1722,7 +1794,7 @@ TEST (SQLiteDatabaseTest, TablePersistense) {
 
 
 /* TableManager testing */
-// TODO(navigation): TableManager testing
+// XXX(navigation): TableManager testing
 // ----------------------------------------------------------------------------
 TEST (TableManagerTest, TableManagerInit) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
