@@ -339,8 +339,10 @@ void CycleTable::deleteEntry(const ID_t& i_entry_id) {
   this->__finalize__(delete_statement.c_str());
   this->__decrement_rows__();
   if (i_entry_id + 1 == this->m_next_id) {
-    --this->m_next_id;
-    DBG1("Deleted entry with largest ID. Next ID value has been decremented.");
+    ID_t last_row_id = this->__read_last_id__(this->m_table_name);
+    this->m_next_id = last_row_id + 1;
+    DBG1("Deleted entry with largest ID. Next ID value is set to [%lli].",
+         this->m_next_id);
   }
   if (this->__empty__()) {
     DBG1("Table ["%s"] has become empty. Next ID value is set to zero.",

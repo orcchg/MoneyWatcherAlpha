@@ -716,19 +716,47 @@ TEST (CycleTableTest, DeleteEntry) {
     mw::Entry entry_2 = cycle_table.addEntry(s_name, s_description, s_balance);
     mw::Entry entry_3 = cycle_table.addEntry(s_name, s_description, s_balance);
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), entry_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
     cycle_table.deleteEntry(entry_3.getID());
     EXPECT_EQ(accessor.getNextID(), 2);
+    EXPECT_EQ(accessor.getNextID(), entry_2.getID() + 1);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 2);
 
     cycle_table.deleteEntry(entry_1.getID());
     EXPECT_EQ(accessor.getNextID(), 2);
+    EXPECT_EQ(accessor.getNextID(), entry_2.getID() + 1);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 1);
 
     cycle_table.deleteEntry(entry_2.getID());
+    EXPECT_EQ(accessor.getNextID(), 0);
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
+    mw::Entry record_11 = cycle_table.addEntry(s_name, s_description, s_balance);
+    EXPECT_EQ(accessor.getNextID(), 1);
+    EXPECT_EQ(accessor.getNextID(), record_11.getID() + 1);
+    mw::Entry record_21 = cycle_table.addEntry(s_name, s_description, s_balance);
+    EXPECT_EQ(accessor.getNextID(), 2);
+    EXPECT_EQ(accessor.getNextID(), record_21.getID() + 1);
+    mw::Entry record_31 = cycle_table.addEntry(s_name, s_description, s_balance);
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_31.getID() + 1);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 3);
+
+    cycle_table.deleteEntry(record_21.getID());
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_31.getID() + 1);
+    cycle_table.deleteEntry(record_31.getID());
+    EXPECT_EQ(accessor.getNextID(), 1);
+    EXPECT_EQ(accessor.getNextID(), record_11.getID() + 1);
+    cycle_table.deleteEntry(record_11.getID());
     EXPECT_EQ(accessor.getNextID(), 0);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
@@ -763,6 +791,7 @@ TEST (CycleTableTest, DeleteEntryWrongId) {
     mw::Entry entry_2 = cycle_table.addEntry(s_name, s_description, s_balance);
     mw::Entry entry_3 = cycle_table.addEntry(s_name, s_description, s_balance);
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), entry_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
     int number_of_caught_exceptions = 0;
@@ -773,6 +802,7 @@ TEST (CycleTableTest, DeleteEntryWrongId) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of wrong deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), entry_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
   } catch (mw::TableException& e) {
@@ -804,10 +834,12 @@ TEST (CycleTableTest, DeleteEntryTwice) {
     mw::Entry entry_2 = cycle_table.addEntry(s_name, s_description, s_balance);
     mw::Entry entry_3 = cycle_table.addEntry(s_name, s_description, s_balance);
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), entry_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
     cycle_table.deleteEntry(entry_2.getID());
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), entry_3.getID() + 1);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 2);
 
@@ -819,6 +851,7 @@ TEST (CycleTableTest, DeleteEntryTwice) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), entry_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
   } catch (mw::TableException& e) {
@@ -1220,19 +1253,47 @@ TEST (DailyTableTest, DeleteRecord) {
     mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
     daily_table.deleteRecord(record_3.getID());
     EXPECT_EQ(accessor.getNextID(), 2);
+    EXPECT_EQ(accessor.getNextID(), record_2.getID() + 1);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 2);
 
     daily_table.deleteRecord(record_1.getID());
     EXPECT_EQ(accessor.getNextID(), 2);
+    EXPECT_EQ(accessor.getNextID(), record_2.getID() + 1);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 1);
 
     daily_table.deleteRecord(record_2.getID());
+    EXPECT_EQ(accessor.getNextID(), 0);
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
+
+    mw::Record record_11 = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_EQ(accessor.getNextID(), 1);
+    EXPECT_EQ(accessor.getNextID(), record_11.getID() + 1);
+    mw::Record record_21 = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_EQ(accessor.getNextID(), 2);
+    EXPECT_EQ(accessor.getNextID(), record_21.getID() + 1);
+    mw::Record record_31 = daily_table.addRecord(s_balance, s_description, s_status);
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_31.getID() + 1);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 3);
+
+    daily_table.deleteRecord(record_21.getID());
+    EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_31.getID() + 1);
+    daily_table.deleteRecord(record_31.getID());
+    EXPECT_EQ(accessor.getNextID(), 1);
+    EXPECT_EQ(accessor.getNextID(), record_11.getID() + 1);
+    daily_table.deleteRecord(record_11.getID());
     EXPECT_EQ(accessor.getNextID(), 0);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
@@ -1267,6 +1328,7 @@ TEST (DailyTableTest, DeleteRecordWrongId) {
     mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
     int number_of_caught_exceptions = 0;
@@ -1277,6 +1339,7 @@ TEST (DailyTableTest, DeleteRecordWrongId) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of wrong deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
   } catch (mw::TableException& e) {
@@ -1308,10 +1371,12 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
     daily_table.deleteRecord(record_2.getID());
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_3.getID() + 1);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 2);
 
@@ -1323,6 +1388,7 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     }
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
+    EXPECT_EQ(accessor.getNextID(), record_3.getID() + 1);
     EXPECT_TRUE(accessor.checkFinalized());
 
   } catch (mw::TableException& e) {
