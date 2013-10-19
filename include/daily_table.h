@@ -79,7 +79,6 @@ public:
   /// -------------------------------------------------------------------------
 
   static int OPENED_DAILY_TABLES_COUNT;
-  static const std::string last_row_id_table_name;
 
 private:
 #if ENABLED_DB_CACHING

@@ -18,7 +18,6 @@
 namespace mw {
 
 int CycleTable::OPENED_CYCLE_TABLES_COUNT = 0;
-const std::string CycleTable::last_row_id_table_name = "Last_Entry_ID";
 
 CycleTable::CycleTable(const std::string& i_db_name)
   : iDatabase(i_db_name, "Cycle_Table") {
@@ -155,7 +154,6 @@ Entry CycleTable::addEntry(
 
   this->__finalize__(insert_statement.c_str());
   this->__increment_rows__();
-  this->__write_last_id__(CycleTable::last_row_id_table_name, entry_id);
   Entry entry(
       entry_id,
       i_name,
@@ -422,8 +420,7 @@ const std::string& CycleTable::getName() const {
 void CycleTable::__init__() {
   DBG2("enter CycleTable::__init__().");
   iDatabase::__init__();
-  iDatabase::__create_table_for_last_id__(CycleTable::last_row_id_table_name);
-  ID_t last_row_id = this->__read_last_id__(CycleTable::last_row_id_table_name);
+  ID_t last_row_id = this->__read_last_id__(this->m_table_name);
   this->m_next_id = last_row_id == 0 ? 0 : last_row_id + 1;
   TRC("Initialization has completed: total rows [%i], last row id [%lli], "
       "next_id [%lli].",

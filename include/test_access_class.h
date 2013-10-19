@@ -29,7 +29,6 @@ public:
   const DB_Handler& getDbHandler() const;
   ID_t getNextID() const;
   const std::string& getTableName() const;
-  const std::string& getLastRowIdTableName() const;
   int countRows(const std::string& table_name) const;
 
   bool checkFinalized() const;
@@ -63,11 +62,6 @@ template <typename Table>
 const std::string& TestAccessTable<Table>::getTableName() const {
   TRC("Table name: "%s".", this->m_ptr_table->m_table_name.c_str());
   return (this->m_ptr_table->m_table_name);
-}
-
-template <typename Table>
-const std::string& TestAccessTable<Table>::getLastRowIdTableName() const {
-  return (Table::last_row_id_table_name);
 }
 
 template <typename Table>

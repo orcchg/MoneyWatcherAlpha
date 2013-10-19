@@ -244,15 +244,15 @@ static const char* intToSQLiteError(int i_error_code) {
   }
 }
 
-static int countRows(const std::string& table_name, const DB_Handler& handler) {
-  std::string count_statement = "SELECT COUNT(*) FROM \'";
-  count_statement += table_name;
-  count_statement += "\';";
-  int nByte = static_cast<int>(count_statement.length());
+static int getInt(
+    const std::string& table_name,
+    const std::string& statement,
+    const DB_Handler& handler) {
+  int nByte = static_cast<int>(statement.length());
   DB_Statement statement_handler = nullptr;
   int result = sqlite3_prepare_v2(
       handler,
-      count_statement.c_str(),
+      statement.c_str(),
       nByte,
       &statement_handler,
       nullptr);
@@ -267,7 +267,14 @@ static int countRows(const std::string& table_name, const DB_Handler& handler) {
   result = sqlite3_step(statement_handler);
   EXPECT_EQ(result, SQLITE_DONE);
   sqlite3_finalize(statement_handler);
-  return value;
+  return (value);
+}
+
+static int countRows(const std::string& table_name, const DB_Handler& handler) {
+  std::string count_statement = "SELECT COUNT(*) FROM '";
+  count_statement += table_name;
+  count_statement += "';";
+  return (getInt(table_name, count_statement, handler));
 }
 
 
@@ -299,8 +306,8 @@ TEST (CycleTableTest, CreateCycleTable) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -378,8 +385,8 @@ TEST (CycleTableTest, AddEntry) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -476,8 +483,8 @@ TEST (CycleTableTest, AddManyEntries) {
     loop_result = sqlite3_step(statement_handler);
     EXPECT_EQ(loop_result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -524,8 +531,8 @@ TEST (CycleTableTest, ReadEntry) {
     EXPECT_STREQ(read_entry.getDateTime().getDate().c_str(), entry.getDateTime().getDate().c_str());
     EXPECT_STREQ(read_entry.getDateTime().getTime().c_str(), entry.getDateTime().getTime().c_str());
     EXPECT_EQ(read_entry.getStatus(), entry.getStatus());
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -562,6 +569,7 @@ TEST (CycleTableTest, ReadEntryWrongId) {
       EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
     }
     EXPECT_EQ(number_of_caught_exceptions, 1);
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -619,8 +627,8 @@ TEST (CycleTableTest, UpdateEntry) {
     EXPECT_STREQ(read_entry.getDateTime().getDate().c_str(), updated_entry.getDateTime().getDate().c_str());
     EXPECT_STREQ(read_entry.getDateTime().getTime().c_str(), updated_entry.getDateTime().getTime().c_str());
     EXPECT_EQ(read_entry.getStatus(), entry.getStatus());
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -674,6 +682,7 @@ TEST (CycleTableTest, UpdateEntryWrongId) {
       EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
     }
     EXPECT_EQ(number_of_caught_exceptions, 2);
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -723,8 +732,8 @@ TEST (CycleTableTest, DeleteEntry) {
     EXPECT_EQ(accessor.getNextID(), 0);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -765,6 +774,7 @@ TEST (CycleTableTest, DeleteEntryWrongId) {
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of wrong deletion
     EXPECT_EQ(accessor.getNextID(), 3);
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -810,6 +820,7 @@ TEST (CycleTableTest, DeleteEntryTwice) {
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -856,8 +867,8 @@ TEST (CycleTableTest, DeleteManyEntries) {
     }
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -896,8 +907,8 @@ TEST (CycleTableTest, DeleteManyEntriesByOneSQLstatement) {
     cycle_table.deleteEntries(entry_ids);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -941,8 +952,8 @@ TEST (DailyTableTest, CreateDailyTable) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1011,8 +1022,8 @@ TEST (DailyTableTest, AddRecord) {
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1103,8 +1114,8 @@ TEST (DailyTableTest, AddManyRecords) {
     loop_result = sqlite3_step(statement_handler);
     EXPECT_EQ(loop_result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1141,8 +1152,8 @@ TEST (DailyTableTest, ReadRecord) {
     EXPECT_EQ(read_record.getBalance(), record.getBalance());
     EXPECT_STREQ(read_record.getDescription().c_str(), record.getDescription().c_str());
     EXPECT_EQ(read_record.getStatus(), record.getStatus());
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1179,6 +1190,7 @@ TEST (DailyTableTest, ReadRecordWrongId) {
       EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
     }
     EXPECT_EQ(number_of_caught_exceptions, 1);
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1224,8 +1236,8 @@ TEST (DailyTableTest, DeleteRecord) {
     EXPECT_EQ(accessor.getNextID(), 0);
     rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1266,6 +1278,7 @@ TEST (DailyTableTest, DeleteRecordWrongId) {
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of wrong deletion
     EXPECT_EQ(accessor.getNextID(), 3);
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1311,6 +1324,7 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     EXPECT_EQ(number_of_caught_exceptions, 0);  // nothing bad happens in case of twice deletion
     EXPECT_EQ(accessor.getNextID(), 3);
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1357,8 +1371,8 @@ TEST (DailyTableTest, DeleteManyRecords) {
     }
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1397,8 +1411,8 @@ TEST (DailyTableTest, DeleteManyRecordsByOneSQLstatement) {
     daily_table.deleteRecords(record_ids);
     int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
     EXPECT_EQ(rows, 0);
-
     EXPECT_TRUE(accessor.checkFinalized());
+
   } catch (mw::TableException& e) {
     WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
         e.what(), intToSQLiteError(e.error()));
@@ -1461,11 +1475,7 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
 
     std::string count_statement = "SELECT COUNT(*) FROM "
         "sqlite_master WHERE type == 'table' "
-        "AND name != '";
-    count_statement += cycle_accessor.getLastRowIdTableName();
-    count_statement += "' AND name != '";
-    count_statement += daily_accessor.getLastRowIdTableName();
-    count_statement += "' AND name != 'sqlite_sequence';";
+        " AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
     int result = sqlite3_prepare_v2(
@@ -1814,8 +1824,6 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     count_statement += accessor.getTableName();
     count_statement += "' AND name != '" + table_manager.getCycleTableName();
     count_statement += "' AND name != '" + table_manager.getDailyTableName();
-    count_statement += "' AND name != '" + mw::CycleTable::last_row_id_table_name;
-    count_statement += "' AND name != '" + mw::DailyTable::last_row_id_table_name;
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -1972,8 +1980,6 @@ TEST (TableManagerTest, TableManagerRemove) {
     count_statement += accessor.getTableName();
     count_statement += "' AND name != '" + table_manager.getCycleTableName();
     count_statement += "' AND name != '" + table_manager.getDailyTableName();
-    count_statement += "' AND name != '" + mw::CycleTable::last_row_id_table_name;
-    count_statement += "' AND name != '" + mw::DailyTable::last_row_id_table_name;
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -2069,8 +2075,6 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
     count_statement += accessor.getTableName();
     count_statement += "' AND name != '" + table_manager.getCycleTableName();
     count_statement += "' AND name != '" + table_manager.getDailyTableName();
-    count_statement += "' AND name != '" + mw::CycleTable::last_row_id_table_name;
-    count_statement += "' AND name != '" + mw::DailyTable::last_row_id_table_name;
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;

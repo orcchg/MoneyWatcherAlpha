@@ -308,71 +308,16 @@ void iDatabase::__set_last_statement__(const char* i_statement) {
   DBG("exit iDatabase::__set_last_statement__().");
 }
 
-void iDatabase::__create_table_for_last_id__(const std::string& i_table_name) {
-  DBG("enter iDatabase::__create_table_for_last_id__().");
-  std::string statement = "CREATE TABLE IF NOT EXISTS ";
-  statement += i_table_name;
-  statement += "('LastRowID' INTEGER);";
-  this->__prepare_statement__(statement);
-  sqlite3_step(this->m_db_statement);
-  DBG("Table ["%s"] has been successfully created.", i_table_name.c_str());
-  this->__finalize__(statement.c_str());
-  DBG("exit iDatabase::__create_table_for_last_id__().");
-}
-
-void iDatabase::__write_last_id__(
-    const std::string& i_table_name,
-    const ID_t& i_last_id) {
-  DBG("enter iDatabase::__write_last_id__().");
-  int rows = this->__count_rows__(i_table_name);
-
-  if (rows == 0) {
-    DBG("Table ["%s"] is empty. Inserting first value...",
-        i_table_name.c_str());
-    std::string insert_statement = "INSERT INTO '";
-    insert_statement += i_table_name;
-    insert_statement += "' VALUES(?1);";
-    this->__prepare_statement__(insert_statement);
-    int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, i_last_id);
-    sqlite3_step(this->m_db_statement);
-    if (accumulate != SQLITE_OK) {
-      ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
-          this->m_db_name.c_str(), insert_statement.c_str());
-      this->__finalize_and_throw__(
-          insert_statement.c_str(),
-          SQLITE_ACCUMULATED_PREPARE_ERROR);
-    } else {
-      DBG("All insertions have succeeded.");
-    }
-    this->__finalize__(insert_statement.c_str());
-
-  } else {
-    DBG("Table ["%s"] is filled. Updating first value...",
-        i_table_name.c_str());
-    std::string update_statement = "UPDATE '";
-    update_statement += i_table_name;
-    update_statement += "' SET LastRowID = '";
-    update_statement += std::to_string(i_last_id);
-    update_statement += "';";
-    this->__prepare_statement__(update_statement);
-    sqlite3_step(this->m_db_statement);
-    this->__finalize__(update_statement.c_str());
-  }
-  DBG("exit iDatabase::__write_last_id__().");
-}
-
 ID_t iDatabase::__read_last_id__(const std::string& i_table_name) {
   DBG("enter iDatabase::__read_last_id__().");
-  std::string count_statement = "SELECT * FROM '";
-  count_statement += i_table_name;
-  count_statement += "';";
-  this->__prepare_statement__(count_statement);
+  std::string statement = "SELECT MAX(ID) FROM '" + i_table_name + "';";
+  this->__prepare_statement__(statement);
   sqlite3_step(this->m_db_statement);
-  ID_t last_row_id = sqlite3_column_int64(this->m_db_statement, 0);
-  DBG("Read last row id: [%lli].", last_row_id);
-  this->__finalize__(count_statement.c_str());
+  ID_t last_id = sqlite3_column_int64(this->m_db_statement, 0);
+  TRC("Read last id [%lli] from table ["%s"].", last_id, i_table_name.c_str());
+  this->__finalize__(statement.c_str());
   DBG("exit iDatabase::__read_last_id__().");
-  return (last_row_id);
+  return (last_id);
 }
 
 #if ENABLED_ADVANCED_DEBUG
