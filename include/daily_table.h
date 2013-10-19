@@ -18,7 +18,7 @@
 #include "hash.h"
 #include "idatabase.h"
 #include "record.h"
-#include "tests/core/test_access_class.h"
+#include "test_access_class.h"
 #include "types.h"
 #include "unistring.h"
 
@@ -77,10 +77,6 @@ public:
   const std::string& getName() const;
   /// @}
   /// -------------------------------------------------------------------------
-
-  /// @brief Loads existing DailyTable from SQLite database.
-  /// @return True, if loading has succeeded, False otherwise.
-  bool load();
 
   static int OPENED_DAILY_TABLES_COUNT;
   static const std::string last_row_id_table_name;

@@ -20,8 +20,9 @@
 #include "record.h"
 #include "serializable.h"
 #include "status.h"
-#include "types.h"
 #include "table_manager.h"
+#include "test_access_class.h"
+#include "types.h"
 #include "unistring.h"
 
 

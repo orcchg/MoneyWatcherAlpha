@@ -19,8 +19,8 @@ noinst_PROGRAMS = moneywatcher
 moneywatcher_SOURCES = main.cc
 
 # Linker options for a.out
-moneywatcher_LDFLAGS = $(top_srcdir)/src/libmoneywatcher.la \
-					   $(top_srcdir)/sqlite3/libsqlite3formw.la
+moneywatcher_LDFLAGS = $(top_builddir)/src/libmoneywatcher.la \
+					   $(top_builddir)/sqlite3/libsqlite3formw.la
 
 # Compiler options for a.out
 moneywatcher_CPPFLAGS = -std=c++11 -I$(top_srcdir)/include

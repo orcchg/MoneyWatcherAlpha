@@ -13,8 +13,7 @@
 #include <thread>
 #include <locale.h>
 #include <unistd.h>
-#include "tests/google/gtest/gtest.h"
-#include "test_access_class.h"
+#include "gtest/gtest.h"
 #include "test_fixture.h"
 #include "test_include_all.h"
 

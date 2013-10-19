@@ -97,7 +97,7 @@ Entry CycleTable::addEntry(
           5,
           last_transaction) == SQLITE_OK);
   DBG1("Last transaction balance [%lli] has been stored in table ["%s"], "
-      "SQLite database ["%s"].",
+       "SQLite database ["%s"].",
        last_transaction, this->m_table_name.c_str(), this->m_db_name.c_str());
 
   DateTime current_datetime;

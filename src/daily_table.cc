@@ -290,17 +290,6 @@ const std::string& DailyTable::getName() const {
   return (this->m_table_name);
 }
 
-bool DailyTable::load() {
-  INF("enter DailyTable::load().");
-
-#if ENABLED_DB_CACHING
-  // TODO: caching the records
-#endif
-
-  INF("exit DailyTable::load().");
-  return (false);
-}
-
 
 /* Private members */
 // ----------------------------------------------------------------------------

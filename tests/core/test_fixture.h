@@ -13,7 +13,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "tests/google/gtest/gtest.h"
+#include "gtest/gtest.h"
 #include "cycle_table.h"
 #include "daily_table.h"
 #include "table_manager.h"

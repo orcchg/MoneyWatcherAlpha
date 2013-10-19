@@ -17,7 +17,7 @@
 #include "entry.h"
 #include "hash.h"
 #include "idatabase.h"
-#include "tests/core/test_access_class.h"
+#include "test_access_class.h"
 #include "unistring.h"
 
 
