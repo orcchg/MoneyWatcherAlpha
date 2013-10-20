@@ -183,6 +183,7 @@ Record TableManager::update(
 void TableManager::remove(const ID_t& i_entry_id) {
   INF("enter TableManager::remove().");
   this->m_cycle_table.deleteEntry(i_entry_id);
+  this->m_entry_ids.erase(i_entry_id);
   DBG3("Deleted entry [ID: %lli] from Cycle_Table at %p.",
        i_entry_id, &(this->m_cycle_table));
   std::string records_table_name =
