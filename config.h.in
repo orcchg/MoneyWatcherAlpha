@@ -1,5 +1,9 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the
+   <boost/date_time/posix_time/posix_time_types.hpp> header file. */
+#undef HAVE_BOOST_DATE_TIME_POSIX_TIME_POSIX_TIME_TYPES_HPP
+
 /* Define to 1 if you have the <boost/foreach.hpp> header file. */
 #undef HAVE_BOOST_FOREACH_HPP
 

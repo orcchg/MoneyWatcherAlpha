@@ -250,9 +250,14 @@ AC_SUBST(DYNAMIC_EXTENSION_FLAGS)
 AC_CHECK_FUNCS(posix_fallocate)
 
 dnl Check for Boost libraries
+BOOST_LIBRARIES_NOT_FOUND_WARNING_STR="You need the Boost libraries."
 AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS([boost/foreach.hpp], [],
-    [AC_MSG_ERROR(You need the Boost libraries.)])
+AC_CHECK_HEADERS([boost/foreach.hpp boost/date_time/posix_time/posix_time_types.hpp],
+  [],
+  [AC_MSG_ERROR([$BOOST_LIBRARIES_NOT_FOUND_WARNING_STR])
+])
+#AC_CHECK_LIB([boost_date_time], [boost::posix_time::time_from_string], [],
+#  [AC_MSG_ERROR([$BOOST_LIBRARIES_NOT_FOUND_WARNING_STR])], [])
 AC_LANG_POP([C++])
 
 dnl Security xFLAGS
@@ -263,6 +268,9 @@ LDFLAGS="$LDFLAGS -Wl,-z,relro -Wl,--hash-style=gnu"
 
 dnl Compile with -rdynamic
 LDFLAGS="$LDFLAGS -rdynamic"
+
+dnl Link with necessary Boost libraries
+LDFLAGS="$LDFLAGS -lboost_date_time"
 
 dnl Do not link with unnecessary libraries
 LDFLAGS="$LDFLAGS -Wl,--as-needed"

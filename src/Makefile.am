@@ -33,5 +33,5 @@ libmoneywatcher_la_CPPFLAGS = -std=c++11 \
                               -I$(top_srcdir)/include \
                               -I$(top_srcdir)/sqlite3
 
-libmoneywatcher_la_LIBADD = -lboost_date_time.so
+libmoneywatcher_la_LIBADD =
 
