@@ -34,6 +34,7 @@ Entry::Entry(
 Entry::~Entry() {
 }
 
+// ----------------------------------------------
 ID_t Entry::getID() const {
   return (this->m_id);
 }
