@@ -52,6 +52,7 @@ std::pair<Entry, Record> TableManager::add(
           i_description,
           i_current_balance);
   ID_t entry_id = entry.getID();
+  this->m_entry_ids.insert(entry_id);
   DBG3("Added entry into table ["%s"], got ID: [%lli].",
        this->getCycleTableName().c_str(), entry_id);
   std::string insert_statement = "INSERT INTO '";
@@ -317,6 +318,17 @@ const std::string& TableManager::getDailyTableName() const {
 void TableManager::__init__() {
   DBG4("enter TableManager::__init__().");
   iDatabase::__init__();
+  std::string statement = "SELECT * FROM '" + this->m_table_name + "';";
+  this->__prepare_statement__(statement);
+  int result = sqlite3_step(this->m_db_statement);
+  while (result == SQLITE_ROW) {
+    ID_t entry_id = sqlite3_column_int64(this->m_db_statement, 0);
+    this->m_entry_ids.insert(entry_id);
+    DBG4("Inserted entry [ID: %lli] from table ["%s"].",
+         entry_id, this->m_table_name.c_str());
+    result = sqlite3_step(this->m_db_statement);
+  }
+  this->__finalize__(statement.c_str());
   DBG4("exit TableManager::__init__().");
 }
 

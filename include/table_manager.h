@@ -11,6 +11,7 @@
 #define TABLE_MANAGER_H_
 
 #include <list>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -93,6 +94,7 @@ public:
 private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
+  std::set<ID_t> m_entry_ids;
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, std::list<ID_t>, Hasher<ID_t> > m_entry_records;
 #endif
