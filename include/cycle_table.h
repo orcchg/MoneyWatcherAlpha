@@ -24,7 +24,7 @@
 namespace mw {
 
 /// @class CycleTable
-/// @brief Represents a table of entries, updating once per certain cycle.
+/// @brief Represents a table of entries.
 class CycleTable : private iDatabase {
   template <typename Table>
   friend class TestAccessTable;

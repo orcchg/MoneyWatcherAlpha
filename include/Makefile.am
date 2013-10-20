@@ -8,6 +8,8 @@ include_HEADERS = common.h \
 				  hash.h \
 				  idatabase.h \
 				  logger.h \
+				  policy.h \
+				  policy_table.h \
 				  record.h \
 				  serializable.h \
 				  service.h \

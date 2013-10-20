@@ -19,4 +19,6 @@ typedef sqlite3_int64 MoneyValue_t;
 typedef sqlite3* DB_Handler;
 typedef sqlite3_stmt* DB_Statement;
 
+typedef MoneyValue_t PolicyRatio_t;
+
 #endif /* TYPES_H_ */
