@@ -82,6 +82,14 @@ public:
   /// @}
   /// -------------------------------------------------------------------------
 
+  /// -------------------------------------------------------------------------
+  /// @defgroup SERVICE Services for entry.
+  /// @brief Makes record from current entry.
+  /// @return Newly created record.
+  Record make_record() const;
+  /// @}
+  /// -------------------------------------------------------------------------
+
 private:
   ID_t m_id;
   WrappedString m_name;
@@ -90,10 +98,6 @@ private:
   MoneyValue_t m_last_transaction;
   DateTime m_datetime;
   Status m_status;
-
-  /// @brief Makes record from current entry.
-  /// @return Newly created record.
-  Record __make_record__() const;
 };
 
 }  /* namespace mw */

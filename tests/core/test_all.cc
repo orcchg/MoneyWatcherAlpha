@@ -698,7 +698,47 @@ TEST (CycleTableTest, UpdateEntryWrongId) {
 }
 
 TEST (CycleTableTest, RollbackEntry) {
-  // TODO: implement
+  std::string test_cycle_table_db_filename = "Test-CycleTable.db";
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  try {
+    mw::CycleTable cycle_table(test_cycle_table_db_filename);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::CycleTable> accessor(&cycle_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя слота";
+    mw::WrappedString s_description = "Тестовое описание слота";
+    MoneyValue_t s_balance = 1000;
+    mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
+    mw::Record record = entry.make_record();
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    MoneyValue_t s_expense = -700;
+    mw::WrappedString s_transaction_comment = "Расход на 700 единиц";
+    cycle_table.updateEntry(entry.getID(), s_expense, s_transaction_comment);
+    cycle_table.rollbackEntry(entry.getID(), s_expense, record);
+    mw::Entry read_entry = cycle_table.readEntry(entry.getID());
+    EXPECT_EQ(read_entry.getID(), entry.getID());
+    EXPECT_STREQ(read_entry.getName().c_str(), entry.getName().c_str());
+    EXPECT_STREQ(read_entry.getDescription().c_str(), entry.getDescription().c_str());
+    EXPECT_EQ(read_entry.getBalance(), entry.getBalance());
+    EXPECT_EQ(read_entry.getLastTransaction(), entry.getLastTransaction());
+    EXPECT_STREQ(read_entry.getDateTime().getDate().c_str(), entry.getDateTime().getDate().c_str());
+    EXPECT_STREQ(read_entry.getDateTime().getTime().c_str(), entry.getDateTime().getTime().c_str());
+    EXPECT_EQ(read_entry.getStatus(), entry.getStatus());
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_cycle_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  remove(test_cycle_table_db_filename.c_str());
 }
 
 TEST (CycleTableTest, DeleteEntry) {

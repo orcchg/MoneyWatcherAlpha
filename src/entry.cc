@@ -109,10 +109,7 @@ Status Entry::rollbackBalance(
   return (this->m_status);
 }
 
-
-/* Private members */
-// ----------------------------------------------------------------------------
-Record Entry::__make_record__() const {
+Record Entry::make_record() const {
   Record record(
       -1,  // proper ID will be assigned during database writing.
       this->m_last_transaction,
