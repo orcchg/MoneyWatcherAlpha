@@ -14,12 +14,12 @@ namespace mw {
 
 Status::Status(const sqlite3_int64& i_status)
   : m_status(SV_UNKNOWN) {
-  int status = i_status % 2;
+  int status = i_status % SV_COUNT;
   switch (status) {
-    case 0:
+    case SV_EXPENSE:
       m_status = SV_EXPENSE;
       break;
-    case 1:
+    case SV_INCOME:
       m_status = SV_INCOME;
       break;
     default:

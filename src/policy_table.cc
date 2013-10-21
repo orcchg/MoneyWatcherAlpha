@@ -187,10 +187,77 @@ Policy PolicyTable::addPolicy(
   return (policy);
 }
 
-Policy PolicyTable::readPolicy(const ID_t& i_policy_id) {
+Policy PolicyTable::readPolicy(
+    const ID_t& i_policy_id,
+    std::shared_ptr<DateTime> o_datetime) {
   INF("enter PolicyTable::readPolicy().");
-  //
+
+#if ENABLED_ADVANCED_DEBUG
+  this->__where_check__(i_policy_id);
+#endif
+
+  std::string select_statement = "SELECT * FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "' WHERE ID == '";
+  select_statement += std::to_string(i_policy_id);
+  select_statement += "';";
+  this->__prepare_statement__(select_statement);
+  sqlite3_step(this->m_db_statement);
+  ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
+  DBG1("Read id [%lli] from  table ["%s"] of database ["%s"], "
+       "input id was [%lli].",
+       id, this->m_table_name.c_str(), this->m_db_name.c_str(), i_policy_id);
+  TABLE_ASSERT("Input entry id does not equal to primary key value "
+               "from database!" &&
+               id == i_policy_id);
+
+  const void* raw_name = reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 1));
+  WrappedString name(raw_name);
+  const void* raw_description = reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 2));
+  WrappedString description(raw_description);
+  PolicyRatio_t ratio = sqlite3_column_int64(this->m_db_statement, 3);
+  ID_t source_entry_id = sqlite3_column_int64(this->m_db_statement, 4);
+  ID_t destination_entry_id = sqlite3_column_int64(this->m_db_statement, 5);
+  int hours_period = sqlite3_column_int(this->m_db_statement, 6);
+  std::string date(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 7)));
+  std::string time(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 8)));
+  o_datetime = std::make_shared<DateTime>(date, time);
+  sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 9);
+  PolicyStatus status(raw_status);
+  DBG1("Loaded column data: Name ["%s"]; Description ["%s"]; Ratio [%lli]; "
+       "Source entry [ID: %lli]; Destination entry [ID: %lli]; "
+       "Period [%i]; Date ["%s"]; Time ["%s"]; Status [%lli].",
+       name.c_str(),
+       description.c_str(),
+       ratio,
+       source_entry_id,
+       destination_entry_id,
+       hours_period,
+       datetime.getDate().c_str(),
+       datetime.getTime().c_str(),
+       raw_status);
+  Policy policy(
+      id,
+      name,
+      description,
+      ratio,
+      source_entry_id,
+      destination_entry_id,
+      hours_period,
+      status);
+  DBG1("Proper policy instance has been constructed.");
+
+#if ENABLED_DB_CACHING
+  // TODO: caching the policy
+#endif
+
+  this->__finalize__(select_statement.c_str());
   INF("exit PolicyTable::readPolicy().");
+  return (policy);
 }
 
 const std::string& PolicyTable::getName() const {

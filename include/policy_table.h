@@ -10,6 +10,7 @@
 #ifndef POLICY_TABLE_H_
 #define POLICY_TABLE_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -59,8 +60,11 @@ public:
 
   /// @brief Reads policy from SQLite database.
   /// @param policy_id - Primary key of policy of interest in SQLite database.
+  /// @param[out] datetime - Date & time, when policy was applied.
   /// @return Newly read policy.
-  Policy readPolicy(const ID_t& policy_id);
+  Policy readPolicy(
+      const ID_t& policy_id,
+      std::shared_ptr<DateTime> datetime);
   /// @}
   /// -------------------------------------------------------------------------
 

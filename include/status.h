@@ -10,8 +10,6 @@
 #ifndef STATUS_H_
 #define STATUS_H_
 
-#include <string>
-#include "serializable.h"
 #include "types.h"
 
 

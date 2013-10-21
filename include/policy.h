@@ -10,19 +10,12 @@
 #ifndef POLICY_H_
 #define POLICY_H_
 
-#include "unistring.h"
+#include "policy_status.h"
 #include "types.h"
+#include "unistring.h"
 
 
 namespace mw {
-
-enum PolicyStatus { PS_UNKNOWN = -1,
-                    PS_ENABLED = 0,
-                    PS_DISABLED = 1,
-                    PS_APPLIED = 2,
-                    PS_PENDING = 3,
-                    PS_COUNT
-};
 
 class Policy {
 public:
