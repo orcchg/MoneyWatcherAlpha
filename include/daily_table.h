@@ -10,7 +10,6 @@
 #ifndef DAILY_TABLE_H_
 #define DAILY_TABLE_H_
 
-#include <exception>
 #include <string>
 #include <unordered_map>
 #include <vector>
