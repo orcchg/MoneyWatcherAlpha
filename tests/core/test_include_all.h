@@ -17,6 +17,8 @@
 #include "entry.h"
 #include "hash.h"
 #include "logger.h"
+#include "policy.h"
+#include "policy_table.h"
 #include "record.h"
 #include "serializable.h"
 #include "status.h"

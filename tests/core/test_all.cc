@@ -1583,6 +1583,320 @@ TEST (DailyTableTest, DeleteManyRecordsByOneSQLstatement) {
 }
 
 
+/* PolicyTable testing */
+// XXX(navigation): PolicyTable testing
+// ----------------------------------------------------------------------------
+TEST (PolicyTableTest, CreatePolicyTable) {
+  std::string test_policy_table_db_filename = "Test-PolicyTable.db";
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  try {
+    mw::PolicyTable policy_table(test_policy_table_db_filename);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::PolicyTable> accessor(&policy_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    int db_file_exists = access(test_policy_table_db_filename.c_str(), F_OK);
+    EXPECT_TRUE(db_file_exists == 0);
+    std::string statement = "SELECT * FROM \'";
+    statement += accessor.getTableName();
+    statement += "\';";
+    DB_Statement statement_handler = nullptr;
+    int result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        statement.c_str(),
+        statement.length(),
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(test_policy_table_db_filename.c_str());
+}
+
+TEST (PolicyTableTest, AddPolicy) {
+  std::string test_policy_table_db_filename = "Test-PolicyTable.db";
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  try {
+    mw::PolicyTable policy_table(test_policy_table_db_filename);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::PolicyTable> accessor(&policy_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя политики";
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    PolicyRatio_t s_ratio = 20;
+    ID_t s_source_entry_id = 2;
+    ID_t s_destination_entry_id = 1;
+    int s_hours_period = 168;
+    mw::PolicyStatus s_status(mw::RSV_INCOME);
+    mw::Policy policy = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(policy.getID(), accessor.getNextID() - 1);
+    EXPECT_STREQ(policy.getName().c_str(), s_name.c_str());
+    EXPECT_STREQ(policy.getDescription().c_str(), s_description.c_str());
+    EXPECT_EQ(policy.getRatio(), s_ratio);
+    EXPECT_EQ(policy.getSourceID(), s_source_entry_id);
+    EXPECT_EQ(policy.getDestinationID(), s_destination_entry_id);
+    EXPECT_EQ(policy.getPeriod(), s_hours_period);
+    EXPECT_EQ(policy.getStatus(), s_status);
+
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 1);
+
+    DB_Statement statement_handler = nullptr;
+    std::string value_statement = "SELECT * FROM \'";
+    value_statement += accessor.getTableName();
+    value_statement += "\';";
+    int nByte = static_cast<int>(value_statement.length());
+    int result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        value_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t id = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(policy.getID(), id);
+    const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
+    mw::WrappedString name(raw_name);
+    EXPECT_STREQ(policy.getName().c_str(), name.c_str());
+    const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
+    mw::WrappedString description(raw_description);
+    EXPECT_STREQ(policy.getDescription().c_str(), description.c_str());
+    PolicyRatio_t ratio = sqlite3_column_int64(statement_handler, 3);
+    EXPECT_EQ(policy.getRatio(), ratio);
+    ID_t source_entry_id = sqlite3_column_int64(statement_handler, 4);
+    EXPECT_EQ(policy.getSourceID(), source_entry_id);
+    ID_t destination_entry_id = sqlite3_column_int64(statement_handler, 5);
+    EXPECT_EQ(policy.getDestinationID(), destination_entry_id);
+    int hours_period = sqlite3_column_int(statement_handler, 6);
+    EXPECT_EQ(policy.getPeriod(), hours_period);
+    sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 9);
+    mw::PolicyStatus status(raw_status);
+    EXPECT_EQ(policy.getStatus(), status);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(test_policy_table_db_filename.c_str());
+}
+
+TEST (PolicyTableTest, AddManyPolicys) {
+  std::string test_policy_table_db_filename = "Test-PolicyTable.db";
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  try {
+    mw::PolicyTable policy_table(test_policy_table_db_filename);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::PolicyTable> accessor(&policy_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя политики";
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    PolicyRatio_t s_ratio = 20;
+    ID_t s_source_entry_id = 2;
+    ID_t s_destination_entry_id = 1;
+    int s_hours_period = 168;
+    mw::PolicyStatus s_status(mw::RSV_INCOME);
+    std::vector<mw::Policy> policys;
+    policys.reserve(10);
+    EXPECT_EQ(policys.size(), 0);
+    mw::Policy policy_1 = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(policy_1.getID(), accessor.getNextID() - 1);
+    policys.push_back(policy_1);
+    mw::Policy policy_2 = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(policy_2.getID(), accessor.getNextID() - 1);
+    policys.push_back(policy_2);
+    mw::Policy policy_3 = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(policy_3.getID(), accessor.getNextID() - 1);
+    policys.push_back(policy_3);
+    mw::Policy policy_4 = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(policy_4.getID(), accessor.getNextID() - 1);
+    policys.push_back(policy_4);
+    mw::Policy policy_5 = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(policy_5.getID(), accessor.getNextID() - 1);
+    policys.push_back(policy_5);
+    EXPECT_EQ(accessor.getNextID(), 5);
+    EXPECT_EQ(policys.size(), 5);
+
+    int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 5);
+
+    DB_Statement statement_handler = nullptr;
+    std::string value_statement = "SELECT * FROM \'";
+    value_statement += accessor.getTableName();
+    value_statement += "\';";
+    int nByte = static_cast<int>(value_statement.length());
+    int loop_result =
+        sqlite3_prepare_v2(
+            accessor.getDbHandler(),
+            value_statement.c_str(),
+            nByte,
+            &statement_handler,
+            nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(loop_result, SQLITE_OK);
+    for (auto it = policys.begin(); it != policys.end(); ++it) {
+      loop_result = sqlite3_step(statement_handler);
+      EXPECT_EQ(loop_result, SQLITE_ROW);
+      ID_t id = sqlite3_column_int64(statement_handler, 0);
+      EXPECT_EQ(it->getID(), id);
+      const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
+      mw::WrappedString name(raw_name);
+      EXPECT_STREQ(it->getName().c_str(), name.c_str());
+      const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
+      mw::WrappedString description(raw_description);
+      EXPECT_STREQ(it->getDescription().c_str(), description.c_str());
+      PolicyRatio_t ratio = sqlite3_column_int64(statement_handler, 3);
+      EXPECT_EQ(it->getRatio(), ratio);
+      ID_t source_entry_id = sqlite3_column_int64(statement_handler, 4);
+      EXPECT_EQ(it->getSourceID(), source_entry_id);
+      ID_t destination_entry_id = sqlite3_column_int64(statement_handler, 5);
+      EXPECT_EQ(it->getDestinationID(), destination_entry_id);
+      int hours_period = sqlite3_column_int(statement_handler, 6);
+      EXPECT_EQ(it->getPeriod(), hours_period);
+      sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 9);
+      mw::PolicyStatus status(raw_status);
+      EXPECT_EQ(it->getStatus(), status);
+    }
+    loop_result = sqlite3_step(statement_handler);
+    EXPECT_EQ(loop_result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(test_policy_table_db_filename.c_str());
+}
+
+TEST (PolicyTableTest, ReadPolicy) {
+  std::string test_policy_table_db_filename = "Test-PolicyTable.db";
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  try {
+    mw::PolicyTable policy_table(test_policy_table_db_filename);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::PolicyTable> accessor(&policy_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя политики";
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    PolicyRatio_t s_ratio = 20;
+    ID_t s_source_entry_id = 2;
+    ID_t s_destination_entry_id = 1;
+    int s_hours_period = 168;
+    mw::PolicyStatus s_status(mw::RSV_INCOME);
+    mw::Policy policy = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    std::shared_ptr<mw::DateTime> ptr_datetime;
+    mw::Policy read_policy = policy_table.readPolicy(policy.getID(), ptr_datetime);
+    EXPECT_TRUE(accessor.checkFinalized());
+    EXPECT_EQ(read_policy.getID(), policy.getID());
+    EXPECT_STREQ(read_policy.getName().c_str(), policy.getName().c_str());
+    EXPECT_STREQ(read_policy.getDescription().c_str(), policy.getDescription().c_str());
+    EXPECT_EQ(read_policy.getRatio(), policy.getRatio());
+    EXPECT_EQ(read_policy.getSourceID(), policy.getSourceID());
+    EXPECT_EQ(read_policy.getDestinationID(), policy.getDestinationID());
+    EXPECT_EQ(read_policy.getPeriod(), policy.getPeriod());
+    EXPECT_EQ(read_policy.getStatus(), policy.getStatus());
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(test_policy_table_db_filename.c_str());
+}
+
+TEST (PolicyTableTest, ReadPolicyWrongId) {
+  std::string test_policy_table_db_filename = "Test-PolicyTable.db";
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  try {
+    mw::PolicyTable policy_table(test_policy_table_db_filename);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::PolicyTable> accessor(&policy_table);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::WrappedString s_name = "Имя политики";
+    mw::WrappedString s_description = "Тестовая запись в таблице";
+    PolicyRatio_t s_ratio = 20;
+    ID_t s_source_entry_id = 2;
+    ID_t s_destination_entry_id = 1;
+    int s_hours_period = 168;
+    mw::PolicyStatus s_status(mw::RSV_INCOME);
+    mw::Policy policy = policy_table.addPolicy(s_name, s_description, s_ratio, s_source_entry_id, s_destination_entry_id, s_hours_period, s_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    int number_of_caught_exceptions = 0;
+    try {
+      std::shared_ptr<mw::DateTime> ptr_datetime;
+      mw::Policy read_policy = policy_table.readPolicy(policy.getID() + 5, ptr_datetime);
+    } catch (mw::TableException& e) {
+      ++number_of_caught_exceptions;
+      EXPECT_EQ(e.error(), TABLE_ASSERTION_ERROR_CODE);
+    }
+    EXPECT_EQ(number_of_caught_exceptions, 1);
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(test_policy_table_db_filename.c_str());
+  }
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(test_policy_table_db_filename.c_str());
+}
+
+
 /* SQLite database testing */
 // XXX(navigation): SQLite database testing
 // ----------------------------------------------------------------------------
