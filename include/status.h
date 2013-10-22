@@ -10,33 +10,102 @@
 #ifndef STATUS_H_
 #define STATUS_H_
 
+#include "service.h"
 #include "types.h"
 
 
 namespace mw {
 
-enum StatusValue { SV_UNKNOWN = -1,
-	                 SV_EXPENSE = 0,
-	                 SV_INCOME = 1,
-	                 SV_COUNT
-};
+static const int SV_UNKNOWN = -1;
 
-/// @class Status
-/// @brief Represents various statuses of data.
-class Status {
+template <typename StatusValue>
+class iStatus {
 public:
-  Status(const sqlite3_int64& status);
-  virtual ~Status();
+  iStatus();
+  virtual ~iStatus();
 
   const StatusValue& getStatus() const;
   void setStatus(const StatusValue& status);
 
   operator sqlite3_int64() const;
-  bool operator == (const Status& rhs) const;
-  bool operator != (const Status& rhs) const;
+  bool operator == (const iStatus& rhs) const;
+  bool operator != (const iStatus& rhs) const;
 
 private:
   StatusValue m_status;
+};
+
+
+template <typename StatusValue>
+iStatus<StatusValue>::iStatus()
+  : m_status(Int2Type<SV_UNKNOWN>()) {
+}
+
+template <typename StatusValue>
+iStatus<StatusValue>::~iStatus() {
+}
+
+template <typename StatusValue>
+const StatusValue& iStatus<StatusValue>::getStatus() const {
+  return (this->m_status);
+}
+
+template <typename StatusValue>
+void iStatus<StatusValue>::setStatus(const StatusValue& status) {
+  this->m_status = status;
+}
+
+template <typename StatusValue>
+iStatus<StatusValue>::operator sqlite3_int64() const {
+  return (static_cast<sqlite3_int64>(this->m_status));
+}
+
+template <typename StatusValue>
+bool iStatus<StatusValue>::operator == (const iStatus& rhs) const {
+  return (this->m_status == rhs.m_status);
+}
+
+template <typename StatusValue>
+bool iStatus<StatusValue>::operator != (const iStatus& rhs) const {
+  return (this->m_status != rhs.m_status);
+}
+
+
+// ----------------------------------------------------------------------------
+enum RecordStatusValue { RSV_EXPENSE = 0,
+                         RSV_INCOME = 1,
+                         RSV_COUNT
+};
+
+/// @class Status
+/// @brief Represents various statuses of record.
+class RecordStatus : public iStatus<RecordStatusValue> {
+public:
+  RecordStatus(const sqlite3_int64& status);
+  virtual ~RecordStatus();
+
+private:
+  RecordStatusValue m_status;
+};
+
+
+// ----------------------------------------------------------------------------
+enum PolicyStatusValue { PSV_ENABLED = 0,
+                         PSV_DISABLED = 1,
+                         PSV_APPLIED = 2,
+                         PSV_PENDING = 3,
+                         PSV_COUNT
+};
+
+/// @class PolicyStatus
+/// @brief Represents various statuses of policy.
+class PolicyStatus : public iStatus<PolicyStatusValue> {
+public:
+  PolicyStatus(const sqlite3_int64& status);
+  virtual ~PolicyStatus();
+
+private:
+  PolicyStatusValue m_status;
 };
 
 }  /* namespace mw */

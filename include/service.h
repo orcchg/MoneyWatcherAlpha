@@ -37,4 +37,9 @@ std::string vectorToString(
   return result;
 }
 
+template <int I>
+struct Int2Type {
+  enum { value = I };
+};
+
 #endif /* SERVICE_H_ */

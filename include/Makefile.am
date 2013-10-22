@@ -9,7 +9,6 @@ include_HEADERS = common.h \
 				  idatabase.h \
 				  logger.h \
 				  policy.h \
-				  policy_status.h \
 				  policy_table.h \
 				  record.h \
 				  serializable.h \

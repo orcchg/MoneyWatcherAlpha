@@ -122,7 +122,7 @@ Entry CycleTable::addEntry(
   DBG1("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
        time.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
-  Status status = SV_UNKNOWN;
+  RecordStatus status = SV_UNKNOWN;
   accumulate = accumulate &&
       (sqlite3_bind_int64(
           this->m_db_statement,
@@ -208,7 +208,7 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
       sqlite3_column_text(this->m_db_statement, 6)));
   DateTime datetime(date, time);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 7);
-  Status status(raw_status);
+  RecordStatus status(raw_status);
   DBG1("Loaded column data: Name ["%s"]; Description ["%s"]; Balance [%lli]; "
        "Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
        name.c_str(),

@@ -10,7 +10,7 @@
 #ifndef POLICY_H_
 #define POLICY_H_
 
-#include "policy_status.h"
+#include "status.h"
 #include "types.h"
 #include "unistring.h"
 

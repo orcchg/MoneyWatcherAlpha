@@ -28,7 +28,7 @@ public:
       const ID_t& id,
       const MoneyValue_t& balance,
       const WrappedString& description,
-      const Status& status,
+      const RecordStatus& status,
       const DateTime& datetime = DateTime());
   virtual ~Record();
 
@@ -46,7 +46,7 @@ public:
   /// has been created.
   const DateTime& getDateTime() const;
   /// @brief Gets the status of the current record.
-  const Status& getStatus() const;
+  const RecordStatus& getStatus() const;
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ private:
   MoneyValue_t m_balance;
   WrappedString m_description;
   DateTime m_datetime;
-  Status m_status;
+  RecordStatus m_status;
 };
 
 } /* namespace mw */

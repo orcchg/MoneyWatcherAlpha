@@ -15,7 +15,6 @@ libmoneywatcher_la_SOURCES = cycle_table.cc \
 							 idatabase.cc \
 							 logger.cc \
 							 policy.cc \
-							 policy_status.cc \
 							 policy_table.cc \
 							 record.cc \
 							 service.cc \

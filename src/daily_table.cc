@@ -41,7 +41,7 @@ DailyTable::~DailyTable() {
 Record DailyTable::addRecord(
     const MoneyValue_t& i_balance,
     const WrappedString& i_description,
-    const Status& i_status) {
+    const RecordStatus& i_status) {
   INF("enter DailyTable::addRecord().");
   std::string insert_statement = "INSERT INTO '";
   insert_statement += this->m_table_name;
@@ -175,7 +175,7 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   const void* raw_description = sqlite3_column_text(this->m_db_statement, 4);
   WrappedString description(raw_description);
   sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
-  Status status(raw_status);
+  RecordStatus status(raw_status);
   DBG1("Loaded column data: Date ["%s"]; Time ["%s"]; "
        "Balance [%lli]; Description ["%s"]; Status [%lli].",
        datetime.getDate().c_str(),

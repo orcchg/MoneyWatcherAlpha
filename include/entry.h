@@ -30,7 +30,7 @@ public:
       const WrappedString& description,
       const MoneyValue_t& current_balance,
       const MoneyValue_t& last_transaction,
-      const Status& status,
+      const RecordStatus& status,
       const DateTime& datetime = DateTime());
   virtual ~Entry();
 
@@ -53,7 +53,7 @@ public:
   /// last transaction of the current entry has been performed.
   const DateTime& getDateTime() const;
   /// @brief Gets the status of the last transaction.
-  const Status& getStatus() const;
+  const RecordStatus& getStatus() const;
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ public:
   /// value.
   /// @param description - Description of provided transaction.
   /// @return Status of last transaction.
-  Status updateBalance(
+  RecordStatus updateBalance(
       const MoneyValue_t& value,
       const WrappedString& description);
 
@@ -78,7 +78,7 @@ public:
   /// @param value - Amount to which the actual money balance should
   /// @param record - Record, whose balance, description and date & time
   /// @return Status of input record.
-  Status rollbackBalance(const MoneyValue_t& i_value, const Record& record);
+  RecordStatus rollbackBalance(const MoneyValue_t& i_value, const Record& record);
   /// @}
   /// -------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ private:
   MoneyValue_t m_current_balance;
   MoneyValue_t m_last_transaction;
   DateTime m_datetime;
-  Status m_status;
+  RecordStatus m_status;
 };
 
 }  /* namespace mw */

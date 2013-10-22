@@ -17,7 +17,7 @@ Record::Record(
 	const ID_t& id,
     const MoneyValue_t& balance,
     const WrappedString& description,
-    const Status& status,
+    const RecordStatus& status,
     const DateTime& datetime)
   : m_id(id)
   , m_balance(balance)
@@ -45,7 +45,7 @@ const DateTime& Record::getDateTime() const {
   return (this->m_datetime);
 }
 
-const Status& Record::getStatus() const {
+const RecordStatus& Record::getStatus() const {
   return (this->m_status);
 }
 
