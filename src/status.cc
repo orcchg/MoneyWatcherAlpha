@@ -14,36 +14,39 @@ namespace mw {
 
 RecordStatus::RecordStatus(const sqlite3_int64& i_status)
   : iStatus() {
-  int status = i_status % RSV_COUNT;
+  int status = i_status % 2;
   switch (status) {
-    case RSV_EXPENSE:
-      m_status = RSV_EXPENSE;
+    case 0:
+      this->setStatus(RSV_EXPENSE);
       break;
-    case RSV_INCOME:
-      m_status = RSV_INCOME;
+    case 1:
+      this->setStatus(RSV_INCOME);
       break;
     default:
       break;
   }
 }
 
+RecordStatus::~RecordStatus() {
+}
+
 
 // ----------------------------------------------------------------------------
 PolicyStatus::PolicyStatus(const sqlite3_int64& i_status)
   : iStatus() {
-  int status = i_status % PSV_COUNT;
+  int status = i_status % 4;
   switch (status) {
-    case PSV_ENABLED:
-      m_status = PSV_ENABLED;
+    case 0:
+      this->setStatus(PSV_ENABLED);
       break;
-    case PSV_DISABLED:
-      m_status = PSV_DISABLED;
+    case 1:
+      this->setStatus(PSV_DISABLED);
       break;
-    case PSV_APPLIED:
-      m_status = PSV_APPLIED;
+    case 2:
+      this->setStatus(PSV_APPLIED);
       break;
-    case PSV_PENDING:
-      m_status = PSV_PENDING;
+    case 3:
+      this->setStatus(PSV_PENDING);
       break;
     default:
       break;

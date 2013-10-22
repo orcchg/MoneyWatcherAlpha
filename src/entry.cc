@@ -68,7 +68,7 @@ RecordStatus Entry::updateBalance(
     const MoneyValue_t& i_value,
     const WrappedString& i_description) {
   DBG("enter Entry::updateBalance().");
-  RecordStatus status(SV_UNKNOWN);
+  RecordStatus status(RSV_UNKNOWN);
   this->m_description = i_description;
   this->m_last_transaction = i_value;
   this->m_current_balance += i_value;  // update current balance

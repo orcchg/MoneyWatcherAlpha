@@ -122,7 +122,7 @@ Entry CycleTable::addEntry(
   DBG1("Time ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
        time.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
-  RecordStatus status = SV_UNKNOWN;
+  RecordStatus status = RSV_UNKNOWN;
   accumulate = accumulate &&
       (sqlite3_bind_int64(
           this->m_db_statement,

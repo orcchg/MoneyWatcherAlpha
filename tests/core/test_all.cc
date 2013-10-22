@@ -96,14 +96,14 @@ TEST (TimeMeasure, CreateDailyTable) {
 TEST_F (TimeMeasureFixture, AddRecord) {
   MoneyValue_t s_balance = 1000;
   mw::WrappedString s_description = "Тестовая запись в таблице";
-  mw::Status s_status(mw::SV_INCOME);
+  mw::RecordStatus s_status(mw::RSV_INCOME);
   this->getDailyTable().addRecord(s_balance, s_description, s_status);
 }
 
 TEST_F (TimeMeasureFixture, AddManyRecord) {
   MoneyValue_t s_balance = 1000;
   mw::WrappedString s_description = "Тестовая запись в таблице";
-  mw::Status s_status(mw::SV_INCOME);
+  mw::RecordStatus s_status(mw::RSV_INCOME);
   this->getDailyTable().addRecord(s_balance, s_description, s_status);
   this->getDailyTable().addRecord(s_balance, s_description, s_status);
   this->getDailyTable().addRecord(s_balance, s_description, s_status);
@@ -334,7 +334,7 @@ TEST (CycleTableTest, AddEntry) {
     mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
     MoneyValue_t s_transaction = 0;
-    mw::Status s_status(mw::SV_UNKNOWN);
+    mw::RecordStatus s_status(mw::RSV_UNKNOWN);
     mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
     EXPECT_TRUE(accessor.checkFinalized());
     EXPECT_EQ(entry.getID(), accessor.getNextID() - 1);
@@ -380,7 +380,7 @@ TEST (CycleTableTest, AddEntry) {
     EXPECT_STREQ(entry.getDateTime().getDate().c_str(), datetime.getDate().c_str());
     EXPECT_STREQ(entry.getDateTime().getTime().c_str(), datetime.getTime().c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
-    mw::Status status(raw_status);
+    mw::RecordStatus status(raw_status);
     EXPECT_EQ(entry.getStatus(), status);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
@@ -412,7 +412,7 @@ TEST (CycleTableTest, AddManyEntries) {
     mw::WrappedString s_name = "Имя слота";
     mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
-    mw::Status s_status(mw::SV_UNKNOWN);
+    mw::RecordStatus s_status(mw::RSV_UNKNOWN);
     std::vector<mw::Entry> entries;
     entries.reserve(10);
     EXPECT_EQ(entries.size(), 0);
@@ -477,7 +477,7 @@ TEST (CycleTableTest, AddManyEntries) {
       EXPECT_STREQ(it->getDateTime().getDate().c_str(), datetime.getDate().c_str());
       EXPECT_STREQ(it->getDateTime().getTime().c_str(), datetime.getTime().c_str());
       sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
-      mw::Status status(raw_status);
+      mw::RecordStatus status(raw_status);
       EXPECT_EQ(it->getStatus(), status);
     }
     loop_result = sqlite3_step(statement_handler);
@@ -511,7 +511,7 @@ TEST (CycleTableTest, ReadEntry) {
     mw::WrappedString s_description = "Тестовое описание слота";
     MoneyValue_t s_balance = 1000;
     MoneyValue_t s_transaction = 0;
-    mw::Status s_status(mw::SV_UNKNOWN);
+    mw::RecordStatus s_status(mw::RSV_UNKNOWN);
     mw::Entry entry = cycle_table.addEntry(s_name, s_description, s_balance);
     EXPECT_TRUE(accessor.checkFinalized());
     EXPECT_EQ(entry.getID(), accessor.getNextID() - 1);
@@ -604,7 +604,7 @@ TEST (CycleTableTest, UpdateEntry) {
     entry.updateBalance(s_expense, s_transaction_comment);
     EXPECT_EQ(entry.getBalance(), s_balance + s_expense);
     EXPECT_EQ(entry.getLastTransaction(), s_expense);
-    mw::Status s_status(mw::SV_EXPENSE);
+    mw::RecordStatus s_status(mw::RSV_EXPENSE);
     EXPECT_EQ(entry.getStatus(), s_status);
 
     mw::Entry updated_entry =
@@ -662,7 +662,7 @@ TEST (CycleTableTest, UpdateEntryWrongId) {
     entry.updateBalance(s_expense, s_transaction_comment);
     EXPECT_EQ(entry.getBalance(), s_balance + s_expense);
     EXPECT_EQ(entry.getLastTransaction(), s_expense);
-    mw::Status s_status(mw::SV_EXPENSE);
+    mw::RecordStatus s_status(mw::RSV_EXPENSE);
     EXPECT_EQ(entry.getStatus(), s_status);
 
     int number_of_caught_exceptions = 0;
@@ -1075,7 +1075,7 @@ TEST (DailyTableTest, AddRecord) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_TRUE(accessor.checkFinalized());
     EXPECT_EQ(record.getID(), accessor.getNextID() - 1);
@@ -1114,7 +1114,7 @@ TEST (DailyTableTest, AddRecord) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(record.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
-    mw::Status status(raw_status);
+    mw::RecordStatus status(raw_status);
     EXPECT_EQ(record.getStatus(), status);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
@@ -1145,7 +1145,7 @@ TEST (DailyTableTest, AddManyRecords) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     std::vector<mw::Record> records;
     records.reserve(10);
     EXPECT_EQ(records.size(), 0);
@@ -1205,7 +1205,7 @@ TEST (DailyTableTest, AddManyRecords) {
       mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
       EXPECT_STREQ(it->getDescription().c_str(), description.c_str());
       sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
-      mw::Status status(raw_status);
+      mw::RecordStatus status(raw_status);
       EXPECT_EQ(it->getStatus(), status);
     }
     loop_result = sqlite3_step(statement_handler);
@@ -1237,7 +1237,7 @@ TEST (DailyTableTest, ReadRecord) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_TRUE(accessor.checkFinalized());
 
@@ -1275,7 +1275,7 @@ TEST (DailyTableTest, ReadRecordWrongId) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     mw::Record record = daily_table.addRecord(s_balance, s_description, s_status);
     EXPECT_TRUE(accessor.checkFinalized());
 
@@ -1312,7 +1312,7 @@ TEST (DailyTableTest, DeleteRecord) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
@@ -1387,7 +1387,7 @@ TEST (DailyTableTest, DeleteRecordWrongId) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
@@ -1430,7 +1430,7 @@ TEST (DailyTableTest, DeleteRecordTwice) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     mw::Record record_1 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_2 = daily_table.addRecord(s_balance, s_description, s_status);
     mw::Record record_3 = daily_table.addRecord(s_balance, s_description, s_status);
@@ -1479,7 +1479,7 @@ TEST (DailyTableTest, DeleteManyRecords) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     std::vector<mw::Record> records;
     int total_records = 10;
     records.reserve(total_records);
@@ -1527,7 +1527,7 @@ TEST (DailyTableTest, DeleteManyRecordsByOneSQLstatement) {
     EXPECT_TRUE(accessor.checkFinalized());
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::Status s_status(mw::SV_INCOME);
+    mw::RecordStatus s_status(mw::RSV_INCOME);
     std::vector<ID_t> record_ids;
     int total_records = 10;
     record_ids.reserve(total_records);
@@ -1608,9 +1608,9 @@ TEST (SQLiteDatabaseTest, SingleTableOpenFromTwoHandlers) {
     mw::WrappedString s_record_description = "Тестовая запись в таблице";
     MoneyValue_t s_entry_balance = 1000;
     MoneyValue_t s_record_balance = 500;
-    mw::Status unknown_status(mw::SV_UNKNOWN);
-    mw::Status s_entry_status(mw::SV_EXPENSE);
-    mw::Status s_record_status(mw::SV_INCOME);
+    mw::RecordStatus unknown_status(mw::RSV_UNKNOWN);
+    mw::RecordStatus s_entry_status(mw::RSV_EXPENSE);
+    mw::RecordStatus s_record_status(mw::RSV_INCOME);
 
     mw::Entry entry = cycle_table.addEntry(s_name, s_entry_description, s_entry_balance);
     EXPECT_TRUE(cycle_accessor.checkFinalized());
@@ -1679,7 +1679,7 @@ TEST (SQLiteDatabaseTest, TablePersistense) {
     mw::WrappedString s_record_description = "Тестовая запись в таблице";
     MoneyValue_t s_entry_balance = 1000;
     MoneyValue_t s_record_balance = 500;
-    mw::Status s_record_status(mw::SV_UNKNOWN);
+    mw::RecordStatus s_record_status(mw::RSV_UNKNOWN);
 
     {  // open single database and fill Cycle_Table
       mw::CycleTable cycle_table(test_single_db_filename);
@@ -2444,7 +2444,7 @@ TEST (TableManagerTest, TableManagerUndo) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(undo_record.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
-    mw::Status status(raw_status);
+    mw::RecordStatus status(raw_status);
     EXPECT_EQ(undo_record.getStatus(), status);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
@@ -2497,7 +2497,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     EXPECT_STREQ(entry.getDateTime().getTime().c_str(), init.first.getDateTime().getTime().c_str());
     EXPECT_STREQ(entry.getDescription().c_str(), s_entry_description.c_str());
     EXPECT_EQ(entry.getLastTransaction(), 0);
-    mw::Status init_status(mw::SV_UNKNOWN);
+    mw::RecordStatus init_status(mw::RSV_UNKNOWN);
     EXPECT_EQ(entry.getStatus(), init_status);
     rows = countRows(records_table_name, accessor.getDbHandler());
     EXPECT_EQ(rows, 0 + 1);
@@ -2553,7 +2553,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(entry.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
-    mw::Status status(raw_status);
+    mw::RecordStatus status(raw_status);
     EXPECT_EQ(entry.getStatus(), status);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
@@ -2609,7 +2609,7 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
     // TODO: difference between new Entry and new Record    EXPECT_STREQ(entry.getDateTime().getTime().c_str(), datetime.getTime().c_str());
     EXPECT_STREQ(entry.getDescription().c_str(), s_entry_description.c_str());
     EXPECT_EQ(entry.getLastTransaction(), s_entry_balance);
-    mw::Status init_status(mw::SV_UNKNOWN);
+    mw::RecordStatus init_status(mw::RSV_UNKNOWN);
     EXPECT_EQ(entry.getStatus(), init_status);
     rows = countRows(records_table_name, accessor.getDbHandler());
     EXPECT_EQ(rows, 0 + 1);

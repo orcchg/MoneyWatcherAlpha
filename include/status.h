@@ -10,13 +10,10 @@
 #ifndef STATUS_H_
 #define STATUS_H_
 
-#include "service.h"
 #include "types.h"
 
 
 namespace mw {
-
-static const int SV_UNKNOWN = -1;
 
 template <typename StatusValue>
 class iStatus {
@@ -37,8 +34,7 @@ private:
 
 
 template <typename StatusValue>
-iStatus<StatusValue>::iStatus()
-  : m_status(Int2Type<SV_UNKNOWN>()) {
+iStatus<StatusValue>::iStatus() {
 }
 
 template <typename StatusValue>
@@ -72,7 +68,8 @@ bool iStatus<StatusValue>::operator != (const iStatus& rhs) const {
 
 
 // ----------------------------------------------------------------------------
-enum RecordStatusValue { RSV_EXPENSE = 0,
+enum RecordStatusValue { RSV_UNKNOWN = -1,
+                         RSV_EXPENSE = 0,
                          RSV_INCOME = 1,
                          RSV_COUNT
 };
@@ -83,14 +80,12 @@ class RecordStatus : public iStatus<RecordStatusValue> {
 public:
   RecordStatus(const sqlite3_int64& status);
   virtual ~RecordStatus();
-
-private:
-  RecordStatusValue m_status;
 };
 
 
 // ----------------------------------------------------------------------------
-enum PolicyStatusValue { PSV_ENABLED = 0,
+enum PolicyStatusValue { PSV_UNKNOWN = -1,
+                         PSV_ENABLED = 0,
                          PSV_DISABLED = 1,
                          PSV_APPLIED = 2,
                          PSV_PENDING = 3,
@@ -103,9 +98,6 @@ class PolicyStatus : public iStatus<PolicyStatusValue> {
 public:
   PolicyStatus(const sqlite3_int64& status);
   virtual ~PolicyStatus();
-
-private:
-  PolicyStatusValue m_status;
 };
 
 }  /* namespace mw */
