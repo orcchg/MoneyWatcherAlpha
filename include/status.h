@@ -76,10 +76,21 @@ enum RecordStatusValue { RSV_UNKNOWN = -1,
 
 /// @class Status
 /// @brief Represents various statuses of record.
-class RecordStatus : public iStatus<RecordStatusValue> {
+class RecordStatus {
 public:
-  RecordStatus(const sqlite3_int64& status);
+  RecordStatus(RecordStatusValue status);
+  RecordStatus(sqlite3_int64 status);
   virtual ~RecordStatus();
+
+  const RecordStatusValue& getStatus() const;
+  void setStatus(const RecordStatusValue& status);
+
+  operator sqlite3_int64() const;
+  bool operator == (const RecordStatus& rhs) const;
+  bool operator != (const RecordStatus& rhs) const;
+
+private:
+  RecordStatusValue m_status;
 };
 
 
@@ -94,10 +105,21 @@ enum PolicyStatusValue { PSV_UNKNOWN = -1,
 
 /// @class PolicyStatus
 /// @brief Represents various statuses of policy.
-class PolicyStatus : public iStatus<PolicyStatusValue> {
+class PolicyStatus {
 public:
-  PolicyStatus(const sqlite3_int64& status);
+  PolicyStatus(PolicyStatusValue status);
+  PolicyStatus(sqlite3_int64 status);
   virtual ~PolicyStatus();
+
+  const PolicyStatusValue& getStatus() const;
+  void setStatus(const PolicyStatusValue& status);
+
+  operator sqlite3_int64() const;
+  bool operator == (const PolicyStatus& rhs) const;
+  bool operator != (const PolicyStatus& rhs) const;
+
+private:
+  PolicyStatusValue m_status;
 };
 
 }  /* namespace mw */

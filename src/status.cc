@@ -12,48 +12,96 @@
 
 namespace mw {
 
-RecordStatus::RecordStatus(const sqlite3_int64& i_status)
-  : iStatus() {
-  int status = i_status % 2;
-  switch (status) {
-    case 0:
-      this->setStatus(RSV_EXPENSE);
-      break;
-    case 1:
-      this->setStatus(RSV_INCOME);
-      break;
-    default:
-      break;
-  }
+RecordStatus::RecordStatus(RecordStatusValue i_status)
+  : m_status(i_status) {
 }
 
 RecordStatus::~RecordStatus() {
 }
 
+RecordStatus::RecordStatus(sqlite3_int64 i_status) {
+  int status = i_status % 2;
+  switch (status) {
+    case 0:
+      this->m_status = RSV_EXPENSE;
+      break;
+    case 1:
+      this->m_status = RSV_INCOME;
+      break;
+    default:
+      this->m_status = RSV_UNKNOWN;
+      break;
+  }
+}
+
+const RecordStatusValue& RecordStatus::getStatus() const {
+  return (this->m_status);
+}
+
+void RecordStatus::setStatus(const RecordStatusValue& status) {
+  this->m_status = status;
+}
+
+RecordStatus::operator sqlite3_int64() const {
+  return (static_cast<sqlite3_int64>(this->m_status));
+}
+
+bool RecordStatus::operator == (const RecordStatus& rhs) const {
+  return (this->m_status == rhs.m_status);
+}
+
+bool RecordStatus::operator != (const RecordStatus& rhs) const {
+  return (this->m_status != rhs.m_status);
+}
+
 
 // ----------------------------------------------------------------------------
-PolicyStatus::PolicyStatus(const sqlite3_int64& i_status)
-  : iStatus() {
+PolicyStatus::PolicyStatus(PolicyStatusValue i_status)
+  : m_status(i_status) {
+}
+
+PolicyStatus::PolicyStatus(sqlite3_int64 i_status) {
   int status = i_status % 4;
   switch (status) {
     case 0:
-      this->setStatus(PSV_ENABLED);
+      this->m_status = PSV_ENABLED;
       break;
     case 1:
-      this->setStatus(PSV_DISABLED);
+      this->m_status = PSV_DISABLED;
       break;
     case 2:
-      this->setStatus(PSV_APPLIED);
+      this->m_status = PSV_APPLIED;
       break;
     case 3:
-      this->setStatus(PSV_PENDING);
+      this->m_status = PSV_PENDING;
       break;
     default:
+      this->m_status = PSV_UNKNOWN;
       break;
   }
 }
 
 PolicyStatus::~PolicyStatus() {
+}
+
+const PolicyStatusValue& PolicyStatus::getStatus() const {
+  return (this->m_status);
+}
+
+void PolicyStatus::setStatus(const PolicyStatusValue& status) {
+  this->m_status = status;
+}
+
+PolicyStatus::operator sqlite3_int64() const {
+  return (static_cast<sqlite3_int64>(this->m_status));
+}
+
+bool PolicyStatus::operator == (const PolicyStatus& rhs) const {
+  return (this->m_status == rhs.m_status);
+}
+
+bool PolicyStatus::operator != (const PolicyStatus& rhs) const {
+  return (this->m_status != rhs.m_status);
 }
 
 }  /* namespace mw */

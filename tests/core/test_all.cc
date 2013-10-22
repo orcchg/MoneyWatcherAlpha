@@ -321,7 +321,7 @@ TEST (CycleTableTest, CreateCycleTable) {
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   remove(test_cycle_table_db_filename.c_str());
 }
-
+#include <iostream>
 TEST (CycleTableTest, AddEntry) {
   std::string test_cycle_table_db_filename = "Test-CycleTable.db";
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
@@ -380,6 +380,7 @@ TEST (CycleTableTest, AddEntry) {
     EXPECT_STREQ(entry.getDateTime().getDate().c_str(), datetime.getDate().c_str());
     EXPECT_STREQ(entry.getDateTime().getTime().c_str(), datetime.getTime().c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
+    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_UNKNOWN));
     mw::RecordStatus status(raw_status);
     EXPECT_EQ(entry.getStatus(), status);
     result = sqlite3_step(statement_handler);
@@ -477,6 +478,7 @@ TEST (CycleTableTest, AddManyEntries) {
       EXPECT_STREQ(it->getDateTime().getDate().c_str(), datetime.getDate().c_str());
       EXPECT_STREQ(it->getDateTime().getTime().c_str(), datetime.getTime().c_str());
       sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
+      EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_UNKNOWN));
       mw::RecordStatus status(raw_status);
       EXPECT_EQ(it->getStatus(), status);
     }
@@ -1114,6 +1116,7 @@ TEST (DailyTableTest, AddRecord) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(record.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
+    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_INCOME));
     mw::RecordStatus status(raw_status);
     EXPECT_EQ(record.getStatus(), status);
     result = sqlite3_step(statement_handler);
@@ -1205,6 +1208,7 @@ TEST (DailyTableTest, AddManyRecords) {
       mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
       EXPECT_STREQ(it->getDescription().c_str(), description.c_str());
       sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
+      EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_INCOME));
       mw::RecordStatus status(raw_status);
       EXPECT_EQ(it->getStatus(), status);
     }
@@ -1688,6 +1692,7 @@ TEST (PolicyTableTest, AddPolicy) {
     int hours_period = sqlite3_column_int(statement_handler, 6);
     EXPECT_EQ(policy.getPeriod(), hours_period);
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 9);
+    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_INCOME));
     mw::PolicyStatus status(raw_status);
     EXPECT_EQ(policy.getStatus(), status);
     result = sqlite3_step(statement_handler);
@@ -1787,6 +1792,7 @@ TEST (PolicyTableTest, AddManyPolicys) {
       int hours_period = sqlite3_column_int(statement_handler, 6);
       EXPECT_EQ(it->getPeriod(), hours_period);
       sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 9);
+      EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_INCOME));
       mw::PolicyStatus status(raw_status);
       EXPECT_EQ(it->getStatus(), status);
     }
@@ -2758,6 +2764,7 @@ TEST (TableManagerTest, TableManagerUndo) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(undo_record.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
+    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_INCOME));
     mw::RecordStatus status(raw_status);
     EXPECT_EQ(undo_record.getStatus(), status);
     result = sqlite3_step(statement_handler);
@@ -2867,6 +2874,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(entry.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
+    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RSV_UNKNOWN));
     mw::RecordStatus status(raw_status);
     EXPECT_EQ(entry.getStatus(), status);
     result = sqlite3_step(statement_handler);
