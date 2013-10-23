@@ -23,7 +23,8 @@ const std::string TableManager::records_table_name_prefix = "Records_for_Entry_"
 TableManager::TableManager()
   : iDatabase(TableManager::single_database_name, "Entry_IDs_Table")
   , m_cycle_table(TableManager::single_database_name)
-  , m_daily_table(TableManager::single_database_name) {
+  , m_daily_table(TableManager::single_database_name)
+  , m_policy_table(TableManager::single_database_name) {
   INF("enter TableManager constructor.");
   this->__init__();
   ++TableManager::OPENED_DATABASES_COUNT;
@@ -41,6 +42,7 @@ TableManager::~TableManager() {
   INF("exit TableManager destructor.");
 }
 
+// ----------------------------------------------------------------------------
 std::pair<Entry, Record> TableManager::add(
     const WrappedString& i_name,
     const WrappedString& i_description,
@@ -299,6 +301,46 @@ Entry TableManager::undo(const ID_t& i_entry_id) {
   return (entry);
 }
 
+// ----------------------------------------------------------------------------
+Policy TableManager::createPolicy(
+      const WrappedString& i_name,
+      const WrappedString& i_description,
+      const PolicyRatio_t& i_ratio,
+      const ID_t& i_source_entry_id,
+      const ID_t& i_destination_entry_id,
+      int i_hours_period,
+      const PolicyStatus& i_status) {
+  INF("enter TableManager::createPolicy().");
+  Policy policy = this->m_policy_table.addPolicy(
+      i_name,
+      i_description,
+      i_ratio,
+      i_source_entry_id,
+      i_destination_entry_id,
+      i_hours_period,
+      i_status);
+  INF("exit TableManager::createPolicy().");
+  return (policy);
+}
+
+Record TableManager::applyPolicy(const ID_t& i_policy_id) {
+  INF("enter TableManager::applyPolicy().");
+  std::shared_ptr<DateTime> ptr_datetime;
+  Policy policy = this->m_policy_table.readPolicy(i_policy_id, ptr_datetime);
+  Entry source_entry = this->m_cycle_table.readEntry(policy.getSourceID());
+  MoneyValue_t value = source_entry.getBalance() * policy.getRatio() / 100;
+  this->m_cycle_table.updateEntry(
+      policy.getDestinationID(),
+      value,
+      policy.getDescription());
+  RecordStatus status(RSV_APPLIED_POLICY);
+  Record record =
+      this->m_daily_table.addRecord(value, policy.getDescription(), status);
+  INF("exit TableManager::applyPolicy().");
+  return (record);
+}
+
+// ----------------------------------------------------------------------------
 const std::string& TableManager::getCycleTableName() const {
   INF("enter TableManager::getCycleTableName().");
   DBG3("Cycle Table name is ["%s"].", this->m_cycle_table.getName().c_str());

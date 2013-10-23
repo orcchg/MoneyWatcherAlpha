@@ -77,6 +77,7 @@ bool iStatus<StatusValue>::operator != (const iStatus& rhs) const {
 enum RecordStatusValue { RSV_UNKNOWN = -1,
                          RSV_EXPENSE = 0,
                          RSV_INCOME = 1,
+                         RSV_APPLIED_POLICY = 2,
                          RSV_COUNT
 };
 

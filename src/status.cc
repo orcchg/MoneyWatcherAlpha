@@ -20,13 +20,16 @@ RecordStatus::~RecordStatus() {
 }
 
 RecordStatus::RecordStatus(sqlite3_int64 i_status) {
-  int status = i_status % 2;
+  int status = i_status % RSV_COUNT;
   switch (status) {
     case 0:
       this->m_status = RSV_EXPENSE;
       break;
     case 1:
       this->m_status = RSV_INCOME;
+      break;
+    case 2:
+      this->m_status = RSV_APPLIED_POLICY;
       break;
     default:
       this->m_status = RSV_UNKNOWN;
@@ -41,7 +44,7 @@ PolicyStatus::PolicyStatus(PolicyStatusValue i_status)
 }
 
 PolicyStatus::PolicyStatus(sqlite3_int64 i_status) {
-  int status = i_status % 4;
+  int status = i_status % PSV_COUNT;
   switch (status) {
     case 0:
       this->m_status = PSV_ENABLED;

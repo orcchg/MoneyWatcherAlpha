@@ -18,6 +18,7 @@
 #include "cycle_table.h"
 #include "daily_table.h"
 #include "hash.h"
+#include "policy_table.h"
 
 
 namespace mw {
@@ -80,6 +81,39 @@ public:
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------
+  /// @defgroup POLICY Methods to provide policies for entries.
+  /// @{
+  /// @brief Creates policy linking two existing entries.
+  /// @param name - Name of policy.
+  /// @param description - Text description of policy.
+  /// @param ratio - Ratio, in which source entry's balance will be divided
+  /// and added to the destination entry's balance.
+  /// @param source_entry_id - ID of source entry.
+  /// @param destination_entry_id - ID of destination entry.
+  /// @param hours_period - Time period (in hours), policy will be
+  /// applied at the end of it.
+  /// @param status - Status of policy.
+  /// @return Newly created policy.
+  /// @details Policy will also be stored into SQLite database.
+  Policy createPolicy(
+      const WrappedString& name,
+      const WrappedString& description,
+      const PolicyRatio_t& ratio,
+      const ID_t& source_entry_id,
+      const ID_t& destination_entry_id,
+      int hours_period,
+      const PolicyStatus& status);
+
+  /// @brief Applies policy, determined by given ID.
+  /// @param policy_id - Primary key of policy of interest in SQLite database.
+  /// @return Record, corresponding to applied policy.
+  /// @details Invocation of this function also makes record and stores it
+  /// to daily_table in SQLite database.
+  Record applyPolicy(const ID_t& policy_id);
+  /// @}
+  /// -------------------------------------------------------------------------
+
+  /// -------------------------------------------------------------------------
   /// @defgroup NAME Getters for underlying tables' names.
   /// @{
   const std::string& getCycleTableName() const;
@@ -94,6 +128,7 @@ public:
 private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
+  PolicyTable m_policy_table;
   std::set<ID_t> m_entry_ids;
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, std::list<ID_t>, Hasher<ID_t> > m_entry_records;

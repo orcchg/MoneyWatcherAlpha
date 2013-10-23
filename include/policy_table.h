@@ -47,8 +47,8 @@ public:
   /// @param hours_period - Time period (in hours), policy will be
   /// applied at the end of it.
   /// @param status - Status of policy.
-  /// @return Newly created record.
-  /// @details Record will also be stored into SQLite database.
+  /// @return Newly created policy.
+  /// @details Policy will also be stored into SQLite database.
   Policy addPolicy(
       const WrappedString& name,
       const WrappedString& description,
