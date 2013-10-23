@@ -87,16 +87,6 @@ public:
   RecordStatus(RecordStatusValue status);
   RecordStatus(sqlite3_int64 status);
   virtual ~RecordStatus();
-
-  /*const RecordStatusValue& getStatus() const;
-  void setStatus(const RecordStatusValue& status);
-
-  operator sqlite3_int64() const;
-  bool operator == (const RecordStatus& rhs) const;
-  bool operator != (const RecordStatus& rhs) const;
-
-private:
-  RecordStatusValue m_status;*/
 };
 
 
@@ -116,16 +106,6 @@ public:
   PolicyStatus(PolicyStatusValue status);
   PolicyStatus(sqlite3_int64 status);
   virtual ~PolicyStatus();
-
-  /*const PolicyStatusValue& getStatus() const;
-  void setStatus(const PolicyStatusValue& status);
-
-  operator sqlite3_int64() const;
-  bool operator == (const PolicyStatus& rhs) const;
-  bool operator != (const PolicyStatus& rhs) const;
-
-private:
-  PolicyStatusValue m_status;*/
 };
 
 }  /* namespace mw */

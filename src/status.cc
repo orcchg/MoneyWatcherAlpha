@@ -33,27 +33,7 @@ RecordStatus::RecordStatus(sqlite3_int64 i_status) {
       break;
   }
 }
-/*
-const RecordStatusValue& RecordStatus::getStatus() const {
-  return (this->m_status);
-}
 
-void RecordStatus::setStatus(const RecordStatusValue& status) {
-  this->m_status = status;
-}
-
-RecordStatus::operator sqlite3_int64() const {
-  return (static_cast<sqlite3_int64>(this->m_status));
-}
-
-bool RecordStatus::operator == (const RecordStatus& rhs) const {
-  return (this->m_status == rhs.m_status);
-}
-
-bool RecordStatus::operator != (const RecordStatus& rhs) const {
-  return (this->m_status != rhs.m_status);
-}
-*/
 
 // ----------------------------------------------------------------------------
 PolicyStatus::PolicyStatus(PolicyStatusValue i_status)
@@ -83,24 +63,5 @@ PolicyStatus::PolicyStatus(sqlite3_int64 i_status) {
 
 PolicyStatus::~PolicyStatus() {
 }
-/*
-const PolicyStatusValue& PolicyStatus::getStatus() const {
-  return (this->m_status);
-}
 
-void PolicyStatus::setStatus(const PolicyStatusValue& status) {
-  this->m_status = status;
-}
-
-PolicyStatus::operator sqlite3_int64() const {
-  return (static_cast<sqlite3_int64>(this->m_status));
-}
-
-bool PolicyStatus::operator == (const PolicyStatus& rhs) const {
-  return (this->m_status == rhs.m_status);
-}
-
-bool PolicyStatus::operator != (const PolicyStatus& rhs) const {
-  return (this->m_status != rhs.m_status);
-}*/
 }  /* namespace mw */
