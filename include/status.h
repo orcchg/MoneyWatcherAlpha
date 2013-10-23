@@ -19,6 +19,7 @@ template <typename StatusValue>
 class iStatus {
 public:
   iStatus();
+  iStatus(StatusValue status);
   virtual ~iStatus();
 
   const StatusValue& getStatus() const;
@@ -28,13 +29,18 @@ public:
   bool operator == (const iStatus& rhs) const;
   bool operator != (const iStatus& rhs) const;
 
-private:
+protected:
   StatusValue m_status;
 };
 
 
 template <typename StatusValue>
-iStatus<StatusValue>::iStatus() {
+iStatus<StatusValue>::iStatus()  {
+}
+
+template <typename StatusValue>
+iStatus<StatusValue>::iStatus(StatusValue i_status)
+  : m_status(i_status) {
 }
 
 template <typename StatusValue>
@@ -76,13 +82,13 @@ enum RecordStatusValue { RSV_UNKNOWN = -1,
 
 /// @class Status
 /// @brief Represents various statuses of record.
-class RecordStatus {
+class RecordStatus : public iStatus<RecordStatusValue> {
 public:
   RecordStatus(RecordStatusValue status);
   RecordStatus(sqlite3_int64 status);
   virtual ~RecordStatus();
 
-  const RecordStatusValue& getStatus() const;
+  /*const RecordStatusValue& getStatus() const;
   void setStatus(const RecordStatusValue& status);
 
   operator sqlite3_int64() const;
@@ -90,7 +96,7 @@ public:
   bool operator != (const RecordStatus& rhs) const;
 
 private:
-  RecordStatusValue m_status;
+  RecordStatusValue m_status;*/
 };
 
 
@@ -105,13 +111,13 @@ enum PolicyStatusValue { PSV_UNKNOWN = -1,
 
 /// @class PolicyStatus
 /// @brief Represents various statuses of policy.
-class PolicyStatus {
+class PolicyStatus : public iStatus<PolicyStatusValue> {
 public:
   PolicyStatus(PolicyStatusValue status);
   PolicyStatus(sqlite3_int64 status);
   virtual ~PolicyStatus();
 
-  const PolicyStatusValue& getStatus() const;
+  /*const PolicyStatusValue& getStatus() const;
   void setStatus(const PolicyStatusValue& status);
 
   operator sqlite3_int64() const;
@@ -119,7 +125,7 @@ public:
   bool operator != (const PolicyStatus& rhs) const;
 
 private:
-  PolicyStatusValue m_status;
+  PolicyStatusValue m_status;*/
 };
 
 }  /* namespace mw */

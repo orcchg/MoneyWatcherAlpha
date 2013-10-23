@@ -13,7 +13,7 @@
 namespace mw {
 
 RecordStatus::RecordStatus(RecordStatusValue i_status)
-  : m_status(i_status) {
+  : iStatus(i_status) {
 }
 
 RecordStatus::~RecordStatus() {
@@ -33,7 +33,7 @@ RecordStatus::RecordStatus(sqlite3_int64 i_status) {
       break;
   }
 }
-
+/*
 const RecordStatusValue& RecordStatus::getStatus() const {
   return (this->m_status);
 }
@@ -53,11 +53,11 @@ bool RecordStatus::operator == (const RecordStatus& rhs) const {
 bool RecordStatus::operator != (const RecordStatus& rhs) const {
   return (this->m_status != rhs.m_status);
 }
-
+*/
 
 // ----------------------------------------------------------------------------
 PolicyStatus::PolicyStatus(PolicyStatusValue i_status)
-  : m_status(i_status) {
+  : iStatus(i_status) {
 }
 
 PolicyStatus::PolicyStatus(sqlite3_int64 i_status) {
@@ -83,7 +83,7 @@ PolicyStatus::PolicyStatus(sqlite3_int64 i_status) {
 
 PolicyStatus::~PolicyStatus() {
 }
-
+/*
 const PolicyStatusValue& PolicyStatus::getStatus() const {
   return (this->m_status);
 }
@@ -102,6 +102,5 @@ bool PolicyStatus::operator == (const PolicyStatus& rhs) const {
 
 bool PolicyStatus::operator != (const PolicyStatus& rhs) const {
   return (this->m_status != rhs.m_status);
-}
-
+}*/
 }  /* namespace mw */
