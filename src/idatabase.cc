@@ -320,6 +320,30 @@ ID_t iDatabase::__read_last_id__(const std::string& i_table_name) {
   return (last_id);
 }
 
+void iDatabase::__drop_table__(const std::string& i_table_name) {
+  DBG("enter iDatabase::__drop_table__().");
+  std::string drop_statement = "DROP TABLE IF EXISTS '";
+  drop_statement += i_table_name;
+  drop_statement += "';";
+  this->__prepare_statement__(drop_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(drop_statement.c_str());
+  DBG("Table with records ["%s"] has been dropped.",
+      i_table_name.c_str());
+  DBG("exit iDatabase::__drop_table__().");
+}
+
+void iDatabase::__vacuum__() {
+  DBG("enter iDatabase::__vacuum__().");
+  std::string vacuum_statement = "VACUUM;";
+  this->__prepare_statement__(vacuum_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(vacuum_statement.c_str());
+  DBG("Shrank database at %p with name ["%s"] through VACUUM statement.",
+      this->m_db_handler, this->m_db_name.c_str());
+  DBG("exit iDatabase::__vacuum__().");
+}
+
 #if ENABLED_ADVANCED_DEBUG
 void iDatabase::__where_check__(const ID_t& i_id) {
   MSG("Entrance into advanced debug source branch.");

@@ -226,12 +226,7 @@ void TableManager::remove(const ID_t& i_entry_id) {
   DBG3("Deleted all records corresponding to entry [ID: %lli].",
        i_entry_id);
 
-  std::string drop_statement = "DROP TABLE IF EXISTS '";
-  drop_statement += records_table_name;
-  drop_statement += "';";
-  this->__prepare_statement__(drop_statement);
-  sqlite3_step(this->m_db_statement);
-  this->__finalize__(drop_statement.c_str());
+  this->__drop_table__(records_table_name);
   DBG3("Table with records ["%s"] has been dropped.",
        records_table_name.c_str());
 

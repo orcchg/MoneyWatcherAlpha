@@ -66,6 +66,8 @@ protected:
   const char* __get_last_statement__() const;  // soft invocation
   void __set_last_statement__(const char* statement);  // soft invocation
   ID_t __read_last_id__(const std::string& table_name);
+  void __drop_table__(const std::string& table_name);
+  void __vacuum__();
 
 #if ENABLED_ADVANCED_DEBUG
   void __where_check__(const ID_t& id);
