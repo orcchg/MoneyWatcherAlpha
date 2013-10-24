@@ -110,6 +110,11 @@ public:
   /// @details Invocation of this function also makes record and stores it
   /// to daily_table in SQLite database.
   Record applyPolicy(const ID_t& policy_id);
+
+  /// @brief Removes policy from SQLite database.
+  /// @param policy_id - Primary key of policy of interest in SQLite database.
+  /// @note Result of this invocation cannot be undone.
+  void deletePolicy(const ID_t& policy_id);
   /// @}
   /// -------------------------------------------------------------------------
 

@@ -371,7 +371,7 @@ Record TableManager::applyPolicy(const ID_t& i_policy_id) {
           value,
           policy.getDescription(),
           status);
-  DBG3("Record corresponding to applied policy [%ID: %lli]: "
+  DBG3("Record corresponding to applied policy [ID: %lli]: "
        "Record ID [%lli]; Balance [%lli]; Description ["%s"]; "
        "Date ["%s"]; Time ["%s"]; Status [%lli].",
        policy.getID(),
@@ -383,6 +383,14 @@ Record TableManager::applyPolicy(const ID_t& i_policy_id) {
        static_cast<sqlite3_int64>(record.getStatus()));
   INF("exit TableManager::applyPolicy().");
   return (record);
+}
+
+void TableManager::deletePolicy(const ID_t& i_policy_id) {
+  INF("enter TableManager::deletePolicy().");
+  this->m_policy_table.deletePolicy(i_policy_id);
+  DBG3("Deleted policy [ID: %lli] from table ["%s"].",
+       i_policy_id, this->m_policy_table.getName().c_str());
+  INF("exit TableManager::deletePolicy().");
 }
 
 // ----------------------------------------------------------------------------

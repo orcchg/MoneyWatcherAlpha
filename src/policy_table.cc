@@ -10,6 +10,7 @@
 #include "datetime.h"
 #include "logger.h"
 #include "policy_table.h"
+#include "service.h"
 
 
 namespace mw {
@@ -260,6 +261,95 @@ Policy PolicyTable::readPolicy(
   this->__finalize__(select_statement.c_str());
   INF("exit PolicyTable::readPolicy().");
   return (policy);
+}
+
+void PolicyTable::deletePolicy(const ID_t& i_policy_id) {
+  INF("enter PolicyTable::deletePolicy().");
+#if ENABLED_ADVANCED_DEBUG
+  this->__where_check__(i_policy_id);
+#endif
+
+  std::string delete_statement = "DELETE FROM '";
+  delete_statement += this->m_table_name;
+  delete_statement += "' WHERE ID == '";
+  delete_statement += std::to_string(i_policy_id);
+  delete_statement += "';";
+  this->__prepare_statement__(delete_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(delete_statement.c_str());
+  this->__decrement_rows__();
+  if (i_policy_id + 1 == this->m_next_id) {
+    ID_t last_row_id = this->__read_last_id__(this->m_table_name);
+    this->m_next_id = last_row_id + 1;
+    DBG1("Deleted policy with largest ID. Next ID value is set to [%lli].",
+         this->m_next_id);
+  }
+  if (this->__empty__()) {
+    DBG1("Table ["%s"] has become empty. Next ID value is set to zero.",
+         this->m_table_name.c_str());
+    this->m_next_id = 0;
+  }
+  DBG1("Deleted policy [ID: %lli] in table ["%s"].",
+       i_policy_id, this->m_table_name.c_str());
+
+#if ENABLED_ADVANCED_DEBUG
+  this->__count_check__();
+#endif
+
+  INF("exit PolicyTable::deletePolicy().");
+}
+
+void PolicyTable::deletePolicies(std::vector<ID_t>& i_policy_ids) {
+  INF("enter PolicyTable::deletePolicies().");
+  std::sort(i_policy_ids.begin(), i_policy_ids.end());
+
+#if ENABLED_ADVANCED_DEBUG
+  for (ID_t& policy_id : i_policy_ids) {
+    this->__where_check__(policy_id);
+  }
+#endif
+
+  std::string delete_statement = "DELETE FROM '";
+  delete_statement += this->m_table_name;
+  delete_statement += "' WHERE ID IN(";
+  delete_statement += vectorToString(i_policy_ids, ", ");
+  delete_statement += ");";
+  this->__prepare_statement__(delete_statement);
+  sqlite3_step(this->m_db_statement);
+  this->__finalize__(delete_statement.c_str());
+  this->__decrease_rows__(static_cast<int>(i_policy_ids.size()));
+  DBG1("Updating next ID if necessary, initial value is [%lli].",
+       this->m_next_id);
+  for (std::vector<ID_t>::const_reverse_iterator it = i_policy_ids.rbegin();
+       it != i_policy_ids.rend();
+       ++it) {
+    if (*it + 1 == this->m_next_id) {
+      --this->m_next_id;
+      DBG1("Deleted policy with largest ID. "
+           "Next ID value has been decremented.");
+    } else {
+      break;
+    }
+  }
+  ID_t last_row_id = this->__read_last_id__(this->m_table_name);
+  this->m_next_id = last_row_id + 1;
+  DBG1("Deleted policy with largest ID. Next ID value is set to [%lli].",
+       this->m_next_id);
+  DBG1("Finished updating next ID: [%lli].", this->m_next_id);
+  if (this->__empty__()) {
+    DBG1("Table ["%s"] has become empty. Next id value is set to zero.",
+         this->m_table_name.c_str());
+    this->m_next_id = 0;
+  }
+  DBG1("Deleted %lli policies from table ["%s"].",
+       static_cast<long long int>(i_policy_ids.size()),
+       this->m_table_name.c_str());
+
+#if ENABLED_ADVANCED_DEBUG
+  this->__count_check__();
+#endif
+
+  INF("exit PolicyTable::deletePolicies().");
 }
 
 const std::string& PolicyTable::getName() const {

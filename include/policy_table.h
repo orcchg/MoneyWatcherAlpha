@@ -67,6 +67,20 @@ public:
   Policy readPolicy(
       const ID_t& policy_id,
       std::shared_ptr<DateTime> datetime);
+
+  /// @brief Removes policy from SQLite database.
+  /// @param policy_id - Primary key of policy of interest in SQLite database.
+  /// @note Value of next_id remains incremented in case the policy
+  /// to be deleted is not the last one, otherwise next_id will be decreased.
+  void deletePolicy(const ID_t& policy_id);
+
+  /// @brief Removes many policies from SQLite database.
+  /// @param policy_ids - Vector of primary key of policies of interest
+  /// in SQLite database.
+  /// @details Input array will be sorted.
+  /// @note Value of next_id remains incremented in case any of policy
+  /// to be deleted is not the last one, otherwise next_id will be decreased.
+  void deletePolicies(std::vector<ID_t>& policy_ids);
   /// @}
   /// -------------------------------------------------------------------------
 
