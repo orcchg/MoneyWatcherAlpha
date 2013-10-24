@@ -3000,6 +3000,22 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
+TEST (TableManagerTest, CreatePolicy) {
+  // TODO: impl
+}
+
+TEST (TableManagerTest, ApplyPolicy) {
+  // TODO: impl
+}
+
+TEST (TableManagerTest, ApplyPolicyAndUndo) {
+  // TODO: impl
+}
+
+TEST (TableManagerTest, DeletePolicy) {
+  // TODO: impl
+}
+
 #endif  // ENABLED_TIME_MEASURE_ONLY
 
 
