@@ -24,7 +24,10 @@ TableManager::TableManager()
   : iDatabase(TableManager::single_database_name, "Entry_IDs_Table")
   , m_cycle_table(TableManager::single_database_name)
   , m_daily_table(TableManager::single_database_name)
-  , m_policy_table(TableManager::single_database_name) {
+  , m_policy_table(TableManager::single_database_name)
+  , m_applied_policies_table(
+      TableManager::single_database_name,
+      "Applied_Policies_Table") {
   INF("enter TableManager constructor.");
   this->__init__();
   ++TableManager::OPENED_DATABASES_COUNT;
@@ -319,6 +322,17 @@ Policy TableManager::createPolicy(
       i_destination_entry_id,
       i_hours_period,
       i_status);
+  DBG3("Created policy: ID [%lli]; Name ["%s"]; Description ["%s"]; "
+       "Ratio [%lli]; Source entry ID [%lli], Destination entry ID [%lli]; "
+       "Period [%i hours]; Status [%lli].",
+       policy.getID(),
+       policy.getName().c_str(),
+       policy.getDescription().c_str(),
+       policy.getRatio(),
+       policy.getSourceID(),
+       policy.getDestinationID(),
+       policy.getPeriod(),
+       static_cast<sqlite3_int64>(policy.getStatus()));
   INF("exit TableManager::createPolicy().");
   return (policy);
 }
@@ -327,15 +341,51 @@ Record TableManager::applyPolicy(const ID_t& i_policy_id) {
   INF("enter TableManager::applyPolicy().");
   std::shared_ptr<DateTime> ptr_datetime;
   Policy policy = this->m_policy_table.readPolicy(i_policy_id, ptr_datetime);
+  DBG3("Read policy: ID [%lli]; Name ["%s"]; Description ["%s"]; "
+       "Ratio [%lli]; Source entry ID [%lli], Destination entry ID [%lli]; "
+       "Period [%i hours]; Status [%lli]. "
+       "From table ["%s"] of database ["%s"]",
+       policy.getID(),
+       policy.getName().c_str(),
+       policy.getDescription().c_str(),
+       policy.getRatio(),
+       policy.getSourceID(),
+       policy.getDestinationID(),
+       policy.getPeriod(),
+       static_cast<sqlite3_int64>(policy.getStatus()),
+       this->m_policy_table.getName().c_str(),
+       this->m_db_name.c_str());
   Entry source_entry = this->m_cycle_table.readEntry(policy.getSourceID());
-  MoneyValue_t value = source_entry.getBalance() * policy.getRatio() / 100;
+  DBG3("Read source entry [ID: %lli] from table ["%s"].",
+       source_entry.getID(), this->m_cycle_table.getName().c_str());
+  MoneyValue_t value =
+      Policy::calculateRatioOfBalance(
+          source_entry.getBalance(),
+          policy.getRatio());
+  DBG3("Calculated ratio [%lli] of source entry balance [%lli]: %lli.",
+       policy.getRatio(), source_entry.getBalance(), value);
   this->m_cycle_table.updateEntry(
       policy.getDestinationID(),
       value,
       policy.getDescription());
+  DBG3("Updated entry [%lli] for value %lli.",
+       policy.getDestinationID(), value);
   RecordStatus status(RSV_APPLIED_POLICY);
   Record record =
-      this->m_daily_table.addRecord(value, policy.getDescription(), status);
+      this->m_applied_policies_table.addRecord(
+          value,
+          policy.getDescription(),
+          status);
+  DBG3("Record corresponding to applied policy [%ID: %lli]: "
+       "Record ID [%lli]; Balance [%lli]; Description ["%s"]; "
+       "Date ["%s"]; Time ["%s"]; Status [%lli].",
+       policy.getID(),
+       record.getID(),
+       record.getBalance(),
+       record.getDescription().c_str(),
+       record.getDateTime().getDate().c_str(),
+       record.getDateTime().getTime().c_str(),
+       static_cast<sqlite3_int64>(record.getStatus()));
   INF("exit TableManager::applyPolicy().");
   return (record);
 }

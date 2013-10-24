@@ -129,6 +129,7 @@ private:
   CycleTable m_cycle_table;
   DailyTable m_daily_table;
   PolicyTable m_policy_table;
+  DailyTable m_applied_policies_table;
   std::set<ID_t> m_entry_ids;
 #if ENABLED_DB_CACHING
   __MW_DB_CACHED__ std::unordered_map<ID_t, std::list<ID_t>, Hasher<ID_t> > m_entry_records;
