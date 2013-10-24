@@ -29,7 +29,9 @@ class CycleTable : private iDatabase {
   template <typename Table>
   friend class TestAccessTable;
 public:
-  CycleTable(const std::string& db_name = "MW_CycleTable.db");
+  CycleTable(
+      const std::string& db_name = "MW_CycleTable.db",
+      const std::string& table_name = "Cycle_Table");
   CycleTable(CycleTable&& rval_obj);
   virtual ~CycleTable();
 

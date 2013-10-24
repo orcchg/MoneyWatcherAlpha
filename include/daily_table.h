@@ -30,7 +30,9 @@ class DailyTable : private iDatabase {
   template <typename Table>
   friend class TestAccessTable;
 public:
-  DailyTable(const std::string& db_name = "MW_DailyTable.db");
+  DailyTable(
+      const std::string& db_name = "MW_DailyTable.db",
+      const std::string& table_name = "Daily_Table");
   DailyTable(DailyTable&& rval_obj);
   virtual ~DailyTable();
 

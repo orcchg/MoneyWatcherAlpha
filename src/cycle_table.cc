@@ -19,8 +19,10 @@ namespace mw {
 
 int CycleTable::OPENED_CYCLE_TABLES_COUNT = 0;
 
-CycleTable::CycleTable(const std::string& i_db_name)
-  : iDatabase(i_db_name, "Cycle_Table") {
+CycleTable::CycleTable(
+    const std::string& i_db_name,
+    const std::string& i_table_name)
+  : iDatabase(i_db_name, i_table_name) {
   INF("enter CycleTable constructor.");
   this->__init__();
   ++CycleTable::OPENED_CYCLE_TABLES_COUNT;

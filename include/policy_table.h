@@ -30,7 +30,9 @@ class PolicyTable : private iDatabase {
   template <typename Table>
   friend class TestAccessTable;
 public:
-  PolicyTable(const std::string& db_name = "MW_PolicyTable.db");
+  PolicyTable(
+      const std::string& db_name = "MW_PolicyTable.db",
+      const std::string& table_name = "Policy_Table");
   PolicyTable(PolicyTable&& rval_obj);
   virtual ~PolicyTable();
 

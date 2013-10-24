@@ -19,8 +19,10 @@ namespace mw {
 
 int DailyTable::OPENED_DAILY_TABLES_COUNT = 0;
 
-DailyTable::DailyTable(const std::string& i_db_name)
-  : iDatabase(i_db_name, "Daily_Table") {
+DailyTable::DailyTable(
+    const std::string& i_db_name,
+    const std::string& i_table_name)
+  : iDatabase(i_db_name, i_table_name) {
   INF("enter DailyTable constructor.");
   this->__init__();
   ++DailyTable::OPENED_DAILY_TABLES_COUNT;

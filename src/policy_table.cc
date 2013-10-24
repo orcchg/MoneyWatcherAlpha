@@ -16,8 +16,10 @@ namespace mw {
 
 int PolicyTable::OPENED_POLICY_TABLES_COUNT = 0;
 
-PolicyTable::PolicyTable(const std::string& i_db_name)
-  : iDatabase(i_db_name, "Policy_Table") {
+PolicyTable::PolicyTable(
+    const std::string& i_db_name,
+    const std::string& i_table_name)
+  : iDatabase(i_db_name, i_table_name) {
   INF("enter PolicyTable constructor.");
   this->__init__();
   ++PolicyTable::OPENED_POLICY_TABLES_COUNT;
@@ -237,8 +239,8 @@ Policy PolicyTable::readPolicy(
        source_entry_id,
        destination_entry_id,
        hours_period,
-       datetime.getDate().c_str(),
-       datetime.getTime().c_str(),
+       o_datetime->getDate().c_str(),
+       o_datetime->getTime().c_str(),
        raw_status);
   Policy policy(
       id,
