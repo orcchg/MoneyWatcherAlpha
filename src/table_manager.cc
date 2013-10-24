@@ -24,10 +24,7 @@ TableManager::TableManager()
   : iDatabase(TableManager::single_database_name, "Entry_IDs_Table")
   , m_cycle_table(TableManager::single_database_name)
   , m_daily_table(TableManager::single_database_name)
-  , m_policy_table(TableManager::single_database_name)
-  , m_applied_policies_table(
-      TableManager::single_database_name,
-      "Applied_Policies_Table") {
+  , m_policy_table(TableManager::single_database_name) {
   INF("enter TableManager constructor.");
   this->__init__();
   ++TableManager::OPENED_DATABASES_COUNT;
@@ -359,18 +356,13 @@ Record TableManager::applyPolicy(const ID_t& i_policy_id) {
           policy.getRatio());
   DBG3("Calculated ratio [%lli] of source entry balance [%lli]: %lli.",
        policy.getRatio(), source_entry.getBalance(), value);
-  this->m_cycle_table.updateEntry(
-      policy.getDestinationID(),
-      value,
-      policy.getDescription());
+  Record record =
+      this->update(
+          policy.getDestinationID(),
+          value,
+          policy.getDescription());
   DBG3("Updated entry [%lli] for value %lli.",
        policy.getDestinationID(), value);
-  RecordStatus status(RSV_APPLIED_POLICY);
-  Record record =
-      this->m_applied_policies_table.addRecord(
-          value,
-          policy.getDescription(),
-          status);
   DBG3("Record corresponding to applied policy [ID: %lli]: "
        "Record ID [%lli]; Balance [%lli]; Description ["%s"]; "
        "Date ["%s"]; Time ["%s"]; Status [%lli].",
@@ -413,14 +405,6 @@ const std::string& TableManager::getPolicyTableName() const {
   DBG3("Policy Table name is ["%s"].", this->m_policy_table.getName().c_str());
   INF("exit TableManager::getPolicyTableName().");
   return (this->m_policy_table.getName());
-}
-
-const std::string& TableManager::getAppliedPoliciesTableName() const {
-  INF("enter TableManager::getAppliedPoliciesTableName().");
-  DBG3("Applied policies table name is ["%s"].",
-       this->m_applied_policies_table.getName().c_str());
-  INF("exit TableManager::getAppliedPoliciesTableName().");
-  return (this->m_applied_policies_table.getName());
 }
 
 
