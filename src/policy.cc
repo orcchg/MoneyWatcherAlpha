@@ -34,6 +34,12 @@ Policy::Policy(
 Policy::~Policy() {
 }
 
+MoneyValue_t Policy::calculateRatioOfBalance(
+      const MoneyValue_t& balance,
+      const PolicyRatio_t& ratio) {
+  return (balance * ratio / 100);
+}
+
 // ----------------------------------------------
 ID_t Policy::getID() const {
   return (this->m_id);

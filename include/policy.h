@@ -30,6 +30,10 @@ public:
       const PolicyStatus& status);
   virtual ~Policy();
 
+  static MoneyValue_t calculateRatioOfBalance(
+      const MoneyValue_t& balance,
+      const PolicyRatio_t& ratio);
+
   /// -------------------------------------------------------------------------
   /// @defgroup GET Getters for class members.
   /// @{
