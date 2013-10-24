@@ -2164,7 +2164,7 @@ TEST (TableManagerTest, TableManagerInit) {
      mw::TableManager table_manager;
      EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
 
      mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
      EXPECT_TRUE(accessor.checkFinalized());
@@ -2198,7 +2198,7 @@ TEST (TableManagerTest, TableManagerAdd) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2285,7 +2285,7 @@ TEST (TableManagerTest, TableManagerUpdate) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2350,7 +2350,7 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
     std::pair<mw::Entry, mw::Record> init_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id_2 = init_2.first.getID();
@@ -2373,6 +2373,8 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     count_statement += accessor.getTableName();
     count_statement += "' AND name != '" + table_manager.getCycleTableName();
     count_statement += "' AND name != '" + table_manager.getDailyTableName();
+    count_statement += "' AND name != '" + table_manager.getPolicyTableName();
+    count_statement += "' AND name != '" + table_manager.getAppliedPoliciesTableName();
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -2484,7 +2486,7 @@ TEST (TableManagerTest, TableManagerRemove) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
     std::pair<mw::Entry, mw::Record> init_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id_2 = init_2.first.getID();
@@ -2529,6 +2531,8 @@ TEST (TableManagerTest, TableManagerRemove) {
     count_statement += accessor.getTableName();
     count_statement += "' AND name != '" + table_manager.getCycleTableName();
     count_statement += "' AND name != '" + table_manager.getDailyTableName();
+    count_statement += "' AND name != '" + table_manager.getPolicyTableName();
+    count_statement += "' AND name != '" + table_manager.getAppliedPoliciesTableName();
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -2582,7 +2586,7 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
     std::pair<mw::Entry, mw::Record> init_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id_2 = init_2.first.getID();
@@ -2624,6 +2628,8 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
     count_statement += accessor.getTableName();
     count_statement += "' AND name != '" + table_manager.getCycleTableName();
     count_statement += "' AND name != '" + table_manager.getDailyTableName();
+    count_statement += "' AND name != '" + table_manager.getPolicyTableName();
+    count_statement += "' AND name != '" + table_manager.getAppliedPoliciesTableName();
     count_statement += "' AND name != 'sqlite_sequence';";
     int nByte = static_cast<int>(count_statement.length());
     DB_Statement statement_handler = nullptr;
@@ -2679,7 +2685,7 @@ TEST (TableManagerTest, TableManagerUndo) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2799,7 +2805,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2911,7 +2917,7 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 2);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);

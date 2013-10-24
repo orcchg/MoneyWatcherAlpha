@@ -118,6 +118,8 @@ public:
   /// @{
   const std::string& getCycleTableName() const;
   const std::string& getDailyTableName() const;
+  const std::string& getPolicyTableName() const;
+  const std::string& getAppliedPoliciesTableName() const;
   /// @}
   /// -------------------------------------------------------------------------
 

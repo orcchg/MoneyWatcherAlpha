@@ -405,6 +405,21 @@ const std::string& TableManager::getDailyTableName() const {
   return (this->m_daily_table.getName());
 }
 
+const std::string& TableManager::getPolicyTableName() const {
+  INF("enter TableManager::getPolicyTableName().");
+  DBG3("Policy Table name is ["%s"].", this->m_policy_table.getName().c_str());
+  INF("exit TableManager::getPolicyTableName().");
+  return (this->m_policy_table.getName());
+}
+
+const std::string& TableManager::getAppliedPoliciesTableName() const {
+  INF("enter TableManager::getAppliedPoliciesTableName().");
+  DBG3("Applied policies table name is ["%s"].",
+       this->m_applied_policies_table.getName().c_str());
+  INF("exit TableManager::getAppliedPoliciesTableName().");
+  return (this->m_applied_policies_table.getName());
+}
+
 
 /* Private members */
 // ----------------------------------------------------------------------------
