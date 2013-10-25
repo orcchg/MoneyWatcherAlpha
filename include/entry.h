@@ -79,11 +79,15 @@ public:
   /// @param record - Record, whose balance, description and date & time
   /// @return Status of input record.
   RecordStatus rollbackBalance(const MoneyValue_t& i_value, const Record& record);
+
+  /// @brief Sets status of current entry to APPLIED_POLICY.
+  void setAppliedPolicyStatus();
   /// @}
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------
   /// @defgroup SERVICE Services for entry.
+  /// @{
   /// @brief Makes record from current entry.
   /// @return Newly created record.
   Record make_record() const;

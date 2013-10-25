@@ -110,6 +110,13 @@ RecordStatus Entry::rollbackBalance(
   return (this->m_status);
 }
 
+void Entry::setAppliedPolicyStatus() {
+  DBG("enter Entry::setAppliedPolicyStatus().");
+  this->m_status.setStatus(RSV_APPLIED_POLICY);
+  DBG("Status of entry [ID: %lli] set to APPLIED_POLICY.", this->m_id);
+  DBG("exit Entry::setAppliedPolicyStatus().");
+}
+
 Record Entry::make_record() const {
   Record record(
       -1,  // proper ID will be assigned during database writing.
