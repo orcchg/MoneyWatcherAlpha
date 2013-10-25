@@ -2160,12 +2160,13 @@ TEST (TableManagerTest, TableManagerInit) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   try {
      mw::TableManager table_manager;
      EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
      EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
      EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
-
+     EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
      mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
      EXPECT_TRUE(accessor.checkFinalized());
      int rows = countRows(accessor.getTableName(), accessor.getDbHandler());
@@ -2184,6 +2185,7 @@ TEST (TableManagerTest, TableManagerInit) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2191,6 +2193,7 @@ TEST (TableManagerTest, TableManagerAdd) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   MoneyValue_t s_entry_balance = 1000;
@@ -2199,6 +2202,7 @@ TEST (TableManagerTest, TableManagerAdd) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2269,6 +2273,7 @@ TEST (TableManagerTest, TableManagerAdd) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2276,6 +2281,7 @@ TEST (TableManagerTest, TableManagerUpdate) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   mw::WrappedString s_update_description = "Расход на 700 единиц";
@@ -2286,6 +2292,7 @@ TEST (TableManagerTest, TableManagerUpdate) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2334,6 +2341,7 @@ TEST (TableManagerTest, TableManagerUpdate) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2341,6 +2349,7 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   mw::WrappedString s_update_description = "Расход на 700 единиц";
@@ -2351,6 +2360,7 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
     std::pair<mw::Entry, mw::Record> init_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id_2 = init_2.first.getID();
@@ -2469,6 +2479,7 @@ TEST (TableManagerTest, TableManagerMultipleUpdate) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2476,6 +2487,7 @@ TEST (TableManagerTest, TableManagerRemove) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   mw::WrappedString s_update_description = "Расход на 700 единиц";
@@ -2486,6 +2498,7 @@ TEST (TableManagerTest, TableManagerRemove) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
     std::pair<mw::Entry, mw::Record> init_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id_2 = init_2.first.getID();
@@ -2568,6 +2581,7 @@ TEST (TableManagerTest, TableManagerRemove) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2575,6 +2589,7 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   mw::WrappedString s_update_description = "Расход на 700 единиц";
@@ -2585,6 +2600,7 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     table_manager.add(s_name, s_entry_description, s_entry_balance);
     std::pair<mw::Entry, mw::Record> init_2 = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id_2 = init_2.first.getID();
@@ -2664,6 +2680,7 @@ TEST (TableManagerTest, TableManagerRemoveWrongId) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2671,6 +2688,7 @@ TEST (TableManagerTest, TableManagerUndo) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   mw::WrappedString s_expense_description = "Расход на 700 единиц";
@@ -2683,6 +2701,7 @@ TEST (TableManagerTest, TableManagerUndo) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2788,6 +2807,7 @@ TEST (TableManagerTest, TableManagerUndo) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2795,6 +2815,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   MoneyValue_t s_entry_balance = 1000;
@@ -2803,6 +2824,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2898,6 +2920,7 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
@@ -2905,6 +2928,7 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   mw::WrappedString s_name = "Имя слота";
   mw::WrappedString s_entry_description = "Тестовое описание слота";
   mw::WrappedString s_income_description = "Доход в 1100 единиц";
@@ -2915,6 +2939,7 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
     EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
     EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     std::pair<mw::Entry, mw::Record> init = table_manager.add(s_name, s_entry_description, s_entry_balance);
     ID_t entry_id = init.first.getID();
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
@@ -2997,23 +3022,176 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TableManagerTest, CreatePolicy) {
-  // TODO: impl
+TEST (PolicyTableManagerTest, CreatePolicy) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  mw::WrappedString s_entry_1st_name = "Первый слот";
+  mw::WrappedString s_entry_2nd_name = "Второй слот";
+  mw::WrappedString s_entry_1st_description = "Тестовое описание первого слота";
+  mw::WrappedString s_entry_2nd_description = "Тестовое описание второго слота";
+  MoneyValue_t s_entry_1st_balance = 1750;
+  MoneyValue_t s_entry_2nd_balance = 5250;
+  mw::WrappedString s_policy_name = "Итог недели Корпорации";
+  mw::WrappedString s_policy_description = "Передача средств корпорации в фонд";
+  PolicyRatio_t s_ratio = 25;
+  int s_hours_period = 168;
+  mw::PolicyStatus s_policy_status(mw::PSV_ENABLED);
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    std::pair<mw::Entry, mw::Record> init_1st = table_manager.add(s_entry_1st_name, s_entry_1st_description, s_entry_1st_balance);
+    std::pair<mw::Entry, mw::Record> init_2nd = table_manager.add(s_entry_2nd_name, s_entry_2nd_description, s_entry_2nd_balance);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::Policy policy = table_manager.createPolicy(s_policy_name, s_policy_description, s_ratio, init_1st.first.getID(), init_2nd.first.getID(), s_hours_period, s_policy_status);
+    EXPECT_EQ(policy.getID(), 0);
+    EXPECT_STREQ(policy.getName().c_str(), s_policy_name.c_str());
+    EXPECT_STREQ(policy.getDescription().c_str(), s_policy_description.c_str());
+    EXPECT_EQ(policy.getRatio(), s_ratio);
+    EXPECT_EQ(policy.getSourceID(), init_1st.first.getID());
+    EXPECT_EQ(policy.getDestinationID(), init_2nd.first.getID());
+    EXPECT_EQ(policy.getPeriod(), s_hours_period);
+    EXPECT_EQ(policy.getStatus(), s_policy_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TableManagerTest, ApplyPolicy) {
-  // TODO: impl
+TEST (PolicyTableManagerTest, ApplyPolicy) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_income_description = "Доход в 1100 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_income = 1100;
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+    // TODO: impl
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TableManagerTest, ApplyPolicyAndUndo) {
-  // TODO: impl
+TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_income_description = "Доход в 1100 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_income = 1100;
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+    // TODO: impl
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
 }
 
-TEST (TableManagerTest, DeletePolicy) {
-  // TODO: impl
+TEST (PolicyTableManagerTest, DeletePolicy) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  mw::WrappedString s_name = "Имя слота";
+  mw::WrappedString s_entry_description = "Тестовое описание слота";
+  mw::WrappedString s_income_description = "Доход в 1100 единиц";
+  MoneyValue_t s_entry_balance = 1000;
+  MoneyValue_t s_income = 1100;
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+    // TODO: impl
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
 }
 
 #endif  // ENABLED_TIME_MEASURE_ONLY
