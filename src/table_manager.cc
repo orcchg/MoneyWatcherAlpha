@@ -356,12 +356,19 @@ Record TableManager::applyPolicy(const ID_t& i_policy_id) {
           policy.getRatio());
   DBG3("Calculated ratio [%lli] of source entry balance [%lli]: %lli.",
        policy.getRatio(), source_entry.getBalance(), value);
+  this->m_cycle_table.updateEntry(
+      source_entry.getID(),
+      -value,
+      policy.getDescription());
+  DBG3("Updated source entry [ID: %lli] for value %lli. "
+       "Final balance [%lli].",
+       source_entry.getID(), -value, source_entry.getBalance());
   Record record =
       this->update(
           policy.getDestinationID(),
           value,
           policy.getDescription());
-  DBG3("Updated entry [%lli] for value %lli.",
+  DBG3("Updated destination entry [ID: %lli] for value %lli.",
        policy.getDestinationID(), value);
   DBG3("Record corresponding to applied policy [ID: %lli]: "
        "Record ID [%lli]; Balance [%lli]; Description ["%s"]; "
