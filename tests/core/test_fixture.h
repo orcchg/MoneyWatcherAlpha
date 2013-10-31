@@ -42,7 +42,7 @@ public:
     mw::WrappedString s_name = "Имя слота";
     MoneyValue_t s_balance = 1000;
     mw::WrappedString s_description = "Тестовая запись в таблице";
-    mw::RecordStatus s_status(mw::RSV_INCOME);
+    mw::RecordStatus s_status(mw::RecordStatusValue::RSV_INCOME);
 
     for (int index = 0; index < TimeMeasureFixture::total_rows; ++index) {
       mw::Entry entry = this->m_cycle_table.addEntry(s_name, s_description, s_balance);

@@ -68,16 +68,16 @@ RecordStatus Entry::updateBalance(
     const MoneyValue_t& i_value,
     const WrappedString& i_description) {
   DBG("enter Entry::updateBalance().");
-  RecordStatus status(RSV_UNKNOWN);
+  RecordStatus status(RecordStatusValue::RSV_UNKNOWN);
   this->m_description = i_description;
   this->m_last_transaction = i_value;
   this->m_current_balance += i_value;  // update current balance
   this->m_datetime = DateTime();  // time of update
   if (i_value < 0) {
-    status.setStatus(RSV_EXPENSE);
+    status.setStatus(RecordStatusValue::RSV_EXPENSE);
     TRC("Balance update as expense.");
   } else {
-    status.setStatus(RSV_INCOME);
+    status.setStatus(RecordStatusValue::RSV_INCOME);
     TRC("Balance update as income.");
   }
   this->m_status = status;
@@ -112,7 +112,7 @@ RecordStatus Entry::rollbackBalance(
 
 void Entry::setAppliedPolicyStatus() {
   DBG("enter Entry::setAppliedPolicyStatus().");
-  this->m_status.setStatus(RSV_APPLIED_POLICY);
+  this->m_status.setStatus(RecordStatusValue::RSV_APPLIED_POLICY);
   DBG("Status of entry [ID: %lli] set to APPLIED_POLICY.", this->m_id);
   DBG("exit Entry::setAppliedPolicyStatus().");
 }

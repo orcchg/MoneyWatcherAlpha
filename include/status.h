@@ -74,11 +74,12 @@ bool iStatus<StatusValue>::operator != (const iStatus& rhs) const {
 
 
 // ----------------------------------------------------------------------------
-enum RecordStatusValue { RSV_UNKNOWN = -1,
-                         RSV_EXPENSE = 0,
-                         RSV_INCOME = 1,
-                         RSV_APPLIED_POLICY = 2,
-                         RSV_COUNT
+enum class RecordStatusValue : int {
+  RSV_UNKNOWN = -1,
+  RSV_EXPENSE = 0,
+  RSV_INCOME = 1,
+  RSV_APPLIED_POLICY = 2,
+  RSV_COUNT
 };
 
 /// @class Status
@@ -92,12 +93,13 @@ public:
 
 
 // ----------------------------------------------------------------------------
-enum PolicyStatusValue { PSV_UNKNOWN = -1,
-                         PSV_ENABLED = 0,
-                         PSV_DISABLED = 1,
-                         PSV_APPLIED = 2,
-                         PSV_PENDING = 3,
-                         PSV_COUNT
+enum class PolicyStatusValue : int {
+  PSV_UNKNOWN = -1,
+  PSV_ENABLED = 0,
+  PSV_DISABLED = 1,
+  PSV_APPLIED = 2,
+  PSV_PENDING = 3,
+  PSV_COUNT
 };
 
 /// @class PolicyStatus

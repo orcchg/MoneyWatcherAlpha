@@ -20,19 +20,19 @@ RecordStatus::~RecordStatus() {
 }
 
 RecordStatus::RecordStatus(sqlite3_int64 i_status) {
-  int status = i_status % RSV_COUNT;
+  int status = i_status % static_cast<int>(RecordStatusValue::RSV_COUNT);
   switch (status) {
     case 0:
-      this->m_status = RSV_EXPENSE;
+      this->m_status = RecordStatusValue::RSV_EXPENSE;
       break;
     case 1:
-      this->m_status = RSV_INCOME;
+      this->m_status = RecordStatusValue::RSV_INCOME;
       break;
     case 2:
-      this->m_status = RSV_APPLIED_POLICY;
+      this->m_status = RecordStatusValue::RSV_APPLIED_POLICY;
       break;
     default:
-      this->m_status = RSV_UNKNOWN;
+      this->m_status = RecordStatusValue::RSV_UNKNOWN;
       break;
   }
 }
@@ -44,22 +44,22 @@ PolicyStatus::PolicyStatus(PolicyStatusValue i_status)
 }
 
 PolicyStatus::PolicyStatus(sqlite3_int64 i_status) {
-  int status = i_status % PSV_COUNT;
+  int status = i_status % static_cast<int>(PolicyStatusValue::PSV_COUNT);
   switch (status) {
     case 0:
-      this->m_status = PSV_ENABLED;
+      this->m_status = PolicyStatusValue::PSV_ENABLED;
       break;
     case 1:
-      this->m_status = PSV_DISABLED;
+      this->m_status = PolicyStatusValue::PSV_DISABLED;
       break;
     case 2:
-      this->m_status = PSV_APPLIED;
+      this->m_status = PolicyStatusValue::PSV_APPLIED;
       break;
     case 3:
-      this->m_status = PSV_PENDING;
+      this->m_status = PolicyStatusValue::PSV_PENDING;
       break;
     default:
-      this->m_status = PSV_UNKNOWN;
+      this->m_status = PolicyStatusValue::PSV_UNKNOWN;
       break;
   }
 }

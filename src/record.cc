@@ -50,7 +50,7 @@ const RecordStatus& Record::getStatus() const {
 }
 
 void Record::setAppliedPolicyStatus() {
-  this->m_status.setStatus(RSV_APPLIED_POLICY);
+  this->m_status.setStatus(RecordStatusValue::RSV_APPLIED_POLICY);
 }
 
 }  /* namespace mw */
