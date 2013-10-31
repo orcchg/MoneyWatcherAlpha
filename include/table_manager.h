@@ -115,6 +115,14 @@ public:
   /// @param policy_id - Primary key of policy of interest in SQLite database.
   /// @note Result of this invocation cannot be undone.
   void deletePolicy(const ID_t& policy_id);
+
+  /// @brief Undoes applied policy, recovering previous states of corresponding
+  /// entries.
+  /// @param policy_id - Primary key of policy of interest in SQLite database.
+  /// @return Rolled back destination entry.
+  /// @note Attendant record will be removed from daily_table
+  /// in SQLite database.
+  Entry undoPolicy(const ID_t& policy_id);
   /// @}
   /// -------------------------------------------------------------------------
 
