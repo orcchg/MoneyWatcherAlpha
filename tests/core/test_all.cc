@@ -3197,11 +3197,150 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  mw::WrappedString s_income_description = "Доход в 1100 единиц";
-  MoneyValue_t s_entry_balance = 1000;
-  MoneyValue_t s_income = 1100;
+  mw::WrappedString s_entry_1st_name = "Первый слот";
+  mw::WrappedString s_entry_2nd_name = "Второй слот";
+  mw::WrappedString s_entry_1st_description = "Тестовое описание первого слота";
+  mw::WrappedString s_entry_2nd_description = "Тестовое описание второго слота";
+  MoneyValue_t s_entry_1st_balance = 1750;
+  MoneyValue_t s_entry_2nd_balance = 5250;
+  mw::WrappedString s_policy_name = "Итог недели Корпорации";
+  mw::WrappedString s_policy_description = "Передача средств корпорации в фонд";
+  PolicyRatio_t s_ratio = 25;
+  int s_hours_period = 168;
+  mw::PolicyStatus s_policy_status(mw::PolicyStatusValue::PSV_ENABLED);
+  try {
+    mw::TableManager table_manager;
+    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
+    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
+    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
+    std::pair<mw::Entry, mw::Record> init_1st = table_manager.add(s_entry_1st_name, s_entry_1st_description, s_entry_1st_balance);
+    std::pair<mw::Entry, mw::Record> init_2nd = table_manager.add(s_entry_2nd_name, s_entry_2nd_description, s_entry_2nd_balance);
+    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
+    EXPECT_TRUE(accessor.checkFinalized());
+    mw::Policy policy = table_manager.createPolicy(s_policy_name, s_policy_description, s_ratio, init_1st.first.getID(), init_2nd.first.getID(), s_hours_period, s_policy_status);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+    mw::RecordStatus policy_status(mw::RecordStatusValue::RSV_APPLIED_POLICY);
+    mw::Record record = table_manager.applyPolicy(policy.getID());
+    MoneyValue_t value = mw::Policy::calculateRatioOfBalance(s_entry_1st_balance, s_ratio);
+
+    mw::Entry undo_entry_1st = table_manager.undo(init_1st.first.getID());
+    EXPECT_EQ(undo_entry_1st.getID(), init_1st.first.getID());
+    EXPECT_STREQ(undo_entry_1st.getName().c_str(), init_1st.first.getName().c_str());
+    EXPECT_STREQ(undo_entry_1st.getDescription().c_str(), init_1st.first.getDescription().c_str());
+    EXPECT_EQ(undo_entry_1st.getBalance(), init_1st.first.getBalance());
+    EXPECT_EQ(undo_entry_1st.getLastTransaction(), init_1st.first.getLastTransaction());
+    EXPECT_STREQ(undo_entry_1st.getDateTime().getDate().c_str(), init_1st.first.getDateTime().getDate().c_str());
+    EXPECT_STREQ(undo_entry_1st.getDateTime().getTime().c_str(), init_1st.first.getDateTime().getTime().c_str());
+    EXPECT_EQ(undo_entry_1st.getStatus(), init_1st.first.getStatus());
+
+    mw::Entry undo_entry_2nd = table_manager.undo(init_2nd.first.getID());
+    EXPECT_EQ(undo_entry_2nd.getID(), init_2nd.first.getID());
+    EXPECT_STREQ(undo_entry_2nd.getName().c_str(), init_2nd.first.getName().c_str());
+    EXPECT_STREQ(undo_entry_2nd.getDescription().c_str(), init_2nd.first.getDescription().c_str());
+    EXPECT_EQ(undo_entry_2nd.getBalance(), init_2nd.first.getBalance());
+    EXPECT_EQ(undo_entry_2nd.getLastTransaction(), init_2nd.first.getLastTransaction());
+    EXPECT_STREQ(undo_entry_2nd.getDateTime().getDate().c_str(), init_2nd.first.getDateTime().getDate().c_str());
+    EXPECT_STREQ(undo_entry_2nd.getDateTime().getTime().c_str(), init_2nd.first.getDateTime().getTime().c_str());
+    EXPECT_EQ(undo_entry_2nd.getStatus(), init_2nd.first.getStatus());
+
+    DB_Statement statement_handler = nullptr;
+    std::string check_statement = "SELECT * FROM '";
+    check_statement += table_manager.getCycleTableName();
+    check_statement += "';";
+    int nByte = static_cast<int>(check_statement.length());
+    int result = sqlite3_prepare_v2(
+        accessor.getDbHandler(),
+        check_statement.c_str(),
+        nByte,
+        &statement_handler,
+        nullptr);
+    EXPECT_TRUE(statement_handler);
+    EXPECT_EQ(result, SQLITE_OK);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t id = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(id, init_1st.first.getID());
+    const void* raw_name = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
+    mw::WrappedString name(raw_name);
+    EXPECT_STREQ(name.c_str(), init_1st.first.getName().c_str());
+    const void* raw_description = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
+    mw::WrappedString description(raw_description);
+    EXPECT_STREQ(description.c_str(), init_1st.first.getDescription().c_str());
+    EXPECT_STRNE(description.c_str(), policy.getDescription().c_str());
+    MoneyValue_t balance = sqlite3_column_int64(statement_handler, 3);
+    EXPECT_EQ(balance, init_1st.first.getBalance());
+    EXPECT_NE(balance, s_entry_1st_balance - value);
+    MoneyValue_t transaction = sqlite3_column_int64(statement_handler, 4);
+    EXPECT_EQ(transaction, init_1st.first.getLastTransaction());
+    EXPECT_NE(transaction, -value);
+    sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
+    mw::RecordStatus status(raw_status);
+    // TODO: EXPECT_EQ(status, policy_status);
+
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_ROW);
+    ID_t id_dest = sqlite3_column_int64(statement_handler, 0);
+    EXPECT_EQ(id_dest, init_2nd.first.getID());
+    const void* raw_name_dest = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 1));
+    mw::WrappedString name_dest(raw_name_dest);
+    EXPECT_STREQ(name_dest.c_str(), init_2nd.first.getName().c_str());
+    const void* raw_description_dest = reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2));
+    mw::WrappedString description_dest(raw_description_dest);
+    EXPECT_STREQ(description_dest.c_str(), init_2nd.first.getDescription().c_str());
+    EXPECT_STRNE(description_dest.c_str(), policy.getDescription().c_str());
+    MoneyValue_t balance_dest = sqlite3_column_int64(statement_handler, 3);
+    EXPECT_EQ(balance_dest, init_2nd.first.getBalance());
+    EXPECT_NE(balance_dest, s_entry_2nd_balance + value);
+    MoneyValue_t transaction_dest = sqlite3_column_int64(statement_handler, 4);
+    EXPECT_EQ(transaction_dest, init_2nd.first.getLastTransaction());
+    EXPECT_NE(transaction_dest, value);
+    sqlite3_int64 raw_status_dest = sqlite3_column_int64(statement_handler, 7);
+    mw::RecordStatus status_dest(raw_status_dest);
+    // TODO: EXPECT_EQ(status_dest, policy_status);
+    result = sqlite3_step(statement_handler);
+    EXPECT_EQ(result, SQLITE_DONE);
+    sqlite3_finalize(statement_handler);
+    EXPECT_TRUE(accessor.checkFinalized());
+
+  } catch (mw::TableException& e) {
+    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
+        e.what(), intToSQLiteError(e.error()));
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  } catch (...) {
+    WRN("Got exception!");
+    EXPECT_TRUE(false);
+    remove(mw::TableManager::single_database_name.c_str());
+  }
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  remove(mw::TableManager::single_database_name.c_str());
+}
+
+/*TEST (PolicyTableManagerTest, UndoPolicy) {
+  // TODO: impl
+}*/
+
+/*TEST (PolicyTableManagerTest, DeletePolicy) {
+  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
+  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
+  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
+  mw::WrappedString s_entry_1st_name = "Первый слот";
+  mw::WrappedString s_entry_2nd_name = "Второй слот";
+  mw::WrappedString s_entry_1st_description = "Тестовое описание первого слота";
+  mw::WrappedString s_entry_2nd_description = "Тестовое описание второго слота";
+  MoneyValue_t s_entry_1st_balance = 1750;
+  MoneyValue_t s_entry_2nd_balance = 5250;
+  mw::WrappedString s_policy_name = "Итог недели Корпорации";
+  mw::WrappedString s_policy_description = "Передача средств корпорации в фонд";
+  PolicyRatio_t s_ratio = 25;
+  int s_hours_period = 168;
+  mw::PolicyStatus s_policy_status(mw::PolicyStatusValue::PSV_ENABLED);
   try {
     mw::TableManager table_manager;
     EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
@@ -3228,45 +3367,7 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
-}
-
-TEST (PolicyTableManagerTest, DeletePolicy) {
-  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
-  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
-  mw::WrappedString s_name = "Имя слота";
-  mw::WrappedString s_entry_description = "Тестовое описание слота";
-  mw::WrappedString s_income_description = "Доход в 1100 единиц";
-  MoneyValue_t s_entry_balance = 1000;
-  MoneyValue_t s_income = 1100;
-  try {
-    mw::TableManager table_manager;
-    EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 1);
-    EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 1);
-    EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
-    mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
-    EXPECT_TRUE(accessor.checkFinalized());
-    // TODO: impl
-    EXPECT_TRUE(accessor.checkFinalized());
-
-  } catch (mw::TableException& e) {
-    WRN("Handled table exception in unit-tests: ["%s"]! Error code: %s.",
-        e.what(), intToSQLiteError(e.error()));
-    EXPECT_TRUE(false);
-    remove(mw::TableManager::single_database_name.c_str());
-  } catch (...) {
-    WRN("Got exception!");
-    EXPECT_TRUE(false);
-    remove(mw::TableManager::single_database_name.c_str());
-  }
-  EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
-  EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
-  EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
-  EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
-  remove(mw::TableManager::single_database_name.c_str());
-}
+}*/
 
 #endif  // ENABLED_TIME_MEASURE_ONLY
 
