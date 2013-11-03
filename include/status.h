@@ -10,6 +10,7 @@
 #ifndef STATUS_H_
 #define STATUS_H_
 
+#include <algorithm>
 #include "types.h"
 
 
@@ -20,14 +21,21 @@ class iStatus {
 public:
   iStatus();
   iStatus(StatusValue status);
+  iStatus(const iStatus& obj);
+  iStatus(iStatus&& rval_obj);
   virtual ~iStatus();
+
+  iStatus& operator = (iStatus rhs);
+  iStatus& operator = (iStatus&& rval_rhs);
 
   const StatusValue& getStatus() const;
   void setStatus(const StatusValue& status);
 
   operator sqlite3_int64() const;
   bool operator == (const iStatus& rhs) const;
+  bool operator == (const StatusValue& rhs) const;
   bool operator != (const iStatus& rhs) const;
+  bool operator != (const StatusValue& rhs) const;
 
 protected:
   StatusValue m_status;
@@ -44,8 +52,32 @@ iStatus<StatusValue>::iStatus(StatusValue i_status)
 }
 
 template <typename StatusValue>
+iStatus<StatusValue>::iStatus(const iStatus& obj)
+  : m_status(obj.m_status) {
+}
+
+template <typename StatusValue>
+iStatus<StatusValue>::iStatus(iStatus&& rval_obj)
+  : m_status(rval_obj.m_status) {
+  rval_obj = StatusValue();
+}
+
+template <typename StatusValue>
 iStatus<StatusValue>::~iStatus() {
 }
+
+template <typename StatusValue>
+iStatus<StatusValue>& iStatus<StatusValue>::operator = (iStatus rhs) {
+  std::swap(this->m_status, rhs.m_status);
+  return (*this);
+}
+
+template <typename StatusValue>
+iStatus<StatusValue>& iStatus<StatusValue>::operator = (iStatus&& rval_rhs) {
+  std::swap(this->m_status, rval_rhs.m_status);
+  return (*this);
+}
+
 
 template <typename StatusValue>
 const StatusValue& iStatus<StatusValue>::getStatus() const {
@@ -68,8 +100,18 @@ bool iStatus<StatusValue>::operator == (const iStatus& rhs) const {
 }
 
 template <typename StatusValue>
+bool iStatus<StatusValue>::operator == (const StatusValue& rhs) const {
+  return (this->m_status == rhs);
+}
+
+template <typename StatusValue>
 bool iStatus<StatusValue>::operator != (const iStatus& rhs) const {
   return (this->m_status != rhs.m_status);
+}
+
+template <typename StatusValue>
+bool iStatus<StatusValue>::operator != (const StatusValue& rhs) const {
+  return (this->m_status != rhs);
 }
 
 
@@ -78,7 +120,8 @@ enum class RecordStatusValue : int {
   RSV_UNKNOWN = -1,
   RSV_EXPENSE = 0,
   RSV_INCOME = 1,
-  RSV_APPLIED_POLICY = 2,
+  RSV_NEW_ENTRY = 2,
+  RSV_APPLIED_POLICY = 3,
   RSV_COUNT
 };
 

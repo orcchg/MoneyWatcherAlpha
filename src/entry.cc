@@ -95,11 +95,15 @@ RecordStatus Entry::rollbackBalance(
     const MoneyValue_t& i_value,
     const Record& i_record) {
   DBG("enter Entry::rollbackBalance().");
+  RecordStatus status = i_record.getStatus();
   this->m_description = i_record.getDescription();
-  this->m_last_transaction = i_record.getBalance();
+  this->m_last_transaction =
+      status == RecordStatusValue::RSV_NEW_ENTRY ? 0 : i_record.getBalance();
   this->m_current_balance -= i_value;
   this->m_datetime = i_record.getDateTime();
-  this->m_status = i_record.getStatus();
+  this->m_status =
+      status == RecordStatusValue::RSV_NEW_ENTRY ?
+                RecordStatusValue::RSV_UNKNOWN : status;
   TRC("Rolled back current balance of entry ["%s"] at ["%s" - "%s"] "
       "for value [%lli]. It was changed by [%lli].",
       this->m_name.c_str(),

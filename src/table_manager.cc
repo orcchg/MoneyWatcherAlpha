@@ -100,7 +100,7 @@ std::pair<Entry, Record> TableManager::add(
       this->m_daily_table.addRecord(
           i_current_balance,
           i_description,
-          entry.getStatus());
+          RecordStatusValue::RSV_NEW_ENTRY);
   ID_t record_id = record.getID();
   DBG3("Added record into table ["%s"], got ID: [%lli].",
        this->getDailyTableName().c_str(), record_id);

@@ -29,6 +29,9 @@ RecordStatus::RecordStatus(sqlite3_int64 i_status) {
       this->m_status = RecordStatusValue::RSV_INCOME;
       break;
     case 2:
+      this->m_status = RecordStatusValue::RSV_NEW_ENTRY;
+      break;
+    case 3:
       this->m_status = RecordStatusValue::RSV_APPLIED_POLICY;
       break;
     default:
