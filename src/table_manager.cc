@@ -329,7 +329,7 @@ Policy TableManager::createPolicy(
   return (policy);
 }
 
-Record TableManager::applyPolicy(const ID_t& i_policy_id) {
+std::pair<Record, Record> TableManager::applyPolicy(const ID_t& i_policy_id) {
   INF("enter TableManager::applyPolicy().");
   std::shared_ptr<DateTime> ptr_datetime;
   Policy policy = this->m_policy_table.readPolicy(i_policy_id, ptr_datetime);
@@ -356,32 +356,40 @@ Record TableManager::applyPolicy(const ID_t& i_policy_id) {
           policy.getRatio());
   DBG3("Calculated ratio [%lli] of source entry balance [%lli]: %lli.",
        policy.getRatio(), source_entry.getBalance(), value);
-  this->m_cycle_table.updateEntry(
-      source_entry.getID(),
-      -value,
-      policy.getDescription());
+  Record source_record =
+      this->update(source_entry.getID(), -value, policy.getDescription());
   DBG3("Updated source entry [ID: %lli] for value %lli. "
        "Final balance [%lli].",
        source_entry.getID(), -value, source_entry.getBalance());
-  Record record =
+  DBG3("Source record corresponding to applied policy [ID: %lli]: "
+       "Record ID [%lli]; Balance [%lli]; Description ["%s"]; "
+       "Date ["%s"]; Time ["%s"]; Status [%lli].",
+       policy.getID(),
+       source_record.getID(),
+       source_record.getBalance(),
+       source_record.getDescription().c_str(),
+       source_record.getDateTime().getDate().c_str(),
+       source_record.getDateTime().getTime().c_str(),
+       static_cast<sqlite3_int64>(source_record.getStatus()));
+  Record destination_record =
       this->update(
           policy.getDestinationID(),
           value,
           policy.getDescription());
   DBG3("Updated destination entry [ID: %lli] for value %lli.",
        policy.getDestinationID(), value);
-  DBG3("Record corresponding to applied policy [ID: %lli]: "
+  DBG3("Destination record corresponding to applied policy [ID: %lli]: "
        "Record ID [%lli]; Balance [%lli]; Description ["%s"]; "
        "Date ["%s"]; Time ["%s"]; Status [%lli].",
        policy.getID(),
-       record.getID(),
-       record.getBalance(),
-       record.getDescription().c_str(),
-       record.getDateTime().getDate().c_str(),
-       record.getDateTime().getTime().c_str(),
-       static_cast<sqlite3_int64>(record.getStatus()));
+       destination_record.getID(),
+       destination_record.getBalance(),
+       destination_record.getDescription().c_str(),
+       destination_record.getDateTime().getDate().c_str(),
+       destination_record.getDateTime().getTime().c_str(),
+       static_cast<sqlite3_int64>(destination_record.getStatus()));
   INF("exit TableManager::applyPolicy().");
-  return (record);
+  return (std::make_pair(source_record, destination_record));
 }
 
 void TableManager::deletePolicy(const ID_t& i_policy_id) {

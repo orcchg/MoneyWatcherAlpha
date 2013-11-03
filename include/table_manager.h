@@ -106,10 +106,11 @@ public:
 
   /// @brief Applies policy, determined by given ID.
   /// @param policy_id - Primary key of policy of interest in SQLite database.
-  /// @return Record, corresponding to applied policy.
-  /// @details Invocation of this function also makes record and stores it
-  /// to daily_table in SQLite database.
-  Record applyPolicy(const ID_t& policy_id);
+  /// @return Pair of records, corresponding to applied policy: first for
+  /// source entry, second for destination entry.
+  /// @details Invocation of this function also makes records and stores them
+  /// into daily_table in SQLite database.
+  std::pair<Record, Record> applyPolicy(const ID_t& policy_id);
 
   /// @brief Removes policy from SQLite database.
   /// @param policy_id - Primary key of policy of interest in SQLite database.
