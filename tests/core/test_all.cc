@@ -2898,8 +2898,8 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     mw::WrappedString description(static_cast<const wchar_t*>(raw_description));
     EXPECT_STREQ(entry.getDescription().c_str(), description.c_str());
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 5);
-    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RecordStatusValue::RSV_UNKNOWN));
-    mw::RecordStatus status(raw_status);
+    EXPECT_EQ(raw_status, static_cast<sqlite3_int64>(mw::RecordStatusValue::RSV_NEW_ENTRY));
+    mw::RecordStatus status(mw::RecordStatusValue::RSV_UNKNOWN);
     EXPECT_EQ(entry.getStatus(), status);
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
@@ -2956,7 +2956,7 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
     EXPECT_EQ(entry.getBalance(), s_entry_balance);
     EXPECT_STREQ(entry.getDateTime().getDate().c_str(), init.first.getDateTime().getDate().c_str());
     EXPECT_STREQ(entry.getDescription().c_str(), s_entry_description.c_str());
-    EXPECT_EQ(entry.getLastTransaction(), s_entry_balance);
+    EXPECT_EQ(entry.getLastTransaction(), 0);
     mw::RecordStatus init_status(mw::RecordStatusValue::RSV_UNKNOWN);
     EXPECT_EQ(entry.getStatus(), init_status);
     rows = countRows(records_table_name, accessor.getDbHandler());
