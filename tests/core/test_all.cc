@@ -2892,7 +2892,6 @@ TEST (TableManagerTest, TableManagerUndoFreshEntry) {
     std::string time(reinterpret_cast<const char*>(sqlite3_column_text(statement_handler, 2)));
     mw::DateTime datetime(date, time);
     EXPECT_STREQ(entry.getDateTime().getDate().c_str(), datetime.getDate().c_str());
-    // TODO: difference between new Entry and new Record    EXPECT_STREQ(entry.getDateTime().getTime().c_str(), datetime.getTime().c_str());
     MoneyValue_t balance = sqlite3_column_int64(statement_handler, 3);
     EXPECT_EQ(entry.getBalance(), balance);
     const void* raw_description = sqlite3_column_text(statement_handler, 4);
@@ -2956,7 +2955,6 @@ TEST (TableManagerTest, TableManagerUndoOnceUpdatedEntry) {
     EXPECT_EQ(entry.getID(), entry_id);
     EXPECT_EQ(entry.getBalance(), s_entry_balance);
     EXPECT_STREQ(entry.getDateTime().getDate().c_str(), init.first.getDateTime().getDate().c_str());
-    // TODO: difference between new Entry and new Record    EXPECT_STREQ(entry.getDateTime().getTime().c_str(), datetime.getTime().c_str());
     EXPECT_STREQ(entry.getDescription().c_str(), s_entry_description.c_str());
     EXPECT_EQ(entry.getLastTransaction(), s_entry_balance);
     mw::RecordStatus init_status(mw::RecordStatusValue::RSV_UNKNOWN);
@@ -3110,11 +3108,14 @@ TEST (PolicyTableManagerTest, ApplyPolicy) {
     EXPECT_TRUE(accessor.checkFinalized());
 
     mw::RecordStatus policy_status(mw::RecordStatusValue::RSV_APPLIED_POLICY);
-    mw::Record record = table_manager.applyPolicy(policy.getID());
+    std::pair<mw::Record, mw::Record> records = table_manager.applyPolicy(policy.getID());
     MoneyValue_t value = mw::Policy::calculateRatioOfBalance(s_entry_1st_balance, s_ratio);
-    EXPECT_EQ(record.getBalance(), value);
-    EXPECT_STREQ(record.getDescription().c_str(), policy.getDescription().c_str());
-    // TODO: EXPECT_EQ(record.getStatus(), policy_status);
+    EXPECT_EQ(records.first.getBalance(), -value);
+    EXPECT_EQ(records.second.getBalance(), value);
+    EXPECT_STREQ(records.first.getDescription().c_str(), policy.getDescription().c_str());
+    EXPECT_STREQ(records.second.getDescription().c_str(), policy.getDescription().c_str());
+    // TODO: EXPECT_EQ(records.first.getStatus(), policy_status);
+    // TODO: EXPECT_EQ(records.second.getStatus(), policy_status);
 
     DB_Statement statement_handler = nullptr;
     std::string check_statement = "SELECT * FROM '";
@@ -3222,7 +3223,7 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
     EXPECT_TRUE(accessor.checkFinalized());
 
     mw::RecordStatus policy_status(mw::RecordStatusValue::RSV_APPLIED_POLICY);
-    mw::Record record = table_manager.applyPolicy(policy.getID());
+    std::pair<mw::Record, mw::Record> records = table_manager.applyPolicy(policy.getID());
     MoneyValue_t value = mw::Policy::calculateRatioOfBalance(s_entry_1st_balance, s_ratio);
 
     mw::Entry undo_entry_1st = table_manager.undo(init_1st.first.getID());
@@ -3231,8 +3232,6 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
     EXPECT_STREQ(undo_entry_1st.getDescription().c_str(), init_1st.first.getDescription().c_str());
     EXPECT_EQ(undo_entry_1st.getBalance(), init_1st.first.getBalance());
     EXPECT_EQ(undo_entry_1st.getLastTransaction(), init_1st.first.getLastTransaction());
-    EXPECT_STREQ(undo_entry_1st.getDateTime().getDate().c_str(), init_1st.first.getDateTime().getDate().c_str());
-    EXPECT_STREQ(undo_entry_1st.getDateTime().getTime().c_str(), init_1st.first.getDateTime().getTime().c_str());
     EXPECT_EQ(undo_entry_1st.getStatus(), init_1st.first.getStatus());
 
     mw::Entry undo_entry_2nd = table_manager.undo(init_2nd.first.getID());
@@ -3241,8 +3240,6 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
     EXPECT_STREQ(undo_entry_2nd.getDescription().c_str(), init_2nd.first.getDescription().c_str());
     EXPECT_EQ(undo_entry_2nd.getBalance(), init_2nd.first.getBalance());
     EXPECT_EQ(undo_entry_2nd.getLastTransaction(), init_2nd.first.getLastTransaction());
-    EXPECT_STREQ(undo_entry_2nd.getDateTime().getDate().c_str(), init_2nd.first.getDateTime().getDate().c_str());
-    EXPECT_STREQ(undo_entry_2nd.getDateTime().getTime().c_str(), init_2nd.first.getDateTime().getTime().c_str());
     EXPECT_EQ(undo_entry_2nd.getStatus(), init_2nd.first.getStatus());
 
     DB_Statement statement_handler = nullptr;
