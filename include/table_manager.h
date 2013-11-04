@@ -161,6 +161,13 @@ private:
   void __create_table__();
   void __create_table_entry_records__(const std::string& table_name);
 
+  /// @note Avoid code doubling.
+  Record __update__(
+        const ID_t& entry_id,
+        const MoneyValue_t& value,
+        const WrappedString& description,
+        const RecordStatus& status);
+
   TableManager(const TableManager& obj) = delete;
   TableManager& operator = (const TableManager& rhs) = delete;
   TableManager& operator = (TableManager&& rval_rhs) = delete;

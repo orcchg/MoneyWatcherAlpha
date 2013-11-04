@@ -246,34 +246,7 @@ Entry CycleTable::updateEntry(
   DBG1("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description);
   DBG1("Updated entry [ID: %lli].", i_entry_id);
-  WrappedString update_statement = "UPDATE '";
-  update_statement += WrappedString(this->m_table_name);
-  update_statement += "' SET Description = '";
-  update_statement += i_description;
-  update_statement += "', CurrentBalance = '";
-  update_statement += WrappedString::to_string(entry.getBalance());
-  update_statement += "', LastTransaction = '";
-  update_statement += WrappedString::to_string(i_value);
-  update_statement += "', Date = '";
-  update_statement += WrappedString(entry.getDateTime().getDate());
-  update_statement += "', Time = '";
-  update_statement += WrappedString(entry.getDateTime().getTime());
-  update_statement += "', Status = '";
-  update_statement +=
-      WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
-  update_statement += "' WHERE ID == '";
-  update_statement += WrappedString::to_string(i_entry_id);
-  update_statement += "';";
-  this->__prepare_statement__(update_statement);
-  sqlite3_step(this->m_db_statement);
-
-#if ENABLED_DB_CACHING
-  // TODO: caching the entry
-#endif
-
-  this->__finalize__(update_statement.c_str());
-  DBG1("Updated database row for entry [ID: %lli] in table ["%s"].",
-       i_entry_id, this->m_table_name.c_str());
+  this->__updateEntry__(entry);
   INF("exit CycleTable::updateEntry().");
   return (entry);
 }
@@ -293,34 +266,7 @@ Entry CycleTable::updateEntry(
   DBG1("Got entry from SQLite database.");
   entry.updateBalance(i_value, i_description, i_status);
   DBG1("Updated entry [ID: %lli].", i_entry_id);
-  WrappedString update_statement = "UPDATE '";
-  update_statement += WrappedString(this->m_table_name);
-  update_statement += "' SET Description = '";
-  update_statement += i_description;
-  update_statement += "', CurrentBalance = '";
-  update_statement += WrappedString::to_string(entry.getBalance());
-  update_statement += "', LastTransaction = '";
-  update_statement += WrappedString::to_string(i_value);
-  update_statement += "', Date = '";
-  update_statement += WrappedString(entry.getDateTime().getDate());
-  update_statement += "', Time = '";
-  update_statement += WrappedString(entry.getDateTime().getTime());
-  update_statement += "', Status = '";
-  update_statement +=
-      WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
-  update_statement += "' WHERE ID == '";
-  update_statement += WrappedString::to_string(i_entry_id);
-  update_statement += "';";
-  this->__prepare_statement__(update_statement);
-  sqlite3_step(this->m_db_statement);
-
-#if ENABLED_DB_CACHING
-  // TODO: caching the entry
-#endif
-
-  this->__finalize__(update_statement.c_str());
-  DBG1("Updated database row for entry [ID: %lli] in table ["%s"].",
-       i_entry_id, this->m_table_name.c_str());
+  this->__updateEntry__(entry);
   INF("exit CycleTable::updateEntry(status).");
   return (entry);
 }
@@ -339,34 +285,7 @@ Entry CycleTable::rollbackEntry(
   DBG1("Got entry from SQLite database.");
   entry.rollbackBalance(i_value, i_record);
   DBG1("Rolled back entry [ID: %lli].", i_entry_id);
-  WrappedString update_statement = "UPDATE '";
-  update_statement += WrappedString(this->m_table_name);
-  update_statement += "' SET Description = '";
-  update_statement += entry.getDescription();
-  update_statement += "', CurrentBalance = '";
-  update_statement += WrappedString::to_string(entry.getBalance());
-  update_statement += "', LastTransaction = '";
-  update_statement += WrappedString::to_string(entry.getLastTransaction());
-  update_statement += "', Date = '";
-  update_statement += WrappedString(entry.getDateTime().getDate());
-  update_statement += "', Time = '";
-  update_statement += WrappedString(entry.getDateTime().getTime());
-  update_statement += "', Status = '";
-  update_statement +=
-      WrappedString::to_string(static_cast<sqlite3_int64>(entry.getStatus()));
-  update_statement += "' WHERE ID == '";
-  update_statement += WrappedString::to_string(i_entry_id);
-  update_statement += "';";
-  this->__prepare_statement__(update_statement);
-  sqlite3_step(this->m_db_statement);
-
-#if ENABLED_DB_CACHING
-  // TODO: caching the entry
-#endif
-
-  this->__finalize__(update_statement.c_str());
-  DBG1("Updated database row for entry [ID: %lli] in table ["%s"].",
-       i_entry_id, this->m_table_name.c_str());
+  this->__updateEntry__(entry);
   INF("exit CycleTable::rollbackEntry().");
   return (entry);
 }
@@ -501,6 +420,39 @@ void CycleTable::__create_table__() {
        this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG2("exit CycleTable::__create_table__().");
+}
+
+void CycleTable::__updateEntry__(const Entry& i_entry) {
+  DBG2("enter CycleTable::__updateEntry__().");
+  WrappedString update_statement = "UPDATE '";
+  update_statement += WrappedString(this->m_table_name);
+  update_statement += "' SET Description = '";
+  update_statement += i_entry.getDescription();
+  update_statement += "', CurrentBalance = '";
+  update_statement += WrappedString::to_string(i_entry.getBalance());
+  update_statement += "', LastTransaction = '";
+  update_statement += WrappedString::to_string(i_entry.getLastTransaction());
+  update_statement += "', Date = '";
+  update_statement += WrappedString(i_entry.getDateTime().getDate());
+  update_statement += "', Time = '";
+  update_statement += WrappedString(i_entry.getDateTime().getTime());
+  update_statement += "', Status = '";
+  update_statement +=
+      WrappedString::to_string(static_cast<sqlite3_int64>(i_entry.getStatus()));
+  update_statement += "' WHERE ID == '";
+  update_statement += WrappedString::to_string(i_entry.getID());
+  update_statement += "';";
+  this->__prepare_statement__(update_statement);
+  sqlite3_step(this->m_db_statement);
+
+#if ENABLED_DB_CACHING
+  // TODO: caching the entry
+#endif
+
+  this->__finalize__(update_statement.c_str());
+  DBG1("Updated database row for entry [ID: %lli] in table ["%s"].",
+       i_entry_id, this->m_table_name.c_str());
+  DBG2("exit CycleTable::__updateEntry__().");
 }
 
 }  /* namespace mw */

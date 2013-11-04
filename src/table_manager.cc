@@ -140,44 +140,7 @@ Record TableManager::update(
           i_value,
           i_description);
   Record record =
-      this->m_daily_table.addRecord(
-          i_value,
-          i_description,
-          entry.getStatus());
-  ID_t record_id = record.getID();
-
-  DBG3("Reading table name of entry records from SQLite database ["%s"]...",
-       this->m_db_name.c_str());
-  std::string select_statement = "SELECT * FROM '";
-  select_statement += this->m_table_name;
-  select_statement += "' WHERE EntryID == '";
-  select_statement += std::to_string(i_entry_id);
-  select_statement += "';";
-  this->__prepare_statement__(select_statement);
-  sqlite3_step(this->m_db_statement);
-  std::string records_table_name(reinterpret_cast<const char*>(
-      sqlite3_column_text(this->m_db_statement, 1)));
-  DBG3("Got record [ID: %lli], inserting into table ["%s"] "
-       "of entry [ID: %lli].",
-       record_id, records_table_name.c_str(), entry.getID());
-  this->__finalize__(select_statement.c_str());
-
-  std::string insert_statement = "INSERT INTO '";
-  insert_statement += records_table_name;
-  insert_statement += "' VALUES(?1);";
-  this->__prepare_statement__(insert_statement);
-  int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
-  sqlite3_step(this->m_db_statement);
-  if (accumulate != SQLITE_OK) {
-    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
-        this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(
-        insert_statement.c_str(),
-        SQLITE_ACCUMULATED_PREPARE_ERROR);
-  } else {
-    DBG3("All insertions have succeeded.");
-  }
-  this->__finalize__(insert_statement.c_str());
+      this->__update__(i_entry_id, i_value, i_description, entry.getStatus());
   INF("exit TableManager::update().");
   return (record);
 }
@@ -195,44 +158,7 @@ Record TableManager::update(
           i_description,
           i_status);
   Record record =
-      this->m_daily_table.addRecord(
-          i_value,
-          i_description,
-          entry.getStatus());
-  ID_t record_id = record.getID();
-
-  DBG3("Reading table name of entry records from SQLite database ["%s"]...",
-       this->m_db_name.c_str());
-  std::string select_statement = "SELECT * FROM '";
-  select_statement += this->m_table_name;
-  select_statement += "' WHERE EntryID == '";
-  select_statement += std::to_string(i_entry_id);
-  select_statement += "';";
-  this->__prepare_statement__(select_statement);
-  sqlite3_step(this->m_db_statement);
-  std::string records_table_name(reinterpret_cast<const char*>(
-      sqlite3_column_text(this->m_db_statement, 1)));
-  DBG3("Got record [ID: %lli], inserting into table ["%s"] "
-       "of entry [ID: %lli].",
-       record_id, records_table_name.c_str(), entry.getID());
-  this->__finalize__(select_statement.c_str());
-
-  std::string insert_statement = "INSERT INTO '";
-  insert_statement += records_table_name;
-  insert_statement += "' VALUES(?1);";
-  this->__prepare_statement__(insert_statement);
-  int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
-  sqlite3_step(this->m_db_statement);
-  if (accumulate != SQLITE_OK) {
-    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
-        this->m_db_name.c_str(), insert_statement.c_str());
-    this->__finalize_and_throw__(
-        insert_statement.c_str(),
-        SQLITE_ACCUMULATED_PREPARE_ERROR);
-  } else {
-    DBG3("All insertions have succeeded.");
-  }
-  this->__finalize__(insert_statement.c_str());
+      this->__update__(i_entry_id, i_value, i_description, i_status);
   INF("exit TableManager::update(status).");
   return (record);
 }
@@ -540,6 +466,55 @@ void TableManager::__create_table_entry_records__(
        this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG4("exit TableManager::__create_table_entry_records__().");
+}
+
+Record TableManager::__update__(
+    const ID_t& i_entry_id,
+    const MoneyValue_t& i_value,
+    const WrappedString& i_description,
+    const RecordStatus& i_status) {
+  DBG4("enter TableManager::__update__().");
+  Record record =
+      this->m_daily_table.addRecord(
+          i_value,
+          i_description,
+          i_status);
+  ID_t record_id = record.getID();
+
+  DBG3("Reading table name of entry records from SQLite database ["%s"]...",
+       this->m_db_name.c_str());
+  std::string select_statement = "SELECT * FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "' WHERE EntryID == '";
+  select_statement += std::to_string(i_entry_id);
+  select_statement += "';";
+  this->__prepare_statement__(select_statement);
+  sqlite3_step(this->m_db_statement);
+  std::string records_table_name(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 1)));
+  DBG3("Got record [ID: %lli], inserting into table ["%s"] "
+       "of entry [ID: %lli].",
+       record_id, records_table_name.c_str(), entry.getID());
+  this->__finalize__(select_statement.c_str());
+
+  std::string insert_statement = "INSERT INTO '";
+  insert_statement += records_table_name;
+  insert_statement += "' VALUES(?1);";
+  this->__prepare_statement__(insert_statement);
+  int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
+  sqlite3_step(this->m_db_statement);
+  if (accumulate != SQLITE_OK) {
+    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
+        this->m_db_name.c_str(), insert_statement.c_str());
+    this->__finalize_and_throw__(
+        insert_statement.c_str(),
+        SQLITE_ACCUMULATED_PREPARE_ERROR);
+  } else {
+    DBG3("All insertions have succeeded.");
+  }
+  this->__finalize__(insert_statement.c_str());
+  DBG4("exit TableManager::__update__().");
+  return (record);
 }
 
 }  /* namespace mw */

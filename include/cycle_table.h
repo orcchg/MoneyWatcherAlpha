@@ -125,6 +125,9 @@ private:
   void __init__();
   void __create_table__();
 
+  /// @note Avoid code doubling.
+  void __updateEntry__(const Entry& entry);
+
   CycleTable(const CycleTable& obj) = delete;
   CycleTable& operator = (const CycleTable& rhs) = delete;
   CycleTable& operator = (CycleTable&& rval_rhs) = delete;
