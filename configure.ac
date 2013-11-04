@@ -260,6 +260,15 @@ AC_CHECK_HEADERS([boost/foreach.hpp boost/date_time/posix_time/posix_time_types.
 #  [AC_MSG_ERROR([$BOOST_LIBRARIES_NOT_FOUND_WARNING_STR])], [])
 AC_LANG_POP([C++])
 
+dnl Check for QT libraries
+PKG_CHECK_MODULES([QT5], [Qt5Core >= 5.1.1 Qt5Gui >= 5.1.1], [
+  AC_PATH_PROGS(MOC, [moc-qt5 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix Qt5Core`/bin)
+  AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix Qt5Core`/bin)
+  AC_PATH_PROGS(UIC, [uic-qt5 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix Qt5Core`/bin)
+], [
+  AC_MSG_ERROR([Qt 5.1.1 library not found])
+])
+
 dnl Security xFLAGS
 SECURITYFLAGS="-fstack-protector --param=ssp-buffer-size=4 -D_FORTIFY_SOURCE=2 -Wall -Wno-comment -Wformat-security"
 CXXFLAGS="$CXXFLAGS $SECURITYFLAGS"
