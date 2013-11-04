@@ -386,17 +386,18 @@ void TableManager::deletePolicy(const ID_t& i_policy_id) {
   INF("exit TableManager::deletePolicy().");
 }
 
-Entry TableManager::undoPolicy(const ID_t& i_policy_id) {
+std::pair<Entry, Entry> TableManager::undoPolicy(const ID_t& i_policy_id) {
   INF("enter TableManager::undoPolicy().");
   std::shared_ptr<DateTime> ptr_datetime;
   Policy policy = this->m_policy_table.readPolicy(i_policy_id, ptr_datetime);
-  // TODO: proper rollback source entry   // this->m_cycle_table.r
+  Entry source_entry = this->undo(policy.getSourceID());
+  DBG3("Undone policy [ID: %lli], rolled back source entry [ID: %lli].",
+       i_policy_id, policy.getSourceID());
   Entry destination_entry = this->undo(policy.getDestinationID());
-  /*DBG3("Undone policy [ID: %lli], removed record [ID: %lli] "
-       "from table ["%s"].",
-       i_policy_id, );*/
+  DBG3("Undone policy [ID: %lli], rolled back source entry [ID: %lli].",
+       i_policy_id, policy.getDestinationID());
   INF("exit TableManager::undoPolicy().");
-  return (destination_entry);
+  return (std::make_pair(source_entry, destination_entry));
 }
 
 // ----------------------------------------------------------------------------

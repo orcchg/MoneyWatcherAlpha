@@ -128,10 +128,10 @@ public:
   /// @brief Undoes applied policy, recovering previous states of corresponding
   /// entries.
   /// @param policy_id - Primary key of policy of interest in SQLite database.
-  /// @return Rolled back destination entry.
+  /// @return Pair of rolled back source and destination entries.
   /// @note Attendant record will be removed from daily_table
   /// in SQLite database.
-  Entry undoPolicy(const ID_t& policy_id);
+  std::pair<Entry, Entry> undoPolicy(const ID_t& policy_id);
   /// @}
   /// -------------------------------------------------------------------------
 
