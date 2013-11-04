@@ -3444,7 +3444,7 @@ TEST (PolicyTableManagerTest, UndoPolicy) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-/*TEST (PolicyTableManagerTest, DeletePolicy) {
+TEST (PolicyTableManagerTest, DeletePolicy) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);
   EXPECT_EQ(mw::CycleTable::OPENED_CYCLE_TABLES_COUNT, 0);
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
@@ -3453,12 +3453,8 @@ TEST (PolicyTableManagerTest, UndoPolicy) {
   mw::WrappedString s_entry_2nd_name = "Второй слот";
   mw::WrappedString s_entry_1st_description = "Тестовое описание первого слота";
   mw::WrappedString s_entry_2nd_description = "Тестовое описание второго слота";
-  MoneyValue_t s_entry_1st_balance = 1750;
-  MoneyValue_t s_entry_2nd_balance = 5250;
   mw::WrappedString s_policy_name = "Итог недели Корпорации";
   mw::WrappedString s_policy_description = "Передача средств корпорации в фонд";
-  PolicyRatio_t s_ratio = 25;
-  int s_hours_period = 168;
   mw::PolicyStatus s_policy_status(mw::PolicyStatusValue::PSV_ENABLED);
   try {
     mw::TableManager table_manager;
@@ -3468,7 +3464,8 @@ TEST (PolicyTableManagerTest, UndoPolicy) {
     EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 1);
     mw::TestAccessTable<mw::TableManager> accessor(&table_manager);
     EXPECT_TRUE(accessor.checkFinalized());
-    // TODO: impl
+    int rows = countRows(table_manager.getPolicyTableName(), accessor.getDbHandler());
+    EXPECT_EQ(rows, 0);
     EXPECT_TRUE(accessor.checkFinalized());
 
   } catch (mw::TableException& e) {
@@ -3486,7 +3483,7 @@ TEST (PolicyTableManagerTest, UndoPolicy) {
   EXPECT_EQ(mw::DailyTable::OPENED_DAILY_TABLES_COUNT, 0);
   EXPECT_EQ(mw::PolicyTable::OPENED_POLICY_TABLES_COUNT, 0);
   remove(mw::TableManager::single_database_name.c_str());
-}*/
+}
 
 #endif  // ENABLED_TIME_MEASURE_ONLY
 
