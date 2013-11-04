@@ -3114,8 +3114,8 @@ TEST (PolicyTableManagerTest, ApplyPolicy) {
     EXPECT_EQ(records.second.getBalance(), value);
     EXPECT_STREQ(records.first.getDescription().c_str(), policy.getDescription().c_str());
     EXPECT_STREQ(records.second.getDescription().c_str(), policy.getDescription().c_str());
-    // TODO: EXPECT_EQ(records.first.getStatus(), policy_status);
-    // TODO: EXPECT_EQ(records.second.getStatus(), policy_status);
+    EXPECT_EQ(records.first.getStatus(), mw::RecordStatus(mw::RecordStatusValue::RSV_APPLIED_POLICY));
+    EXPECT_EQ(records.second.getStatus(), mw::RecordStatus(mw::RecordStatusValue::RSV_APPLIED_POLICY));
 
     DB_Statement statement_handler = nullptr;
     std::string check_statement = "SELECT * FROM '";
@@ -3149,7 +3149,7 @@ TEST (PolicyTableManagerTest, ApplyPolicy) {
     EXPECT_EQ(transaction, -value);
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
     mw::RecordStatus status(raw_status);
-    // TODO: EXPECT_EQ(status, policy_status);
+    EXPECT_EQ(status, mw::RecordStatus(mw::RecordStatusValue::RSV_APPLIED_POLICY));
 
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
@@ -3170,7 +3170,7 @@ TEST (PolicyTableManagerTest, ApplyPolicy) {
     EXPECT_EQ(transaction_dest, value);
     sqlite3_int64 raw_status_dest = sqlite3_column_int64(statement_handler, 7);
     mw::RecordStatus status_dest(raw_status_dest);
-    // TODO: EXPECT_EQ(status_dest, policy_status);
+    EXPECT_EQ(status_dest, mw::RecordStatus(mw::RecordStatusValue::RSV_APPLIED_POLICY));
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -3274,7 +3274,7 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
     EXPECT_NE(transaction, -value);
     sqlite3_int64 raw_status = sqlite3_column_int64(statement_handler, 7);
     mw::RecordStatus status(raw_status);
-    // TODO: EXPECT_EQ(status, policy_status);
+    EXPECT_EQ(status, mw::RecordStatus(mw::RecordStatusValue::RSV_UNKNOWN));
 
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_ROW);
@@ -3295,7 +3295,7 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
     EXPECT_NE(transaction_dest, value);
     sqlite3_int64 raw_status_dest = sqlite3_column_int64(statement_handler, 7);
     mw::RecordStatus status_dest(raw_status_dest);
-    // TODO: EXPECT_EQ(status_dest, policy_status);
+    EXPECT_EQ(status_dest, mw::RecordStatus(mw::RecordStatusValue::RSV_UNKNOWN));
     result = sqlite3_step(statement_handler);
     EXPECT_EQ(result, SQLITE_DONE);
     sqlite3_finalize(statement_handler);
@@ -3318,9 +3318,9 @@ TEST (PolicyTableManagerTest, ApplyPolicyAndUndo) {
   remove(mw::TableManager::single_database_name.c_str());
 }
 
-/*TEST (PolicyTableManagerTest, UndoPolicy) {
+TEST (PolicyTableManagerTest, UndoPolicy) {
   // TODO: impl
-}*/
+}
 
 /*TEST (PolicyTableManagerTest, DeletePolicy) {
   EXPECT_EQ(mw::TableManager::OPENED_DATABASES_COUNT, 0);

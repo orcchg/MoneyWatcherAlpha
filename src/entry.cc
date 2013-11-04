@@ -91,6 +91,25 @@ RecordStatus Entry::updateBalance(
   return (status);
 }
 
+void Entry::updateBalance(
+    const MoneyValue_t& i_value,
+    const WrappedString& i_description,
+    const RecordStatus& i_status) {
+  DBG("enter Entry::updateBalance(status).");
+  this->m_description = i_description;
+  this->m_last_transaction = i_value;
+  this->m_current_balance += i_value;  // update current balance
+  this->m_datetime = DateTime();  // time of update
+  this->m_status = i_status;
+  TRC("Updated current balance of entry ["%s"] at ["%s" - "%s"] "
+      "for value [%lli]. It was changed by [%lli].",
+      this->m_name.c_str(),
+      this->m_datetime.getDate().c_str(),
+      this->m_datetime.getTime().c_str(),
+      this->m_current_balance, i_value);
+  DBG("exit Entry::updateBalance(status).");
+}
+
 RecordStatus Entry::rollbackBalance(
     const MoneyValue_t& i_value,
     const Record& i_record) {
@@ -112,13 +131,6 @@ RecordStatus Entry::rollbackBalance(
       this->m_current_balance, i_value);
   DBG("exit Entry::rollbackBalance().");
   return (this->m_status);
-}
-
-void Entry::setAppliedPolicyStatus() {
-  DBG("enter Entry::setAppliedPolicyStatus().");
-  this->m_status.setStatus(RecordStatusValue::RSV_APPLIED_POLICY);
-  DBG("Status of entry [ID: %lli] set to APPLIED_POLICY.", this->m_id);
-  DBG("exit Entry::setAppliedPolicyStatus().");
 }
 
 Record Entry::make_record() const {

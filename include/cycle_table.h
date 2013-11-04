@@ -67,6 +67,14 @@ public:
       const MoneyValue_t& value,
       const WrappedString& description);
 
+  /// @brief Same as above, but status of last transaction given.
+  /// @brief status - Status of last transaction.
+  Entry updateEntry(
+      const ID_t& entry_id,
+      const MoneyValue_t& value,
+      const WrappedString& description,
+      const RecordStatus& status);
+
   /// @brief Updates existing entry by values of given record,
   /// i.e. rolls entry back from its current state to those assigned
   /// in record.

@@ -182,6 +182,61 @@ Record TableManager::update(
   return (record);
 }
 
+Record TableManager::update(
+      const ID_t& i_entry_id,
+      const MoneyValue_t& i_value,
+      const WrappedString& i_description,
+      const RecordStatus& i_status) {
+  INF("enter TableManager::update(status).");
+  Entry entry =
+      this->m_cycle_table.updateEntry(
+          i_entry_id,
+          i_value,
+          i_description,
+          i_status);
+  Record record =
+      this->m_daily_table.addRecord(
+          i_value,
+          i_description,
+          entry.getStatus());
+  ID_t record_id = record.getID();
+
+  DBG3("Reading table name of entry records from SQLite database ["%s"]...",
+       this->m_db_name.c_str());
+  std::string select_statement = "SELECT * FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "' WHERE EntryID == '";
+  select_statement += std::to_string(i_entry_id);
+  select_statement += "';";
+  this->__prepare_statement__(select_statement);
+  sqlite3_step(this->m_db_statement);
+  std::string records_table_name(reinterpret_cast<const char*>(
+      sqlite3_column_text(this->m_db_statement, 1)));
+  DBG3("Got record [ID: %lli], inserting into table ["%s"] "
+       "of entry [ID: %lli].",
+       record_id, records_table_name.c_str(), entry.getID());
+  this->__finalize__(select_statement.c_str());
+
+  std::string insert_statement = "INSERT INTO '";
+  insert_statement += records_table_name;
+  insert_statement += "' VALUES(?1);";
+  this->__prepare_statement__(insert_statement);
+  int accumulate = sqlite3_bind_int64(this->m_db_statement, 1, record_id);
+  sqlite3_step(this->m_db_statement);
+  if (accumulate != SQLITE_OK) {
+    ERR("Error during saving data into database ["%s"] by statement ["%s"]!",
+        this->m_db_name.c_str(), insert_statement.c_str());
+    this->__finalize_and_throw__(
+        insert_statement.c_str(),
+        SQLITE_ACCUMULATED_PREPARE_ERROR);
+  } else {
+    DBG3("All insertions have succeeded.");
+  }
+  this->__finalize__(insert_statement.c_str());
+  INF("exit TableManager::update(status).");
+  return (record);
+}
+
 void TableManager::remove(const ID_t& i_entry_id) {
   INF("enter TableManager::remove().");
   this->m_cycle_table.deleteEntry(i_entry_id);
@@ -357,7 +412,11 @@ std::pair<Record, Record> TableManager::applyPolicy(const ID_t& i_policy_id) {
   DBG3("Calculated ratio [%lli] of source entry balance [%lli]: %lli.",
        policy.getRatio(), source_entry.getBalance(), value);
   Record source_record =
-      this->update(source_entry.getID(), -value, policy.getDescription());
+      this->update(
+          source_entry.getID(),
+          -value,
+          policy.getDescription(),
+          RecordStatus(RecordStatusValue::RSV_APPLIED_POLICY));
   DBG3("Updated source entry [ID: %lli] for value %lli. "
        "Final balance [%lli].",
        source_entry.getID(), -value, source_entry.getBalance());
@@ -375,7 +434,8 @@ std::pair<Record, Record> TableManager::applyPolicy(const ID_t& i_policy_id) {
       this->update(
           policy.getDestinationID(),
           value,
-          policy.getDescription());
+          policy.getDescription(),
+          RecordStatus(RecordStatusValue::RSV_APPLIED_POLICY));
   DBG3("Updated destination entry [ID: %lli] for value %lli.",
        policy.getDestinationID(), value);
   DBG3("Destination record corresponding to applied policy [ID: %lli]: "

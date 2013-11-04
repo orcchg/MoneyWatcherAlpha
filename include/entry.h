@@ -71,6 +71,13 @@ public:
       const MoneyValue_t& value,
       const WrappedString& description);
 
+  /// @brief Same as above, but status of last transaction given.
+  /// @brief status - Status of last transaction.
+  void updateBalance(
+      const MoneyValue_t& value,
+      const WrappedString& description,
+      const RecordStatus& status);
+
   /// @brief Updates an actual money balance and
   /// description of the current entry
   /// by values of giver record, i.e. rolls entry back from its current state
@@ -79,9 +86,6 @@ public:
   /// @param record - Record, whose balance, description and date & time
   /// @return Status of input record.
   RecordStatus rollbackBalance(const MoneyValue_t& i_value, const Record& record);
-
-  /// @brief Sets status of current entry to APPLIED_POLICY.
-  void setAppliedPolicyStatus();
   /// @}
   /// -------------------------------------------------------------------------
 

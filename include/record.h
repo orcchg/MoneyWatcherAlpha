@@ -50,14 +50,6 @@ public:
   /// @}
   /// -------------------------------------------------------------------------
 
-  /// -------------------------------------------------------------------------
-  /// @defgroup SET Setters for class members.
-  /// @{
-  /// @brief Sets status of current record to APPLIED_POLICY.
-  void setAppliedPolicyStatus();
-  /// @}
-  /// -------------------------------------------------------------------------
-
 private:
   ID_t m_id;
   MoneyValue_t m_balance;

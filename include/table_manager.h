@@ -64,6 +64,14 @@ public:
 	    const MoneyValue_t& value,
 	    const WrappedString& description);
 
+  /// @brief Same as above, but status of last transaction given.
+  /// @brief status - Status of last transaction.
+  Record update(
+        const ID_t& entry_id,
+        const MoneyValue_t& value,
+        const WrappedString& description,
+        const RecordStatus& status);
+
   /// @brief Removes existing entry by its ID. Also removes all related records
   /// from daily_table through cascade deletion.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
