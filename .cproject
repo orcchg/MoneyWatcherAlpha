@@ -3,7 +3,9 @@
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194" moduleId="org.eclipse.cdt.core.settings" name="Build (GNU)">
-				<externalSettings/>
+				<externalSettings>
+					<externalSetting/>
+				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
@@ -41,6 +43,9 @@
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1456755525" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__GXX_EXPERIMENTAL_CXX0X__"/>
 									<listOptionValue builtIn="false" value="__STDC_FORMAT_MACROS"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.1942755444" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="//home/maxa/Development/Tools/QT5111/5.1.1/gcc_64/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.658352563" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -98,6 +103,9 @@
 									<listOptionValue builtIn="false" value="__GXX_EXPERIMENTAL_CXX0X__"/>
 									<listOptionValue builtIn="false" value="__STDC_FORMAT_MACROS"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.92935443" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="//home/maxa/Development/Tools/QT5111/5.1.1/gcc_64/include"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1411037186" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -153,6 +161,9 @@
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1515496178" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__GXX_EXPERIMENTAL_CXX0X__"/>
 									<listOptionValue builtIn="false" value="__STDC_FORMAT_MACROS"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.1596054174" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="//home/maxa/Development/Tools/QT5111/5.1.1/gcc_64/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1485612057" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -210,6 +221,9 @@
 									<listOptionValue builtIn="false" value="__GXX_EXPERIMENTAL_CXX0X__"/>
 									<listOptionValue builtIn="false" value="__STDC_FORMAT_MACROS"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.795345794" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="//home/maxa/Development/Tools/QT5111/5.1.1/gcc_64/include"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1168836779" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -234,6 +248,7 @@
 		<configuration configurationName="Build-Release">
 			<resource resourceType="PROJECT" workspacePath="/MoneyWatcherAlpha"/>
 		</configuration>
+		<configuration configurationName="Build-Time"/>
 		<configuration configurationName="Build-Debug">
 			<resource resourceType="PROJECT" workspacePath="/MoneyWatcherAlpha"/>
 		</configuration>
@@ -242,21 +257,6 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.860764647;cdt.managedbuild.tool.gnu.c.compiler.input.2079708875">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1416605804;cdt.managedbuild.tool.gnu.cpp.compiler.input.1411037186">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.296198462;cdt.managedbuild.tool.gnu.c.compiler.input.87565960">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.857957860;cdt.managedbuild.tool.gnu.cpp.compiler.input.658352563">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="all" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
@@ -668,5 +668,32 @@
 				<runAllBuilders>false</runAllBuilders>
 			</target>
 		</buildTargets>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.860764647;cdt.managedbuild.tool.gnu.c.compiler.input.2079708875">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1803848455;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1803848455.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1373980175;cdt.managedbuild.tool.gnu.cpp.compiler.input.1168836779">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.2140147014;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.2140147014.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1432135894;cdt.managedbuild.tool.gnu.cpp.compiler.input.1485612057">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1416605804;cdt.managedbuild.tool.gnu.cpp.compiler.input.1411037186">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.2140147014;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.2140147014.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.441169605;cdt.managedbuild.tool.gnu.c.compiler.input.679986696">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1803848455;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1803848455.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.1620940671;cdt.managedbuild.tool.gnu.c.compiler.input.699879641">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.1433619669.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.296198462;cdt.managedbuild.tool.gnu.c.compiler.input.87565960">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.722583194.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.857957860;cdt.managedbuild.tool.gnu.cpp.compiler.input.658352563">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

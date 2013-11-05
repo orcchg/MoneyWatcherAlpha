@@ -23,4 +23,4 @@ moneywatcher_LDFLAGS = $(top_builddir)/src/libmoneywatcher.la \
 					   $(top_builddir)/sqlite3/libsqlite3formw.la
 
 # Compiler options for a.out
-moneywatcher_CPPFLAGS = -std=c++11 -I$(top_srcdir)/include
+moneywatcher_CPPFLAGS = -std=c++11 -fPIC -I$(top_srcdir)/include
