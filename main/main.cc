@@ -7,13 +7,9 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
-#include <iostream>
-#include <locale.h>
-#include <QtWidgets/QApplication>
+#include "engine.h"
 
 
 int main(int argc, char** argv) {
-  setlocale(LC_CTYPE, "");
-  std::cout << "Hello, World!" << std::endl;
   return (0);
 }

@@ -1,3 +1,5 @@
+SUBDIRS = src
+
 #######################################
 # The list of executables we are building seperated by spaces
 # the 'bin_' indicates that these build products will be installed
@@ -19,8 +21,8 @@ noinst_PROGRAMS = moneywatcher
 moneywatcher_SOURCES = main.cc
 
 # Linker options for a.out
-moneywatcher_LDFLAGS = $(top_builddir)/src/libmoneywatcher.la \
-					   $(top_builddir)/sqlite3/libsqlite3formw.la
+moneywatcher_LDFLAGS = $(top_builddir)/main/src/libmwengineapp.la
 
 # Compiler options for a.out
-moneywatcher_CPPFLAGS = -std=c++11 -fPIC -I$(top_srcdir)/include
+moneywatcher_CPPFLAGS = -std=c++11 -fPIC \
+                        -I$(top_srcdir)/main/include

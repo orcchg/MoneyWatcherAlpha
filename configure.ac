@@ -40,10 +40,11 @@ PKG_PROG_PKG_CONFIG
 
 dnl Link with Makefile.am in source directories
 AC_CONFIG_FILES(Makefile
+                include/Makefile
                 sqlite3/Makefile
                 src/Makefile
-                main/Makefile
-                include/Makefile)
+                main/src/Makefile
+                main/Makefile)
                 
 AC_SUBST([BUILD_CFLAGS])
 #-----------------------------------------------------------------------

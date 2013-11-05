@@ -23,7 +23,7 @@ libmoneywatcher_la_SOURCES = cycle_table.cc \
 							 test_access_class.cc \
 							 unistring.cc
 
-# Linker options libTestProgram
+# Linker options libmoneywatcher
 libmoneywatcher_la_LDFLAGS =
 
 # Compiler options. Here we are adding the include directory
