@@ -8,6 +8,7 @@
  */
 
 #include "engine.h"
+#include "logger.h"
 
 
 namespace mw {
@@ -17,6 +18,12 @@ MoneyWatcherEngine::MoneyWatcherEngine(int argc, char* argv[])
 }
 
 MoneyWatcherEngine::~MoneyWatcherEngine() {
+}
+
+void MoneyWatcherEngine::run() {
+  INF("enter MoneyWatcherEngine::run().");
+  //
+  INF("exit MoneyWatcherEngine::run().");
 }
 
 }  /* namespace mw */

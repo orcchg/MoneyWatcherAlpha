@@ -21,6 +21,9 @@ public:
   MoneyWatcherEngine(int argc, char* argv[]);
   virtual ~MoneyWatcherEngine();
 
+  /// @brief Run Graphic application.
+  void run();
+
 private:
   QApplication m_application;
 
