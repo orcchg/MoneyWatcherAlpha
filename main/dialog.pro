@@ -1,6 +1,6 @@
 QT += widgets
 
-HEADERS     = $$[QT_APP_DIR]/main/app_dialog.h
+HEADERS     = $$[QT_APP_DIR]/main/include/app_dialog.h
 SOURCES     = $$[QT_APP_DIR]/main/app_dialog.cc \
 			  $$[QT_APP_DIR]/main/main.cc
 

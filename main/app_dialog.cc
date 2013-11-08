@@ -8,7 +8,7 @@
  */
 
 #include <QtWidgets/QtWidgets>
-#include "app_dialog.h"
+#include "include/app_dialog.h"
 
 
 //! [0]

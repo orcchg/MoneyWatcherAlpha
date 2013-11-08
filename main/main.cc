@@ -8,7 +8,8 @@
  */
 
 #include <QtWidgets/QApplication>
-#include "app_dialog.h"
+#include "include/app_dialog.h"
+#include "src/engine.h"
 
 
 int main(int argc, char** argv) {

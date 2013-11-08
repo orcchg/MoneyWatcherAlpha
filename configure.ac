@@ -43,6 +43,7 @@ AC_CONFIG_FILES(Makefile
                 include/Makefile
                 sqlite3/Makefile
                 src/Makefile
+                main/src/Makefile
                 main/Makefile)
                 
 AC_SUBST([BUILD_CFLAGS])
