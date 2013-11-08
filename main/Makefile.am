@@ -9,7 +9,7 @@ SUBDIRS = src
 # Because a.out is only a sample program we don't want it to be installed.
 # The 'noinst_' prefix indicates that the following targets are not to be
 # installed.
-noinst_PROGRAMS = moneywatcher
+#noinst_PROGRAMS = moneywatcher
 
 #######################################
 # Build information for each executable. The variable name is derived
@@ -18,11 +18,11 @@ noinst_PROGRAMS = moneywatcher
 # '_SOURCES' for example.
 
 # Sources for the a.out 
-moneywatcher_SOURCES = main.cc
+#moneywatcher_SOURCES = main.cc
 
 # Linker options for a.out
-moneywatcher_LDFLAGS = $(top_builddir)/main/src/libmwengineapp.la
+#moneywatcher_LDFLAGS = $(top_builddir)/main/src/libmwengineapp.la
 
 # Compiler options for a.out
-moneywatcher_CPPFLAGS = -std=c++11 -fPIC \
-                        -I$(top_srcdir)/main/include
+#moneywatcher_CPPFLAGS = -std=c++11 -fPIC \
+#                        -I$(top_srcdir)/main/include

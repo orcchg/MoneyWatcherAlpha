@@ -304,10 +304,4 @@ CXXFLAGS="$CXXFLAGS -Winvalid-pch"
 dnl Use the modern C standard
 CFLAGS="$CFLAGS -std=c99"
 
-dnl Top project directory
-MW_TOP_PROJECT_DIR=$(readlink -f ../configure.ac)
-MW_TOP_PROJECT_DIR=$(dirname $MW_TOP_PROJECT_DIR)
-AC_MSG_NOTICE([Top project directory: $MW_TOP_PROJECT_DIR])
-AC_SUBST(MW_TOP_PROJECT_DIR)
-
 AC_OUTPUT

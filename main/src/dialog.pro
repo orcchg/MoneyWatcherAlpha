@@ -1,4 +1,7 @@
 QT += widgets
 
-HEADERS     = $$[MW_TOP_PROJECT_DIR]/main/include/dialog.h
-SOURCES     = $$[MW_TOP_PROJECT_DIR]/main/src/dialog.cc
+HEADERS     = $$[QT_APP_DIR]/main/src/app_dialog.h
+SOURCES     = $$[QT_APP_DIR]/main/src/app_dialog.cc \
+			  $$[QT_APP_DIR]/main/src/main.cc
+
+QMAKE_CXXFLAGS += -std=c++0x -fPIC

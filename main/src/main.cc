@@ -7,8 +7,8 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
-#include "dialog.h"
-#include "engine.h"
+#include <QtWidgets/QApplication>
+#include "app_dialog.h"
 
 
 int main(int argc, char** argv) {
