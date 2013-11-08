@@ -189,7 +189,7 @@ AS_IF([test "x$enable_time_measurements_only" != "xno"],
   AC_MSG_NOTICE([Enabled time measurements only])
 ])
 AS_IF([test "x$enable_time_measurements_only" != "xyes"],
-  AC_DEFINE([__MW_ENABLE_TIME_MEASURE_ONLY__], [false], [Disabled time measurements only])
+  [AC_DEFINE([__MW_ENABLE_TIME_MEASURE_ONLY__], [false], [Disabled time measurements only])
   MW_VAR_ENABLE_TIME_MEASURE_ONLY=false
   AC_MSG_NOTICE([Disabled time measurements only])
 ])
