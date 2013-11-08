@@ -1,4 +1,4 @@
 QT += widgets
 
-HEADERS     = $$PWD/main/include/dialog.h
-SOURCES     = $$PWD/main/src/dialog.cc
+HEADERS     = $$[MW_TOP_PROJECT_DIR]/main/include/dialog.h
+SOURCES     = $$[MW_TOP_PROJECT_DIR]/main/src/dialog.cc
