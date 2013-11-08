@@ -28,4 +28,4 @@ libmwengineapp_la_LIBADD = $(top_builddir)/src/libmoneywatcher.la \
 #######################################
 # Qt make
 all:
-	$(AM_V_GEN)$(QMAKE) dialog.pro
+	$(AM_V_GEN)$(QMAKE) $(top_srcdir)/main/src/dialog.pro
