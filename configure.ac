@@ -267,8 +267,15 @@ PKG_CHECK_MODULES([QT5], [Qt5Core >= 5.1.1 Qt5Gui >= 5.1.1 Qt5Widgets >= 5.1.1],
   AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix Qt5Core`/bin)
   AC_PATH_PROGS(UIC, [uic-qt5 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix Qt5Core`/bin)
 ], [
-  AC_MSG_ERROR([Qt 5.1.1 library not found])
+  AC_MSG_ERROR([Qt library not found])
 ])
+
+dnl Set path to QMAKE utility
+AC_ARG_VAR(QMAKE, Path to QMAKE utility)
+AC_PATH_PROG(QMAKE, [qmake], "")
+AS_IF([test -z "$QMAKE"],
+  AC_MSG_ERROR([qmake was not found])
+)
 
 dnl Security xFLAGS
 SECURITYFLAGS="-fstack-protector --param=ssp-buffer-size=4 -D_FORTIFY_SOURCE=2 -Wall -Wno-comment -Wformat-security"

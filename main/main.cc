@@ -7,6 +7,7 @@
  *      Author: Maxim Alov <m.alov@samsung.com>
  */
 
+#include "dialog.h"
 #include "engine.h"
 
 

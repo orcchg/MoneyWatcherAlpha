@@ -24,3 +24,8 @@ libmwengineapp_la_CPPFLAGS = -std=c++11 \
 libmwengineapp_la_LIBADD = $(top_builddir)/src/libmoneywatcher.la \
 					       $(top_builddir)/sqlite3/libsqlite3formw.la
 
+
+#######################################
+# Qt make
+all:
+	$(AM_V_GEN)$(QMAKE) dialog.pro
