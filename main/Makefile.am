@@ -1,28 +1,32 @@
-SUBDIRS = src
+#######################################
+# The list of libraries we are building seperated by spaces.
+# The 'lib_' indicates that these build products will be installed
+# in the $(libdir) directory. For example /usr/lib
+lib_LTLIBRARIES = libmwengineapp.la
 
 #######################################
-# The list of executables we are building seperated by spaces
-# the 'bin_' indicates that these build products will be installed
-# in the $(bindir) directory. For example /usr/bin
-#bin_PROGRAMS=exampleProgram
+# Build information for each library
 
-# Because a.out is only a sample program we don't want it to be installed.
-# The 'noinst_' prefix indicates that the following targets are not to be
-# installed.
-#noinst_PROGRAMS = moneywatcher
+# Sources for libmwengineapp
+libmwengineapp_la_SOURCES = engine.cc
+
+# Linker options libmwengineapp
+libmwengineapp_LDFLAGS =
+
+# Compiler options. Here we are adding the include directory
+# to be searched for headers included in the source code.
+libmwengineapp_la_CPPFLAGS = -std=c++11 \
+                             -fPIC \
+                             -I$(top_srcdir)/include \
+                             -I$(top_srcdir)/sqlite3 \
+                             -I$(top_srcdir)/main/include
+
+libmwengineapp_la_LIBADD = $(top_builddir)/src/libmoneywatcher.la \
+					       $(top_builddir)/sqlite3/libsqlite3formw.la
+
 
 #######################################
-# Build information for each executable. The variable name is derived
-# by use the name of the executable with each non alpha-numeric character is
-# replaced by '_'. So a.out becomes a_out and the appropriate suffex added.
-# '_SOURCES' for example.
-
-# Sources for the a.out 
-#moneywatcher_SOURCES = main.cc
-
-# Linker options for a.out
-#moneywatcher_LDFLAGS = $(top_builddir)/main/src/libmwengineapp.la
-
-# Compiler options for a.out
-#moneywatcher_CPPFLAGS = -std=c++11 -fPIC \
-#                        -I$(top_srcdir)/main/include
+# Qt make
+all:
+	$(QMAKE) -set QT_APP_DIR $(top_srcdir)
+	$(AM_V_GEN)$(QMAKE) $(top_srcdir)/main/dialog.pro
