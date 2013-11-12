@@ -11,6 +11,7 @@
 #define DIALOG_H_
 
 #include <QtWidgets/QDialog>
+#include "table_manager.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -54,6 +55,8 @@ private:
 
     QMenu *fileMenu;
     QAction *exitAction;
+
+    mw::TableManager tm;
 };
 //! [0]
 
