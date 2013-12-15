@@ -2,9 +2,11 @@ QT += widgets
 
 INCLUDEPATH = $$[QT_SRC_DIR]/include
 
-HEADERS     = $$[QT_SRC_DIR]/main/include/app_dialog.h
+HEADERS     = $$[QT_SRC_DIR]/main/include/app_dialog.h \
+              $$[QT_SRC_DIR]/main/include/main_window.h
 
 SOURCES     = $$[QT_SRC_DIR]/main/app_dialog.cc \
+              $$[QT_SRC_DIR]/main/main_window.cc \
 			  $$[QT_SRC_DIR]/main/main.cc
 			  
 LIBS       += $$[QT_SRC_LIB_DIR]/libmoneywatcher.so \
