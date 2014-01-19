@@ -197,6 +197,52 @@ Record DailyTable::readRecord(const ID_t& i_record_id) {
   return (record);
 }
 
+const std::unordered_map<ID_t, Record> DailyTable::listRecords() {
+  INF("enter DailyTable::listRecords().");
+  std::string select_statement = "SELECT * FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "';";
+  this->__prepare_statement__(select_statement);
+
+  std::unordered_map<ID_t, Record> records;
+  int result = sqlite3_step(this->m_db_statement);
+  while (result == SQLITE_OK) {
+    ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
+    DBG1("Read id [%lli] from  table ["%s"] of database ["%s"].",
+         id, this->m_table_name.c_str(), this->m_db_name.c_str());
+    std::string date(reinterpret_cast<const char*>(
+        sqlite3_column_text(this->m_db_statement, 1)));
+    std::string time(reinterpret_cast<const char*>(
+        sqlite3_column_text(this->m_db_statement, 2)));
+    DateTime datetime(date, time);
+    MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
+    const void* raw_description = sqlite3_column_text(this->m_db_statement, 4);
+    WrappedString description(raw_description);
+    sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 5);
+    RecordStatus status(raw_status);
+    DBG1("Loaded column data: Date ["%s"]; Time ["%s"]; "
+         "Balance [%lli]; Description ["%s"]; Status [%lli].",
+         datetime.getDate().c_str(),
+         datetime.getTime().c_str(),
+         balance,
+         description.c_str(),
+         raw_status);
+    Record record(id, balance, description, status, datetime);
+    DBG1("Proper record instance has been constructed.");
+    records[id] = record;
+    DBG1("Record has been inserted into map.");
+    result = sqlite3_step(this->m_db_statement);
+  }
+
+#if ENABLED_DB_CACHING
+  // TODO: caching the record
+#endif
+
+  this->__finalize__(select_statement.c_str());
+  INF("exit DailyTable::listRecords().");
+  return (records);
+}
+
 void DailyTable::deleteRecord(const ID_t& i_record_id) {
   INF("enter DailyTable::deleteRecord().");
 

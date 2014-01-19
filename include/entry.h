@@ -25,12 +25,12 @@ namespace mw {
 class Entry {
 public:
   Entry(
-      const ID_t& id,
-      const WrappedString& name,
-      const WrappedString& description,
-      const MoneyValue_t& current_balance,
-      const MoneyValue_t& last_transaction,
-      const RecordStatus& status,
+      const ID_t& id = -1,
+      const WrappedString& name = "",
+      const WrappedString& description = "",
+      const MoneyValue_t& current_balance = 0,
+      const MoneyValue_t& last_transaction = 0,
+      const RecordStatus& status = RecordStatusValue::RSV_UNKNOWN,
       const DateTime& datetime = DateTime());
   virtual ~Entry();
 

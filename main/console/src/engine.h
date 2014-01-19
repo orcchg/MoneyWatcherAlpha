@@ -17,13 +17,24 @@ namespace mw {
 
 class ConsoleEngine {
 public:
-  ConsoleEngine();
-  virtual ~ConsoleEngine();
+  ConsoleEngine() = default;
+  virtual ~ConsoleEngine() = default;
 
   void run();
 
 private:
-  TableManager tm;
+  TableManager m_table_manager;
+
+  void __banner__();
+  void __show_menu__();
+  bool __list_cycle_table__();
+  void __list_daily_table__();
+  void __run_cycle_table_operations__();
+
+  ConsoleEngine(const ConsoleEngine& obj) = delete;
+  ConsoleEngine(ConsoleEngine&& rval_obj) = delete;
+  ConsoleEngine& operator = (const ConsoleEngine& rhs) = delete;
+  ConsoleEngine& operator = (ConsoleEngine&& rval_rhs) = delete;
 };
 
 }  /* namespace mw */

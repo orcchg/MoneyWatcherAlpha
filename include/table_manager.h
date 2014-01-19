@@ -50,7 +50,7 @@ public:
       const WrappedString& description,
       const MoneyValue_t& current_balance);
 
-  /// @brief Updates current balance of existing entry by its ID. Also,
+  /// @brief Updates current balance of existing entry by its ID. Also,  void __run_cycle_table_operations__()
   /// provides corresponding record in daily_table.
   /// @param entry_id - Primary key of entry of interest in SQLite database.
   /// @param value - Amount to which the actual money balance should
@@ -83,7 +83,7 @@ public:
   /// @param entry_id - Primary key of entry of interest in SQLite database.
   /// @return Rolled back entry.
   /// @note If there is no last transaction provided with entry, the entry
-  /// becomes empty. Also deletes associated record from daily_table.
+  /// becomes empty. Also deletes associated record from daily_table.  void __run_cycle_table_operations__()
   Entry undo(const ID_t& entry_id);
   /// @}
   /// -------------------------------------------------------------------------
@@ -122,7 +122,7 @@ public:
 
   /// @brief Removes policy from SQLite database.
   /// @param policy_id - Primary key of policy of interest in SQLite database.
-  /// @note Result of this invocation cannot be undone.
+  /// @note Result of this invocation cannot be undone.  void __run_cycle_table_operations__()
   void deletePolicy(const ID_t& policy_id);
 
   /// @brief Undoes applied policy, recovering previous states of corresponding
@@ -141,6 +141,14 @@ public:
   const std::string& getCycleTableName() const;
   const std::string& getDailyTableName() const;
   const std::string& getPolicyTableName() const;
+  /// @}
+  /// -------------------------------------------------------------------------
+
+  /// -------------------------------------------------------------------------
+  /// @defgroup LIST Getters for tables' content (read-only).
+  /// @{
+  const std::unordered_map<ID_t, Entry> listCycleTable();
+  const std::unordered_map<ID_t, Record> listDailyTable();
   /// @}
   /// -------------------------------------------------------------------------
 

@@ -54,7 +54,10 @@ public:
   /// @param record_id - Primary key of record of interest in SQLite database.
   /// @return Newly read record.
   Record readRecord(const ID_t& record_id);
-  /// @}
+
+  /// @brief Reads all records from DailyTable.
+  /// @return Map with records.
+  const std::unordered_map<ID_t, Record> listRecords();
 
   /// @brief Removes record from SQLite database.
   /// @param record_id - Primary key of record of interest in SQLite database.
@@ -69,6 +72,7 @@ public:
   /// @note Value of next_id remains incremented in case any of record
   /// to be deleted is not the last one, otherwise next_id will be decreased.
   void deleteRecords(std::vector<ID_t>& record_ids);
+  /// @}
   /// -------------------------------------------------------------------------
 
   /// -------------------------------------------------------------------------

@@ -232,6 +232,59 @@ Entry CycleTable::readEntry(const ID_t& i_entry_id) {
   return (entry);
 }
 
+const std::unordered_map<ID_t, Entry> CycleTable::listEntries() {
+  INF("enter CycleTable::listEntries().");
+  std::string select_statement = "SELECT * FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "';";
+  this->__prepare_statement__(select_statement);
+
+  std::unordered_map<ID_t, Entry> entries;
+  int result = sqlite3_step(this->m_db_statement);
+  while (result == SQLITE_OK) {
+    ID_t id = sqlite3_column_int64(this->m_db_statement, 0);
+    DBG1("Read id [%lli] from  table ["%s"] of database ["%s"].",
+         id, this->m_table_name.c_str(), this->m_db_name.c_str());
+    const void* raw_name = reinterpret_cast<const char*>(
+        sqlite3_column_text(this->m_db_statement, 1));
+    WrappedString name(raw_name);
+    const void* raw_description = reinterpret_cast<const char*>(
+        sqlite3_column_text(this->m_db_statement, 2));
+    WrappedString description(raw_description);
+    MoneyValue_t balance = sqlite3_column_int64(this->m_db_statement, 3);
+    MoneyValue_t transaction = sqlite3_column_int64(this->m_db_statement, 4);
+    std::string date(reinterpret_cast<const char*>(
+        sqlite3_column_text(this->m_db_statement, 5)));
+    std::string time(reinterpret_cast<const char*>(
+        sqlite3_column_text(this->m_db_statement, 6)));
+    DateTime datetime(date, time);
+    sqlite3_int64 raw_status = sqlite3_column_int64(this->m_db_statement, 7);
+    RecordStatus status(raw_status);
+    DBG1("Loaded column data: Name ["%s"]; Description ["%s"]; Balance [%lli]; "
+         "Transaction [%lli]; Date ["%s"]; Time ["%s"]; Status [%lli].",
+         name.c_str(),
+         description.c_str(),
+         balance,
+         transaction,
+         datetime.getDate().c_str(),
+         datetime.getTime().c_str(),
+         raw_status);
+    Entry entry(id, name, description, balance, transaction, status, datetime);
+    DBG1("Proper entry instance has been constructed.");
+    entries[id] = entry;
+    DBG1("Entry has been inserted into map.");
+    result = sqlite3_step(this->m_db_statement);
+  }
+
+#if ENABLED_DB_CACHING
+  // TODO: caching the entry
+#endif
+
+  this->__finalize__(select_statement.c_str());
+  INF("exit CycleTable::listEntries().");
+  return (entries);
+}
+
 Entry CycleTable::updateEntry(
     const ID_t& i_entry_id,
     const MoneyValue_t& i_value,

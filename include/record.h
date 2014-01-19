@@ -25,10 +25,10 @@ namespace mw {
 class Record {
 public:
   Record(
-      const ID_t& id,
-      const MoneyValue_t& balance,
-      const WrappedString& description,
-      const RecordStatus& status,
+      const ID_t& id = -1,
+      const MoneyValue_t& balance = 0,
+      const WrappedString& description = "",
+      const RecordStatus& status = RecordStatusValue::RSV_UNKNOWN,
       const DateTime& datetime = DateTime());
   virtual ~Record();
 

@@ -42,7 +42,7 @@ public:
   /// @param name - Name of entry.
   /// @param description - Text description of last transaction.
   /// @param current_balace - Value of current money balance of entry.
-  /// @return Newly created entry.
+  /// @return Newly created entry.Records
   /// @details Entry will also be stored into SQLite database.
   Entry addEntry(
       const WrappedString& name,
@@ -53,6 +53,10 @@ public:
   /// @param entry_id - Primary key of entry of interest in SQLite database.
   /// @return Newly read entry.
   Entry readEntry(const ID_t& entry_id);
+
+  /// @brief Reads all entries from CycleTable.
+  /// @return Map with entries.
+  const std::unordered_map<ID_t, Entry> listEntries();
 
   /// @brief Updates current balance and description of existing entry.
   /// @param entry_id - Primary key of entry of interest in SQLite database.

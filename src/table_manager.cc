@@ -422,6 +422,25 @@ const std::string& TableManager::getPolicyTableName() const {
   return (this->m_policy_table.getName());
 }
 
+// ----------------------------------------------------------------------------
+const std::unordered_map<ID_t, Entry> TableManager::listCycleTable() {
+  INF("enter TableManager::listCycleTable().");
+  std::unordered_map<ID_t, Entry> entries = this->m_cycle_table.listEntries();
+  DBG3("Read all entries from table ["%s"], count: %llu.",
+       this->m_cycle_table.getName().c_str(), entries.size());
+  INF("exit TableManager::listCycleTable().");
+  return (entries);
+}
+
+const std::unordered_map<ID_t, Record> TableManager::listDailyTable() {
+  INF("enter TableManager::listDailyTable().");
+  std::unordered_map<ID_t, Record> records = this->m_daily_table.listRecords();
+  DBG3("Read all records from table ["%s"], count: %llu.",
+       this->m_daily_table.getName().c_str(), records.size());
+  INF("exit TableManager::listDailyTable().");
+  return (records);
+}
+
 
 /* Private members */
 // ----------------------------------------------------------------------------
