@@ -43,7 +43,6 @@ AC_CONFIG_FILES(Makefile
                 include/Makefile
                 sqlite3/Makefile
                 src/Makefile
-                main/src/Makefile
                 main/Makefile)
                 
 AC_SUBST([BUILD_CFLAGS])
@@ -141,20 +140,51 @@ AC_SUBST([MW_VAR_ENABLE_ADVANCED_DEBUG])
 
 #-----------------------------------------------------------------------
 #
+#   --disable-gui
+#
+AC_ARG_ENABLE(gui, [AS_HELP_STRING(
+  [--disable-gui],
+  [disable building graphic application, use console application instead (yes, no) [default=no]])],
+  [], [disable_gui=no])
+AS_IF([test "x$disable_gui" != "xno"],
+  [dnl Disable building graphic application
+  AC_MSG_NOTICE([Disabled building graphic application])
+])
+AS_IF([test "x$disable_gui" == "xno"],
+  [AC_MSG_NOTICE([Enabled building graphic application])
+])
+AM_CONDITIONAL([ENABLE_GUI], [test "x$disable_gui" == "xno"])
+AM_COND_IF([ENABLE_GUI], [dnl action-if-true
+    MW_VAR_ENABLE_GUI=true
+    MW_VAR_SUBDIR_APPLICATION=main/gui
+    AC_CONFIG_FILES(main/gui/Makefile
+    				main/gui/src/Makefile)
+    ], [dnl action-if-false
+    MW_VAR_ENABLE_GUI=false
+    MW_VAR_SUBDIR_APPLICATION=main/console
+    AC_CONFIG_FILES(main/console/Makefile
+    				main/console/src/Makefile)
+])
+AC_SUBST([MW_VAR_ENABLE_GUI])
+AC_SUBST([MW_VAR_SUBDIR_APPLICATION])
+#-----------------------------------------------------------------------
+
+#-----------------------------------------------------------------------
+#
 #   --disable-tests
 #
 AC_ARG_ENABLE(tests, [AS_HELP_STRING(
   [--disable-tests],
   [disable building unit-tests (yes, no) [default=no]])],
   [], [disable_tests=no])
-AS_IF([test "x$disable_tests" == "xyes"],
+AS_IF([test "x$disable_tests" != "xno"],
   [dnl Disable building unit-tests
   AC_MSG_NOTICE([Disabled building unit-tests])
 ])
-AS_IF([test "x$disable_tests" != "xyes"],
+AS_IF([test "x$disable_tests" == "xno"],
   [AC_MSG_NOTICE([Enabled building unit-tests])
 ])
-AM_CONDITIONAL([ENABLE_TESTS], [test "x$disable_tests" != "xyes"])
+AM_CONDITIONAL([ENABLE_TESTS], [test "x$disable_tests" == "xno"])
 AM_COND_IF([ENABLE_TESTS], [dnl action-if-true
     MW_VAR_ENABLE_TESTS=true
 	MW_VAR_SUBDIR_TESTS=tests
