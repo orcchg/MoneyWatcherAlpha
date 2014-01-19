@@ -27,6 +27,7 @@ private:
 
   void __banner__();
   void __show_menu__();
+  void __show_cycle_table_menu__();
   bool __list_cycle_table__();
   void __list_daily_table__();
   void __run_cycle_table_operations__();
