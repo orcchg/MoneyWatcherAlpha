@@ -11,7 +11,7 @@ lib_LTLIBRARIES = libmwengineapp.la
 libmwengineapp_la_SOURCES = engine.cc
 
 # Linker options libmwengineapp
-libmwengineapp_LDFLAGS =
+libmwengineapp_la_LDFLAGS =
 
 # Compiler options. Here we are adding the include directory
 # to be searched for headers included in the source code.
@@ -19,7 +19,7 @@ libmwengineapp_la_CPPFLAGS = -std=c++11 \
                              -fPIC \
                              -I$(top_srcdir)/include \
                              -I$(top_srcdir)/sqlite3 \
-                             -I$(top_srcdir)/main/include
+                             -I$(top_srcdir)/main/gui/include
 
 libmwengineapp_la_LIBADD = $(top_builddir)/src/libmoneywatcher.la \
 					       $(top_builddir)/sqlite3/libsqlite3formw.la
