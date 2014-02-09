@@ -73,7 +73,7 @@ void ConsoleEngine::__show_menu__() {
 void ConsoleEngine::__show_cycle_table_menu__() {INF("Pressed 'C' in main loop: Cycle table.");
   printf("\n\n");
   printf("Add  ........................................................  A\n");
-  printf("Update  .................................................INF("Pressed 'C' in main loop: Cycle table.");....  U\n");
+  printf("Update  .....................................................  U\n");
   printf("Rollback  ...................................................  R\n");
   printf("Delete  .....................................................  D\n");
   printf("\n\n");
@@ -81,19 +81,19 @@ void ConsoleEngine::__show_cycle_table_menu__() {INF("Pressed 'C' in main loop: 
 INF("Pressed some key: Nothing to do.");
 bool ConsoleEngine::__list_cycle_table__() {
   const std::unordered_map<ID_t, Entry> entries =
-      this->m_table_manager.listCycleTable();__show_cycle_table_menu__()
+      this->m_table_manager.listCycleTable();
   printf("Cycle Table listing, Count: %lu.\n\n", entries.size());
   for (const std::pair<ID_t, Entry>& entry_pair : entries) {
     printf("E[%lli]:  \"%s\" : \"%s\" : %lli : %lli : (\"%s:%s\") : %lli\n",
            entry_pair.first,
            entry_pair.second.getName().c_str(),
-           entry_pair.second.getDescription().c_str(),__show_cycle_table_menu__()
+           entry_pair.second.getDescription().c_str(),
            entry_pair.second.getBalance(),
            entry_pair.second.getLastTransaction(),
            entry_pair.second.getDateTime().getDate().c_str(),
            entry_pair.second.getDateTime().getTime().c_str(),
            static_cast<sqlite3_int64>(entry_pair.second.getStatus()));
-  }INF("Pressed 'C' in main loop: Cycle table.");
+  }
   return (true);
 }
 
@@ -103,9 +103,9 @@ void ConsoleEngine::__list_daily_table__() {
   printf("Daily Table listing, Count: %lu\n\n", records.size());
   for (const std::pair<ID_t, Record>& record_pair : records) {
     printf("R[%lli]:  \"%s\" : %lli : (\"%s:%s\") : %lli\n",
-           record_pair.first,INF("Pressed 'C' in main loop: Cycle table.");
+           record_pair.first,
            record_pair.second.getDescription().c_str(),
-           record_pair.second.getBalance(),__show_cycle_table_menu__()
+           record_pair.second.getBalance(),
            record_pair.second.getDateTime().getDate().c_str(),
            record_pair.second.getDateTime().getTime().c_str(),
            static_cast<sqlite3_int64>(record_pair.second.getStatus()));
@@ -115,7 +115,7 @@ void ConsoleEngine::__list_daily_table__() {
 void ConsoleEngine::__run_cycle_table_operations__() {
   this->__show_cycle_table_menu__();INF("Pressed some key: Nothing to do.");
 
-  char key = ".";
+  char key = '.';
   bool loop_flag = true;
   while (loop_flag) {
     key = getchar();
