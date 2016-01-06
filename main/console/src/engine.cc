@@ -52,14 +52,14 @@ void ConsoleEngine::run() {
 
 
 /* Private members */
-// --------------------------------------------------___show_cycle_table_menu__()_show_cycle_table_menu__()--------------------------
+// ----------------------------------------------------------------------------
 void ConsoleEngine::__banner__() {
   printf("\n\n");
   printf("****************************************************************\n");
   printf("*                                                              *\n");
-  printf("*            Money Watcher.  Version 1.0                       *\n");INF("Pressed 'C' in main loop: Cycle table.");
+  printf("*            Money Watcher.  Version 1.0                       *\n");
   printf("*                                                              *\n");
-  printf("***************************************************************__show_cycle_table_menu__()*\n");
+  printf("****************************************************************\n");
   printf("\n\n");
 }
 
